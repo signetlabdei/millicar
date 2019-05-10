@@ -7,10 +7,11 @@
 #     conf.check_nonfatal(header_name='stdint.h', define_name='HAVE_STDINT_H')
 
 def build(bld):
-    module = bld.create_ns3_module('mmwave-vehicular', ['core','propagation'])
+    module = bld.create_ns3_module('mmwave-vehicular', ['core', 'propagation', 'spectrum'])
     module.source = [
         'model/mmwave-vehicular.cc',
         'model/mmwave-vehicular-propagation-loss-model.cc',
+        'model/mmwave-vehicular-spectrum-propagation-loss-model.cc',
         'helper/mmwave-vehicular-helper.cc',
         ]
 
@@ -24,6 +25,7 @@ def build(bld):
     headers.source = [
         'model/mmwave-vehicular.h',
         'model/mmwave-vehicular-propagation-loss-model.h',
+        'model/mmwave-vehicular-spectrum-propagation-loss-model.h',
         'helper/mmwave-vehicular-helper.h',
         ]
 
@@ -31,4 +33,3 @@ def build(bld):
         bld.recurse('examples')
 
     # bld.ns3_python_bindings()
-

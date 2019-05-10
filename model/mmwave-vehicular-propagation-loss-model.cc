@@ -38,12 +38,20 @@ NS_LOG_COMPONENT_DEFINE ("MmWaveVehicularPropagationLossModel");
 
 NS_OBJECT_ENSURE_REGISTERED (MmWaveVehicularPropagationLossModel);
 
+static const double g_C = 299792458.0;   // speed of light in vacuum
+
 TypeId
 MmWaveVehicularPropagationLossModel::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::MmWaveVehicularPropagationLossModel")
     .SetParent<PropagationLossModel> ()
     .AddConstructor<MmWaveVehicularPropagationLossModel> ()
+    .AddAttribute ("Frequency",
+                   "Operating frequency in Hz.",
+                   DoubleValue (0.0),
+                   MakeDoubleAccessor (&MmWaveVehicularPropagationLossModel::SetFrequency,
+                                       &MmWaveVehicularPropagationLossModel::GetFrequency),
+                   MakeDoubleChecker<double> ())
     .AddAttribute ("MinLoss",
                    "The minimum value (dB) of the total loss, used at short ranges.",
                    DoubleValue (0.0),
@@ -101,6 +109,15 @@ MmWaveVehicularPropagationLossModel::GetMinLoss (void) const
   return m_minLoss;
 }
 
+void
+MmWaveVehicularPropagationLossModel::SetFrequency (double freq)
+{
+  NS_ASSERT_MSG (freq != 0.0, "Frequency cannot be set to 0.0!");
+
+  m_frequency = freq;
+  m_lambda = g_C / m_frequency;
+}
+
 double
 MmWaveVehicularPropagationLossModel::GetFrequency (void) const
 {
@@ -119,6 +136,7 @@ MmWaveVehicularPropagationLossModel::DoCalcRxPower (double txPowerDbm,
 double
 MmWaveVehicularPropagationLossModel::GetLoss (Ptr<MobilityModel> deviceA, Ptr<MobilityModel> deviceB) const
 {
+  NS_ASSERT_MSG (m_frequency != 0.0, "Set the operating frequency first!");
 
   Vector aPos = deviceA->GetPosition ();
   Vector bPos = deviceB->GetPosition ();
@@ -164,7 +182,7 @@ MmWaveVehicularPropagationLossModel::GetLoss (Ptr<MobilityModel> deviceA, Ptr<Mo
         {
           double PRef = m_uniformVar->GetValue ();
           double probLos, probnLos, probnLosv;
-          
+
           if (m_scenario == "V2V-Highway")
             {
               double a, b, c;
@@ -435,7 +453,7 @@ MmWaveVehicularPropagationLossModel::GetLoss (Ptr<MobilityModel> deviceA, Ptr<Mo
           double deltaX = aPos.x - (*it).second.m_position.x;
           double deltaY = aPos.y - (*it).second.m_position.y;
           double disDiff = sqrt (deltaX * deltaX + deltaY * deltaY);
-          double R = exp (-1 * disDiff / shadowingCorDistance);             
+          double R = exp (-1 * disDiff / shadowingCorDistance);
 
           cond.m_shadowing = R * (*it).second.m_shadowing + sqrt (1 - R * R) * m_norVar->GetValue () * shadowingStd;
         }
@@ -484,8 +502,8 @@ MmWaveVehicularPropagationLossModel::GetAdditionalNlosVLoss (double distance3D, 
     // Case 2: Maximum antenna height value of TX and RX < Blocker height
     mu_a = 9.0 + std::max (0.0, 15 * log10 (distance3D) - 41.0);
     sigma_a = 4.5;
-    // Pay attention to the ambiguous definition of the parameters. 
-    // Vehicular TR 37.885 defines mu_a and sigma_a as the mean and standard deviation of the log-normal random variable. 
+    // Pay attention to the ambiguous definition of the parameters.
+    // Vehicular TR 37.885 defines mu_a and sigma_a as the mean and standard deviation of the log-normal random variable.
     // ns-3's RNG considers mu and sigma as specific parameters of the log-normal distribution, while the mean and standard deviation are evaluated separately.
     m_logNorVar->SetAttribute ("Mu", DoubleValue (log(pow(mu_a,2) / sqrt(pow(sigma_a,2) + pow(mu_a,2)))));
     m_logNorVar->SetAttribute ("Sigma", DoubleValue (sqrt(log(pow(sigma_a,2) / pow(mu_a,2) + 1))));
@@ -496,8 +514,8 @@ MmWaveVehicularPropagationLossModel::GetAdditionalNlosVLoss (double distance3D, 
     // Case 3: Otherwise
     mu_a = 5.0 + std::max (0.0, 15 * log10 (distance3D) - 41.0);
     sigma_a = 4.0;
-    // Pay attention to the ambiguous definition of the parameters. 
-    // Vehicular TR 37.885 defines mu_a and sigma_a as the mean and standard deviation of the log-normal random variable. 
+    // Pay attention to the ambiguous definition of the parameters.
+    // Vehicular TR 37.885 defines mu_a and sigma_a as the mean and standard deviation of the log-normal random variable.
     // ns-3's RNG considers mu and sigma as specific parameters of the log-normal distribution, while the mean and standard deviation are evaluated separately.
     m_logNorVar->SetAttribute ("Mu", DoubleValue (log(pow(mu_a,2) / sqrt(pow(sigma_a,2) + pow(mu_a,2)))));
     m_logNorVar->SetAttribute ("Sigma", DoubleValue (sqrt(log(pow(sigma_a,2) / pow(mu_a,2) + 1))));
@@ -538,17 +556,6 @@ std::string
 MmWaveVehicularPropagationLossModel::GetScenario ()
 {
   return m_scenario;
-}
-
-void
-MmWaveVehicularPropagationLossModel::SetConfigurationParameters (Ptr<MmWavePhyMacCommon> ptrConfig)
-{
-  m_phyMacConfig = ptrConfig;
-  m_frequency = m_phyMacConfig->GetCenterFrequency ();
-  static const double C = 299792458.0;   // speed of light in vacuum
-  m_lambda = C / m_frequency;
-
-  NS_LOG_INFO ("Frequency " << m_frequency);
 }
 
 } // namespace mmwave

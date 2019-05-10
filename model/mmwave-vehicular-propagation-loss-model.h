@@ -39,7 +39,7 @@
 
 namespace ns3 {
 
-namespace mmwave { 
+namespace mmwave {
 
 struct channelCondition
 {
@@ -58,8 +58,6 @@ class MmWaveVehicularPropagationLossModel : public PropagationLossModel
     static TypeId GetTypeId (void);
     MmWaveVehicularPropagationLossModel ();
 
-    void SetConfigurationParameters (Ptr<MmWavePhyMacCommon> ptrConfig);
-
     /**
      * \param minLoss the minimum loss (dB)
      *
@@ -72,6 +70,11 @@ class MmWaveVehicularPropagationLossModel : public PropagationLossModel
      * \return the minimum loss.
      */
     double GetMinLoss (void) const;
+
+    /**
+     * \param freq the operating frequency (Hz)
+     */
+    void SetFrequency (double freq);
 
     /**
      * \returns the current frequency (Hz)
@@ -88,7 +91,7 @@ class MmWaveVehicularPropagationLossModel : public PropagationLossModel
 
     MmWaveVehicularPropagationLossModel (const MmWaveVehicularPropagationLossModel &o);
     MmWaveVehicularPropagationLossModel & operator = (const MmWaveVehicularPropagationLossModel &o);
-    
+
     virtual double DoCalcRxPower (double txPowerDbm,
                                   Ptr<MobilityModel> a,
                                   Ptr<MobilityModel> b) const;
@@ -104,8 +107,8 @@ class MmWaveVehicularPropagationLossModel : public PropagationLossModel
      */
     double GetAdditionalNlosVLoss (double distance3D, double hA, double hB) const;
 
-    double m_lambda;
     double m_frequency;
+    double m_lambda;
     double m_minLoss;
     mutable channelConditionMap_t m_channelConditionMap;
     std::string m_channelConditions;
@@ -115,7 +118,6 @@ class MmWaveVehicularPropagationLossModel : public PropagationLossModel
     Ptr<LogNormalRandomVariable> m_logNorVar;
     Ptr<UniformRandomVariable> m_uniformVar;
     bool m_shadowingEnabled;
-    Ptr<MmWavePhyMacCommon> m_phyMacConfig;
     double m_percType3Vehicles;
 };
 
