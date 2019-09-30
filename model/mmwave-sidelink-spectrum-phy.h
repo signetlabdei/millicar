@@ -138,12 +138,21 @@ public:
   Ptr<AntennaModel> GetRxAntenna ();
   void SetAntenna (Ptr<AntennaModel> a);
 
-  void SetState (State newState);
-
   void SetNoisePowerSpectralDensity (Ptr<const SpectrumValue> noisePsd);
   void SetTxPowerSpectralDensity (Ptr<SpectrumValue> TxPsd);
+
   void StartRx (Ptr<SpectrumSignalParameters> params);
-  void StartRxData (Ptr<MmwaveSpectrumSignalParametersDataFrame> params);
+
+  /**
+   * \brief Start receive data function
+   * \param params Ptr<MmWaveSidelinkSpectrumSignalParameters>
+   */
+  void StartRxData (Ptr<MmWaveSidelinkSpectrumSignalParameters> params);
+
+  /**
+   * \brief Start receive control function
+   * \param params Ptr<SpectrumSignalParameters>
+   */
   void StartRxCtrl (Ptr<SpectrumSignalParameters> params);
   Ptr<SpectrumChannel> GetSpectrumChannel ();
 

@@ -121,8 +121,6 @@ MmWaveSidelinkSpectrumPhy::Reset ()
   m_rxControlMessageList.clear ();
   m_expectedTbs.clear ();
   m_rxPacketBurstList.clear ();
-  //m_txPacketBurst = 0;
-  //m_rxSpectrumModel = 0;
 }
 
 void
@@ -177,12 +175,6 @@ void
 MmWaveSidelinkSpectrumPhy::SetAntenna (Ptr<AntennaModel> a)
 {
   m_antenna = a;
-}
-
-void
-MmWaveSidelinkSpectrumPhy::SetState (State newState)
-{
-  ChangeState (newState);
 }
 
 void
@@ -249,6 +241,7 @@ MmWaveSidelinkSpectrumPhy::StartRx (Ptr<SpectrumSignalParameters> params)
     {
       bool isAllocated = true;
 
+      // TODO this could be handled by a switch state machine implemented in this class
       // Ptr<mmwave::MmWaveUeNetDevice> ueRx = 0;
       // ueRx = DynamicCast<mmwave::MmWaveUeNetDevice> (GetDevice ());
       //
@@ -262,6 +255,11 @@ MmWaveSidelinkSpectrumPhy::StartRx (Ptr<SpectrumSignalParameters> params)
           m_interferenceData->AddSignal (mmwaveSidelinkParams->psd, mmwaveSidelinkParams->duration);
           StartRxData (mmwaveSidelinkParams);
         }
+    }
+    else
+    {
+      // other type of signal that needs to be counted as interference
+      m_interferenceData->AddSignal (params->psd, params->duration);
     }
 }
 
@@ -331,31 +329,23 @@ MmWaveSidelinkSpectrumPhy::StartRxCtrl (Ptr<SpectrumSignalParameters> params)
       NS_FATAL_ERROR ("Cannot RX data while receiving control");
       break;
     case RX_CTRL:
+      {
+        Ptr<MmWaveSidelinkSpectrumSignalParameters> sidelinkParams = DynamicCast<MmWaveSidelinkSpectrumSignalParameters> (params);
+        m_rxControlMessageList.insert (m_rxControlMessageList.end (), sidelinkParams->ctrlMsgList.begin (), sidelinkParams->ctrlMsgList.end ());
+        break;
+      } 
     case IDLE:
       {
-        // the behavior is similar when we're IDLE or RX because we can receive more signals
-        // simultaneously (e.g., at the eNB).
-        Ptr<MmWaveSidelinkSpectrumSignalParameters> sidelinkParams = DynamicCast<MmWaveSidelinkSpectrumSignalParameters> (params);
-        if (m_state == RX_CTRL)
-          {
-            NS_FATAL_ERROR ("TBD");
-          }
-        if (m_state == IDLE)
-          {
-            // first transmission, i.e., we're IDLE and we start RX
-            NS_ASSERT (m_rxControlMessageList.empty ());
-            m_firstRxStart = Simulator::Now ();
-            m_firstRxDuration = params->duration;
-            NS_LOG_LOGIC (this << " scheduling EndRx with delay " << params->duration);
-            // store the DCIs
-            m_rxControlMessageList = sidelinkParams->ctrlMsgList;
-            m_endRxDlCtrlEvent = Simulator::Schedule (params->duration, &MmWaveSidelinkSpectrumPhy::EndRxCtrl, this);
-            ChangeState (RX_CTRL);
-          }
-        else
-          {
-            m_rxControlMessageList.insert (m_rxControlMessageList.end (), sidelinkParams->ctrlMsgList.begin (), sidelinkParams->ctrlMsgList.end ());
-          }
+        // first transmission, i.e., we're IDLE and we start RX
+        NS_ASSERT (m_rxControlMessageList.empty ());
+        m_firstRxStart = Simulator::Now ();
+        m_firstRxDuration = params->duration;
+        NS_LOG_LOGIC (this << " scheduling EndRx with delay " << params->duration);
+
+        // store the DCIs
+        m_rxControlMessageList = sidelinkParams->ctrlMsgList;
+        m_endRxDlCtrlEvent = Simulator::Schedule (params->duration, &MmWaveSidelinkSpectrumPhy::EndRxCtrl, this);
+        ChangeState (RX_CTRL);
         break;
       }
     default:
@@ -369,18 +359,6 @@ MmWaveSidelinkSpectrumPhy::EndRxData ()
   m_interferenceData->EndRx ();
 
   double sinrAvg = Sum (m_sinrPerceived) / (m_sinrPerceived.GetSpectrumModel ()->GetNumBands ());
-  double sinrMin = 99999999999;
-  for (Values::const_iterator it = m_sinrPerceived.ConstValuesBegin (); it != m_sinrPerceived.ConstValuesEnd (); it++)
-    {
-      if (*it < sinrMin)
-        {
-          sinrMin = *it;
-        }
-    }
-
-  Ptr<MmWaveEnbNetDevice> enbRx = DynamicCast<MmWaveEnbNetDevice> (GetDevice ());
-  Ptr<mmwave::MmWaveUeNetDevice> ueRx = DynamicCast<mmwave::MmWaveUeNetDevice> (GetDevice ());
-  Ptr<McUeNetDevice> rxMcUe = DynamicCast<McUeNetDevice> (GetDevice ());
 
   NS_ASSERT (m_state = RX_DATA);
   ExpectedTbMap_t::iterator itTb = m_expectedTbs.begin ();
@@ -429,53 +407,6 @@ MmWaveSidelinkSpectrumPhy::EndRxData ()
                 {
                   NS_LOG_INFO ("TB failed");
                 }
-
-              MmWaveMacPduTag pduTag;
-              if ((*j)->PeekPacketTag (pduTag) == false)
-                {
-                  NS_FATAL_ERROR ("No radio bearer tag found");
-                }
-
-              RxPacketTraceParams traceParams;
-              traceParams.m_tbSize = itTb->second.size;
-              traceParams.m_frameNum = pduTag.GetSfn ().m_frameNum;
-              traceParams.m_sfNum = pduTag.GetSfn ().m_sfNum;
-              traceParams.m_slotNum = pduTag.GetSfn ().m_slotNum;
-              traceParams.m_rnti = rnti;
-              traceParams.m_mcs = itTb->second.mcs;
-              traceParams.m_rv = itTb->second.rv;
-              traceParams.m_sinr = sinrAvg;
-              traceParams.m_sinrMin = itTb->second.mi;                  //sinrMin;
-              traceParams.m_tbler = itTb->second.tbler;
-              traceParams.m_corrupt = itTb->second.corrupt;
-              traceParams.m_symStart = itTb->second.symStart;
-              traceParams.m_numSym = itTb->second.numSym;
-              traceParams.m_ccId = m_componentCarrierId;
-
-              // if (enbRx)
-              //   {
-              //     //traceParams.m_cellId = enbRx->GetCellId(); //now m_cellId is set correctly
-              //     m_rxPacketTraceEnb (traceParams);
-              //   }
-              // else if (ueRx)
-              //   {
-              //
-              //     //traceParams.m_cellId = ueRx->GetTargetEnb()->GetCellId(); //now m_cellId is set correctly
-              //     m_rxPacketTraceUe (traceParams);
-              //   }
-              // else if (rxMcUe)
-              //   {
-              //     Ptr<McUeNetDevice> mcUe = DynamicCast<McUeNetDevice> (ueRx);
-              //     if (mcUe != 0)
-              //       {
-              //         Ptr<MmWaveEnbNetDevice> mmWaveEnb = mcUe->GetMmWaveTargetEnb ();
-              //         if (mmWaveEnb != 0)
-              //           {
-              //             //traceParams.m_cellId = mmWaveEnb->GetCellId(); //now m_cellId is set correctly
-              //           }
-              //       }
-              //     m_rxPacketTraceUe (traceParams);                       // TODO consider a different trace for MC UE
-              //   }
             }
         }
     }
