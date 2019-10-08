@@ -114,7 +114,7 @@ MmWaveSidelinkSpectrumPhy::Reset ()
   m_state = IDLE;
   m_endTxEvent.Cancel ();
   m_endRxDataEvent.Cancel ();
-  m_endRxCtrlEvent.Cancel ();
+  //m_endRxCtrlEvent.Cancel ();
   //m_rxControlMessageList.clear ();
   m_rxTransportBlock.clear ();
 }
@@ -201,11 +201,11 @@ MmWaveSidelinkSpectrumPhy::SetPhyRxDataEndOkCallback (MmWavePhyRxDataEndOkCallba
   m_phyRxDataEndOkCallback = c;
 }
 
-void
-MmWaveSidelinkSpectrumPhy::SetPhyRxCtrlEndOkCallback (MmWavePhyRxCtrlEndOkCallback c)
-{
-  m_phyRxCtrlEndOkCallback = c;
-}
+// void
+// MmWaveSidelinkSpectrumPhy::SetPhyRxCtrlEndOkCallback (MmWavePhyRxCtrlEndOkCallback c)
+// {
+//   m_phyRxCtrlEndOkCallback = c;
+// }
 
 void
 MmWaveSidelinkSpectrumPhy::StartRx (Ptr<SpectrumSignalParameters> params)
@@ -345,7 +345,9 @@ MmWaveSidelinkSpectrumPhy::EndRxData ()
     for (std::list<TbInfo_t>::const_iterator i = m_rxTransportBlock.begin ();
          i != m_rxTransportBlock.end (); ++i)
      {
-       std::vector <MmWaveHarqProcessInfoElement_t> harqInfoList; // add comment on why we do this
+       // Here we need to initialize an empty harqInfoList since it is mandatory input
+       // for the method. Since the vector is empty, no harq procedures are triggeres (as we want)
+       std::vector <MmWaveHarqProcessInfoElement_t> harqInfoList;
        MmWaveTbStats_t tbStats = MmWaveMiErrorModel::GetTbDecodificationStats (m_sinrPerceived, (*i).rbBitmap, (*i).size, (*i).mcs, harqInfoList);
        bool corrupt = m_random->GetValue () > tbStats.tbler ? false : true;
        if(!corrupt)
@@ -402,7 +404,6 @@ MmWaveSidelinkSpectrumPhy::EndRxData ()
 
 bool
 MmWaveSidelinkSpectrumPhy::StartTxDataFrames (Ptr<PacketBurst> pb,
-  std::list<Ptr<MmWaveControlMessage> > ctrlMsgList,
   Time duration,
   uint8_t slotInd,
   uint8_t mcs,

@@ -44,21 +44,39 @@ namespace mmwave {
 
 struct TbInfo_t
 {
-  Ptr<PacketBurst> packetBurst;
-  uint32_t size;
-  uint8_t mcs;
-  std::vector<int> rbBitmap;
+  Ptr<PacketBurst> packetBurst; ///< Packet burst associated to the transport block
+  uint32_t size; ///< Transport block size
+  uint8_t mcs; ///< MCS
+  std::vector<int> rbBitmap; ///< Resource block bitmap
 };
 
+/**
+* This method is used by the MmWaveSidelinkSpectrumPhy to notify the PHY that a
+* previously started RX attempt has been successfully completed.
+*
+* @param packet the received Packet
+*/
 typedef Callback< void, Ptr<Packet> > MmWavePhyRxDataEndOkCallback;
-typedef Callback< void, std::list<Ptr<MmWaveControlMessage> > > MmWavePhyRxCtrlEndOkCallback;
 
+//typedef Callback< void, std::list<Ptr<MmWaveControlMessage> > > MmWavePhyRxCtrlEndOkCallback;
+
+/**
+ * \ingroup mmwave
+ * \class MmWaveSidelinkSpectrumPhy
+ *
+ * The MmWaveSidelinkSpectrumPhy models the physical layer of sidelink mode of vehicular
+ * networks exploiting mmwave band.
+ *
+ */
 class MmWaveSidelinkSpectrumPhy : public SpectrumPhy
 {
 public:
   MmWaveSidelinkSpectrumPhy ();
   virtual ~MmWaveSidelinkSpectrumPhy ();
 
+  /**
+   *  PHY states
+   */
   enum State
   {
     IDLE = 0,
@@ -127,6 +145,12 @@ public:
    * @return a Ptr to the AntennaModel used by the NetDevice for reception
    */
   Ptr<AntennaModel> GetRxAntenna ();
+
+  /**
+   * set the AntennaModel to be used
+   *
+   * \param a the Antenna Model
+   */
   void SetAntenna (Ptr<AntennaModel> a);
 
   void SetNoisePowerSpectralDensity (Ptr<const SpectrumValue> noisePsd);
@@ -145,81 +169,103 @@ public:
    * \param params Ptr<SpectrumSignalParameters>
    */
   //void StartRxCtrl (Ptr<SpectrumSignalParameters> params);
+
   Ptr<SpectrumChannel> GetSpectrumChannel ();
 
   void SetComponentCarrierId (uint8_t componentCarrierId);
 
-  bool StartTxDataFrames (Ptr<PacketBurst> pb, std::list<Ptr<MmWaveControlMessage> > ctrlMsgList, Time duration, uint8_t slotInd, uint8_t mcs, uint32_t size, std::vector<int> rbBitmap);
+  /**
+  * Start a transmission of data frame in sidelink
+  *
+  * @param pb the burst of packets to be transmitted
+  * @param duration the duration of the data frame
+  *
+  * @return true if an error occurred and the transmission was not
+  * started, false otherwise.
+  */
+  bool StartTxDataFrames (Ptr<PacketBurst> pb, Time duration, uint8_t slotInd, uint8_t mcs, uint32_t size, std::vector<int> rbBitmap);
 
   //bool StartTxControlFrames (std::list<Ptr<MmWaveControlMessage> > ctrlMsgList, Time duration);       // control frames from enb to ue
 
+  /**
+  * set the callback for the successful end of a RX ctrl frame, as part
+  * of the interconnections between the MmWaveSidelinkSpectrumPhy and the PHY
+  *
+  * @param c the callback
+  */
   void SetPhyRxDataEndOkCallback (MmWavePhyRxDataEndOkCallback c);
-  void SetPhyRxCtrlEndOkCallback (MmWavePhyRxCtrlEndOkCallback c);
 
-  void AddDataPowerChunkProcessor (Ptr<mmWaveChunkProcessor> p);
-  void AddDataSinrChunkProcessor (Ptr<mmWaveChunkProcessor> p);
-
-  void UpdateSinrPerceived (const SpectrumValue& sinr);
+  //void SetPhyRxCtrlEndOkCallback (MmWavePhyRxCtrlEndOkCallback c);
 
   /**
-   * Add the transport block that the spectrum should expect to receive.
-   *
-   * \param rnti the RNTI of the UE
-   * \param ndi the New Data Indicator
-   * \param tbSize the size of the transport block
-   * \param mcs the modulation and coding scheme to use
-   * \param map a map of the resource blocks used
-   * \param rv the number of retransmissions
-   * \param symStart the first symbol of this TB
-   * \param numSym the number of symbols of the TB
-   */
-  void AddExpectedTb (uint16_t rnti, uint8_t ndi, uint32_t tbSize, uint8_t mcs, std::vector<int> map,
-                      uint8_t rv, uint8_t symStart, uint8_t numSym);
+  *
+  *
+  * \param p the new ChunkProcessor to be added to the Data Channel power processing chain
+  */
+  void AddDataPowerChunkProcessor (Ptr<mmWaveChunkProcessor> p);
+
+  /**
+  *
+  *
+  * \param p the new ChunkProcessor to be added to the data processing chain
+  */
+  void AddDataSinrChunkProcessor (Ptr<mmWaveChunkProcessor> p);
+
+  /**
+  *
+  *
+  * \param sinr vector of sinr perceived per each RB
+  */
+  void UpdateSinrPerceived (const SpectrumValue& sinr);
 
 private:
+  /**
+  * \brief Change state function
+  *
+  * \param newState the new state to set
+  */
   void ChangeState (State newState);
+  /// End transmit data function
   void EndTx ();
+  /// End receive data function
   void EndRxData ();
   //void EndRxCtrl ();
 
-  Ptr<mmWaveInterference> m_interferenceData;
-  Ptr<MobilityModel> m_mobility;
-  Ptr<NetDevice> m_device;
-  Ptr<SpectrumChannel> m_channel;
-  Ptr<const SpectrumModel> m_rxSpectrumModel;
-  Ptr<SpectrumValue> m_txPsd;
+  Ptr<mmWaveInterference> m_interferenceData; ///< the data interference
+  Ptr<MobilityModel> m_mobility; ///< the modility model
+  Ptr<NetDevice> m_device; ///< the device
+  Ptr<SpectrumChannel> m_channel; ///< the channel
+  Ptr<const SpectrumModel> m_rxSpectrumModel; ///< the spectrum model
+  Ptr<SpectrumValue> m_txPsd; ///< the transmit PSD
   //Ptr<PacketBurst> m_txPacketBurst;
 
-  std::list<TbInfo_t> m_rxTransportBlock;
+  std::list<TbInfo_t> m_rxTransportBlock; ///< the received with associated structure
 
   // Should it be MmWaveSidelinkControlMessage?
   //std::list<Ptr<MmWaveControlMessage> > m_rxControlMessageList;
 
-  Time m_firstRxStart;
-  Time m_firstRxDuration;
+  Time m_firstRxStart; ///< the first receive start
+  Time m_firstRxDuration; ///< the first receive duration
 
-  Ptr<AntennaModel> m_antenna;
+  Ptr<AntennaModel> m_antenna; ///< the antenna model
 
-  State m_state;
+  State m_state; ///< the state
 
   uint8_t m_componentCarrierId; ///< the component carrier ID
 
-  MmWavePhyRxCtrlEndOkCallback m_phyRxCtrlEndOkCallback;
-  MmWavePhyRxDataEndOkCallback m_phyRxDataEndOkCallback;
+  //MmWavePhyRxCtrlEndOkCallback m_phyRxCtrlEndOkCallback;
+  MmWavePhyRxDataEndOkCallback m_phyRxDataEndOkCallback;  ///< the mmwave sidelink phy receive data end ok callback
 
-  TracedCallback<RxPacketTraceParams> m_rxPacketTraceEnb;
-  TracedCallback<RxPacketTraceParams> m_rxPacketTraceUe;
-
-  SpectrumValue m_sinrPerceived;
+  SpectrumValue m_sinrPerceived; ///< the perceived SINR
 
   Ptr<UniformRandomVariable> m_random;
 
-  bool m_dataErrorModelEnabled;       // when true (default) the phy error model is enabled
-  bool m_ctrlErrorModelEnabled;       // when true (default) the phy error model is enabled for DL ctrl frame
+  bool m_dataErrorModelEnabled; ///< when true (default) the phy error model is enabled
+  bool m_ctrlErrorModelEnabled; ///< when true (default) the phy error model is enabled for DL ctrl frame
 
-  EventId m_endTxEvent;
-  EventId m_endRxDataEvent;
-  EventId m_endRxCtrlEvent;
+  EventId m_endTxEvent; ///< end transmit event
+  EventId m_endRxDataEvent; ///< end receive data event
+  //EventId m_endRxCtrlEvent;
 
 };
 
