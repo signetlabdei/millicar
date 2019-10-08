@@ -25,16 +25,16 @@
 
 namespace ns3 {
 
-NS_LOG_COMPONENT_DEFINE ("MmwaveSidelinkSpectrumSignalParameters");
+NS_LOG_COMPONENT_DEFINE ("MmWaveSidelinkSpectrumSignalParameters");
 
 namespace mmwave {
 
-MmwaveSidelinkSpectrumSignalParameters::mmwaveSidelinkSpectrumSignalParameters ()
+MmWaveSidelinkSpectrumSignalParameters::MmWaveSidelinkSpectrumSignalParameters ()
 {
   NS_LOG_FUNCTION (this);
 }
 
-MmwaveSidelinkSpectrumSignalParameters::mmwaveSidelinkSpectrumSignalParameters (const MmwaveSidelinkSpectrumSignalParameters& p)
+MmWaveSidelinkSpectrumSignalParameters::MmWaveSidelinkSpectrumSignalParameters (const MmWaveSidelinkSpectrumSignalParameters& p)
   : SpectrumSignalParameters (p)
 {
   NS_LOG_FUNCTION (this << &p);
@@ -42,12 +42,12 @@ MmwaveSidelinkSpectrumSignalParameters::mmwaveSidelinkSpectrumSignalParameters (
     {
       packetBurst = p.packetBurst->Copy ();
     }
-  ctrlMsgList = p.ctrlMsgList;
+  //ctrlMsgList = p.ctrlMsgList;
   pss = p.pss;
 }
 
 Ptr<SpectrumSignalParameters>
-MmwaveSidelinkSpectrumSignalParameters::Copy ()
+MmWaveSidelinkSpectrumSignalParameters::Copy ()
 {
   NS_LOG_FUNCTION (this);
   // Ideally we would use:
@@ -56,7 +56,7 @@ MmwaveSidelinkSpectrumSignalParameters::Copy ()
   //   return Copy<mmwaveSpectrumSignalParameters> (this);
   // but it causes a double creation of the object, hence it is less efficient.
   // The solution below is copied from the implementation of Copy<> (Ptr<>) in ptr.h
-  Ptr<MmwaveSidelinkSpectrumSignalParameters> lssp (new MmwaveSidelinkSpectrumSignalParameters (*this), false);
+  Ptr<MmWaveSidelinkSpectrumSignalParameters> lssp (new MmWaveSidelinkSpectrumSignalParameters (*this), false);
   return lssp;
 }
 

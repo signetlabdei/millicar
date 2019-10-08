@@ -31,7 +31,7 @@ namespace mmwave {
 
 class MmWaveSidelinkControlMessage;
 
-struct MmwaveSidelinkSpectrumSignalParameter : public SpectrumSignalParameters
+struct MmWaveSidelinkSpectrumSignalParameters : public SpectrumSignalParameters
 {
 
   // inherited from SpectrumSignalParameters
@@ -40,18 +40,24 @@ struct MmwaveSidelinkSpectrumSignalParameter : public SpectrumSignalParameters
   /**
   * default constructor
   */
-  MmwaveSidelinkSpectrumSignalParameters ();
+  MmWaveSidelinkSpectrumSignalParameters ();
 
   /**
   * copy constructor
   */
-  MmwaveSidelinkSpectrumSignalParameters (const MmwaveSidelinkSpectrumSignalParameters& p);
+  MmWaveSidelinkSpectrumSignalParameters (const MmWaveSidelinkSpectrumSignalParameters& p);
 
   Ptr<PacketBurst> packetBurst;
 
-  std::list<Ptr<MmWaveSidelinkControlMessage>> ctrlMsgList;
+  //std::list<Ptr<MmWaveSidelinkControlMessage>> ctrlMsgList;
 
   uint8_t slotInd;
+
+  uint8_t mcs; ///< the modulation and coding scheme index to be used to transmit the transport block
+
+  uint32_t size; ///< the size of the corresponding transport block
+
+  std::vector<int> rbBitmap; ///< the resource blocks bitmap associated to the transport block
 
   bool pss;
 

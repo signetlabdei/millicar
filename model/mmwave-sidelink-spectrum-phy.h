@@ -35,29 +35,20 @@
 #include "mmwave-sidelink-spectrum-signal-parameters.h"
 #include "ns3/random-variable-stream.h"
 #include "ns3/mmwave-beamforming.h"
-#include "mmwave-interference.h"
-#include "mmwave-control-messages.h"
+#include "ns3/mmwave-interference.h"
+#include "ns3/mmwave-control-messages.h"
 
 namespace ns3 {
 
 namespace mmwave {
 
-struct ExpectedTbInfo_t
+struct TbInfo_t
 {
-  uint8_t ndi;
+  Ptr<PacketBurst> packetBurst;
   uint32_t size;
   uint8_t mcs;
   std::vector<int> rbBitmap;
-  uint8_t rv;
-  double mi;
-  bool downlink;
-  bool corrupt;
-  double tbler;
-  uint8_t               symStart;
-  uint8_t               numSym;
 };
-
-typedef std::map<uint16_t, ExpectedTbInfo_t> ExpectedTbMap_t;
 
 typedef Callback< void, Ptr<Packet> > MmWavePhyRxDataEndOkCallback;
 typedef Callback< void, std::list<Ptr<MmWaveControlMessage> > > MmWavePhyRxCtrlEndOkCallback;
@@ -153,14 +144,14 @@ public:
    * \brief Start receive control function
    * \param params Ptr<SpectrumSignalParameters>
    */
-  void StartRxCtrl (Ptr<SpectrumSignalParameters> params);
+  //void StartRxCtrl (Ptr<SpectrumSignalParameters> params);
   Ptr<SpectrumChannel> GetSpectrumChannel ();
 
   void SetComponentCarrierId (uint8_t componentCarrierId);
 
-  bool StartTxDataFrames (Ptr<PacketBurst> pb, std::list<Ptr<MmWaveControlMessage> > ctrlMsgList, Time duration, uint8_t slotInd);
+  bool StartTxDataFrames (Ptr<PacketBurst> pb, std::list<Ptr<MmWaveControlMessage> > ctrlMsgList, Time duration, uint8_t slotInd, uint8_t mcs, uint32_t size, std::vector<int> rbBitmap);
 
-  bool StartTxControlFrames (std::list<Ptr<MmWaveControlMessage> > ctrlMsgList, Time duration);       // control frames from enb to ue
+  //bool StartTxControlFrames (std::list<Ptr<MmWaveControlMessage> > ctrlMsgList, Time duration);       // control frames from enb to ue
 
   void SetPhyRxDataEndOkCallback (MmWavePhyRxDataEndOkCallback c);
   void SetPhyRxCtrlEndOkCallback (MmWavePhyRxCtrlEndOkCallback c);
@@ -189,7 +180,7 @@ private:
   void ChangeState (State newState);
   void EndTx ();
   void EndRxData ();
-  void EndRxCtrl ();
+  //void EndRxCtrl ();
 
   Ptr<mmWaveInterference> m_interferenceData;
   Ptr<MobilityModel> m_mobility;
@@ -198,10 +189,11 @@ private:
   Ptr<const SpectrumModel> m_rxSpectrumModel;
   Ptr<SpectrumValue> m_txPsd;
   //Ptr<PacketBurst> m_txPacketBurst;
-  std::list<Ptr<PacketBurst> > m_rxPacketBurstList;
+
+  std::list<TbInfo_t> m_rxTransportBlock;
 
   // Should it be MmWaveSidelinkControlMessage?
-  std::list<Ptr<MmWaveControlMessage> > m_rxControlMessageList;
+  //std::list<Ptr<MmWaveControlMessage> > m_rxControlMessageList;
 
   Time m_firstRxStart;
   Time m_firstRxDuration;
@@ -219,8 +211,6 @@ private:
   TracedCallback<RxPacketTraceParams> m_rxPacketTraceUe;
 
   SpectrumValue m_sinrPerceived;
-
-  ExpectedTbMap_t m_expectedTbs;
 
   Ptr<UniformRandomVariable> m_random;
 

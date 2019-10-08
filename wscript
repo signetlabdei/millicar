@@ -12,6 +12,8 @@ def build(bld):
         'model/mmwave-vehicular.cc',
         'model/mmwave-vehicular-propagation-loss-model.cc',
         'model/mmwave-vehicular-spectrum-propagation-loss-model.cc',
+        'model/mmwave-sidelink-spectrum-phy.cc',
+        'model/mmwave-sidelink-spectrum-signal-parameters.cc',
         'helper/mmwave-vehicular-helper.cc',
         ]
 
@@ -26,6 +28,8 @@ def build(bld):
         'model/mmwave-vehicular.h',
         'model/mmwave-vehicular-propagation-loss-model.h',
         'model/mmwave-vehicular-spectrum-propagation-loss-model.h',
+        'model/mmwave-sidelink-spectrum-phy.h',
+        'model/mmwave-sidelink-spectrum-signal-parameters.h',
         'helper/mmwave-vehicular-helper.h',
         ]
 

@@ -25,13 +25,10 @@
 #include <ns3/trace-source-accessor.h>
 #include <ns3/antenna-model.h>
 #include "mmwave-sidelink-spectrum-phy.h"
-#include "mmwave-phy-mac-common.h"
-#include <ns3/mmwave-ue-phy.h>
-#include "mmwave-radio-bearer-tag.h"
+#include "mmwave-sidelink-spectrum-signal-parameters.h"
 #include <stdio.h>
 #include <ns3/double.h>
 #include <ns3/mmwave-mi-error-model.h>
-#include "mmwave-mac-pdu-tag.h"
 
 namespace ns3 {
 
@@ -118,9 +115,8 @@ MmWaveSidelinkSpectrumPhy::Reset ()
   m_endTxEvent.Cancel ();
   m_endRxDataEvent.Cancel ();
   m_endRxCtrlEvent.Cancel ();
-  m_rxControlMessageList.clear ();
-  m_expectedTbs.clear ();
-  m_rxPacketBurstList.clear ();
+  //m_rxControlMessageList.clear ();
+  m_rxTransportBlock.clear ();
 }
 
 void
@@ -212,23 +208,6 @@ MmWaveSidelinkSpectrumPhy::SetPhyRxCtrlEndOkCallback (MmWavePhyRxCtrlEndOkCallba
 }
 
 void
-MmWaveSidelinkSpectrumPhy::AddExpectedTb (uint16_t rnti, uint8_t ndi, uint32_t tbSize, uint8_t mcs,
-                                  std::vector<int> chunkMap, uint8_t rv,
-                                  uint8_t symStart, uint8_t numSym)
-{
-  ExpectedTbMap_t::iterator it;
-  it = m_expectedTbs.find (rnti);
-
-  if (it != m_expectedTbs.end ())
-    {
-      m_expectedTbs.erase (it);
-    }
-
-  ExpectedTbInfo_t tbInfo = {ndi, tbSize, mcs, chunkMap, rv, 0.0, false, false, 0, symStart, numSym};
-  m_expectedTbs.insert (std::pair<uint16_t, ExpectedTbInfo_t> (rnti,tbInfo));
-}
-
-void
 MmWaveSidelinkSpectrumPhy::StartRx (Ptr<SpectrumSignalParameters> params)
 {
 
@@ -281,7 +260,7 @@ MmWaveSidelinkSpectrumPhy::StartRxData (Ptr<MmWaveSidelinkSpectrumSignalParamete
     case RX_DATA:
     case IDLE:
       {
-        if (m_rxPacketBurstList.empty ())
+        if (m_rxTransportBlock.empty ())
           {
             NS_ASSERT (m_state == IDLE);
             // first transmission, i.e., we're IDLE and we start RX
@@ -304,11 +283,10 @@ MmWaveSidelinkSpectrumPhy::StartRxData (Ptr<MmWaveSidelinkSpectrumSignalParamete
         ChangeState (RX_DATA);
         if (params->packetBurst && !params->packetBurst->GetPackets ().empty ())
           {
-            m_rxPacketBurstList.push_back (params->packetBurst);
+            TbInfo_t tbInfo = {params->packetBurst, params->size, params->mcs, params->rbBitmap};
+            m_rxTransportBlock.push_back (tbInfo);
           }
-        m_rxControlMessageList.insert (m_rxControlMessageList.end (), params->ctrlMsgList.begin (), params->ctrlMsgList.end ());
-
-        NS_LOG_LOGIC (this << " numSimultaneousRxEvents = " << m_rxPacketBurstList.size ());
+        //m_rxControlMessageList.insert (m_rxControlMessageList.end (), params->ctrlMsgList.begin (), params->ctrlMsgList.end ());
       }
       break;
     default:
@@ -316,135 +294,120 @@ MmWaveSidelinkSpectrumPhy::StartRxData (Ptr<MmWaveSidelinkSpectrumSignalParamete
     }
 }
 
-void
-MmWaveSidelinkSpectrumPhy::StartRxCtrl (Ptr<SpectrumSignalParameters> params)
-{
-  NS_LOG_FUNCTION (this);
-  switch (m_state)
-    {
-    case TX:
-      NS_FATAL_ERROR ("Cannot RX while TX");
-      break;
-    case RX_DATA:
-      NS_FATAL_ERROR ("Cannot RX data while receiving control");
-      break;
-    case RX_CTRL:
-      {
-        Ptr<MmWaveSidelinkSpectrumSignalParameters> sidelinkParams = DynamicCast<MmWaveSidelinkSpectrumSignalParameters> (params);
-        m_rxControlMessageList.insert (m_rxControlMessageList.end (), sidelinkParams->ctrlMsgList.begin (), sidelinkParams->ctrlMsgList.end ());
-        break;
-      } 
-    case IDLE:
-      {
-        // first transmission, i.e., we're IDLE and we start RX
-        NS_ASSERT (m_rxControlMessageList.empty ());
-        m_firstRxStart = Simulator::Now ();
-        m_firstRxDuration = params->duration;
-        NS_LOG_LOGIC (this << " scheduling EndRx with delay " << params->duration);
-
-        // store the DCIs
-        m_rxControlMessageList = sidelinkParams->ctrlMsgList;
-        m_endRxDlCtrlEvent = Simulator::Schedule (params->duration, &MmWaveSidelinkSpectrumPhy::EndRxCtrl, this);
-        ChangeState (RX_CTRL);
-        break;
-      }
-    default:
-      NS_FATAL_ERROR ("Programming Error: Unknown State");
-    }
-}
+// void
+// MmWaveSidelinkSpectrumPhy::StartRxCtrl (Ptr<SpectrumSignalParameters> params)
+// {
+//   NS_LOG_FUNCTION (this);
+//   switch (m_state)
+//     {
+//     case TX:
+//       NS_FATAL_ERROR ("Cannot RX while TX");
+//       break;
+//     case RX_DATA:
+//       NS_FATAL_ERROR ("Cannot RX data while receiving control");
+//       break;
+//     case RX_CTRL:
+//       {
+//         Ptr<MmWaveSidelinkSpectrumSignalParameters> sidelinkParams = DynamicCast<MmWaveSidelinkSpectrumSignalParameters> (params);
+//         m_rxControlMessageList.insert (m_rxControlMessageList.end (), sidelinkParams->ctrlMsgList.begin (), sidelinkParams->ctrlMsgList.end ());
+//         break;
+//       }
+//     case IDLE:
+//       {
+//         // first transmission, i.e., we're IDLE and we start RX
+//         NS_ASSERT (m_rxControlMessageList.empty ());
+//         m_firstRxStart = Simulator::Now ();
+//         m_firstRxDuration = params->duration;
+//         NS_LOG_LOGIC (this << " scheduling EndRx with delay " << params->duration);
+//
+//         // store the DCIs
+//         m_rxControlMessageList = sidelinkParams->ctrlMsgList;
+//         m_endRxDlCtrlEvent = Simulator::Schedule (params->duration, &MmWaveSidelinkSpectrumPhy::EndRxCtrl, this);
+//         ChangeState (RX_CTRL);
+//         break;
+//       }
+//     default:
+//       NS_FATAL_ERROR ("Programming Error: Unknown State");
+//     }
+// }
 
 void
 MmWaveSidelinkSpectrumPhy::EndRxData ()
 {
   m_interferenceData->EndRx ();
 
-  double sinrAvg = Sum (m_sinrPerceived) / (m_sinrPerceived.GetSpectrumModel ()->GetNumBands ());
+  //double sinrAvg = Sum (m_sinrPerceived) / (m_sinrPerceived.GetSpectrumModel ()->GetNumBands ());
 
   NS_ASSERT (m_state = RX_DATA);
-  ExpectedTbMap_t::iterator itTb = m_expectedTbs.begin ();
-  while (itTb != m_expectedTbs.end ())
-    {
-      if ((m_dataErrorModelEnabled)&&(m_rxPacketBurstList.size () > 0))
-        {
 
-          MmWaveTbStats_t tbStats = MmWaveMiErrorModel::GetTbDecodificationStats (m_sinrPerceived,
-                                                                                  itTb->second.rbBitmap, itTb->second.size, itTb->second.mcs, harqInfoList);
-          itTb->second.tbler = tbStats.tbler;
-          itTb->second.mi = tbStats.miTotal;
-          itTb->second.corrupt = m_random->GetValue () > tbStats.tbler ? false : true;
-          if (itTb->second.corrupt)
-            {
-              NS_LOG_INFO (this << " RNTI " << itTb->first << " size " << itTb->second.size << " mcs " << (uint32_t)itTb->second.mcs << " bitmap " << itTb->second.rbBitmap.size () << " rv " << rv << " TBLER " << tbStats.tbler << " corrupted " << itTb->second.corrupt);
-            }
-        }
-      itTb++;
-    }
+  if ((m_dataErrorModelEnabled)&&(m_rxTransportBlock.size () > 0))
+  {
+    for (std::list<TbInfo_t>::const_iterator i = m_rxTransportBlock.begin ();
+         i != m_rxTransportBlock.end (); ++i)
+     {
+       std::vector <MmWaveHarqProcessInfoElement_t> harqInfoList; // add comment on why we do this
+       MmWaveTbStats_t tbStats = MmWaveMiErrorModel::GetTbDecodificationStats (m_sinrPerceived, (*i).rbBitmap, (*i).size, (*i).mcs, harqInfoList);
+       bool corrupt = m_random->GetValue () > tbStats.tbler ? false : true;
+       if(!corrupt)
+       {
+         Ptr<PacketBurst> burst = (*i).packetBurst;
+         for (std::list<Ptr<Packet> >::const_iterator j = (*burst).Begin (); j != (*burst).End (); ++j)
+         {
+           if ((*j)->GetSize () == 0)
+           {
+             continue;
+           }
 
-  for (std::list<Ptr<PacketBurst> >::const_iterator i = m_rxPacketBurstList.begin ();
-       i != m_rxPacketBurstList.end (); ++i)
-    {
-      for (std::list<Ptr<Packet> >::const_iterator j = (*i)->Begin (); j != (*i)->End (); ++j)
-        {
-          if ((*j)->GetSize () == 0)
-            {
-              continue;
-            }
-
-          LteRadioBearerTag bearerTag;
-          if ((*j)->PeekPacketTag (bearerTag) == false)
-            {
-              NS_FATAL_ERROR ("No radio bearer tag found");
-            }
-          uint16_t rnti = bearerTag.GetRnti ();
-          itTb = m_expectedTbs.find (rnti);
-          if (itTb != m_expectedTbs.end ())
-            {
-              if (!itTb->second.corrupt)
-                {
-                  m_phyRxDataEndOkCallback (*j);
-                }
-              else
-                {
-                  NS_LOG_INFO ("TB failed");
-                }
-            }
-        }
-    }
+           // Do we need the LteRadioBearerTag also here to check the rnti? I don't think so.
+           m_phyRxDataEndOkCallback (*j);
+         }
+       }
+       else
+       {
+         NS_LOG_INFO ("TB failed");
+       }
+     }
+  }
 
   // forward control messages of this frame to MmWavePhy
 
-  if (!m_rxControlMessageList.empty () && !m_phyRxCtrlEndOkCallback.IsNull ())
-    {
-      m_phyRxCtrlEndOkCallback (m_rxControlMessageList);
-    }
+  // if (!m_rxControlMessageList.empty () && !m_phyRxCtrlEndOkCallback.IsNull ())
+  // {
+  //   m_phyRxCtrlEndOkCallback (m_rxControlMessageList);
+  // }
 
   m_state = IDLE;
-  m_rxPacketBurstList.clear ();
-  m_expectedTbs.clear ();
-  m_rxControlMessageList.clear ();
+  m_rxTransportBlock.clear ();
+  //m_rxControlMessageList.clear ();
 }
 
-void
-MmWaveSidelinkSpectrumPhy::EndRxCtrl ()
-{
-  NS_ASSERT (m_state = RX_CTRL);
-
-  // control error model not supported
-  // forward control messages of this frame to LtePhy
-  if (!m_rxControlMessageList.empty ())
-    {
-      if (!m_phyRxCtrlEndOkCallback.IsNull ())
-        {
-          m_phyRxCtrlEndOkCallback (m_rxControlMessageList);
-        }
-    }
-
-  m_state = IDLE;
-  m_rxControlMessageList.clear ();
-}
+// void
+// MmWaveSidelinkSpectrumPhy::EndRxCtrl ()
+// {
+//   NS_ASSERT (m_state = RX_CTRL);
+//
+//   // control error model not supported
+//   // forward control messages of this frame to LtePhy
+//   if (!m_rxControlMessageList.empty ())
+//     {
+//       if (!m_phyRxCtrlEndOkCallback.IsNull ())
+//         {
+//           m_phyRxCtrlEndOkCallback (m_rxControlMessageList);
+//         }
+//     }
+//
+//   m_state = IDLE;
+//   m_rxControlMessageList.clear ();
+// }
 
 bool
-MmWaveSidelinkSpectrumPhy::StartTxDataFrames (Ptr<PacketBurst> pb, std::list<Ptr<MmWaveControlMessage> > ctrlMsgList, Time duration, uint8_t slotInd)
+MmWaveSidelinkSpectrumPhy::StartTxDataFrames (Ptr<PacketBurst> pb,
+  std::list<Ptr<MmWaveControlMessage> > ctrlMsgList,
+  Time duration,
+  uint8_t slotInd,
+  uint8_t mcs,
+  uint32_t size,
+  std::vector<int> rbBitmap)
 {
   switch (m_state)
     {
@@ -465,9 +428,12 @@ MmWaveSidelinkSpectrumPhy::StartTxDataFrames (Ptr<PacketBurst> pb, std::list<Ptr
         txParams->txPhy = this->GetObject<SpectrumPhy> ();
         txParams->psd = m_txPsd;
         txParams->packetBurst = pb;
-        txParams->ctrlMsgList = ctrlMsgList;
+        //txParams->ctrlMsgList = ctrlMsgList;
         txParams->slotInd = slotInd;
         txParams->txAntenna = m_antenna;
+        txParams->mcs = mcs;
+        txParams->size = size;
+        txParams->rbBitmap = rbBitmap;
 
         m_channel->StartTx (txParams);
 
@@ -480,40 +446,41 @@ MmWaveSidelinkSpectrumPhy::StartTxDataFrames (Ptr<PacketBurst> pb, std::list<Ptr
   return true;
 }
 
-bool
-MmWaveSidelinkSpectrumPhy::StartTxDlControlFrames (std::list<Ptr<MmWaveControlMessage> > ctrlMsgList, Time duration)
-{
-  NS_LOG_LOGIC (this << " state: " << m_state);
-
-  switch (m_state)
-    {
-    case RX_DATA:
-    case RX_CTRL:
-      NS_FATAL_ERROR ("Cannot transmit while receiving");
-      break;
-    case TX:
-      NS_FATAL_ERROR ("Cannot transmit while a different transmission is still on");
-      break;
-    case IDLE:
-      {
-        NS_ASSERT (m_txPsd);
-
-        m_state = TX;
-
-        Ptr<MmWaveSidelinkSpectrumSignalParameters> txParams = Create<MmWaveSidelinkSpectrumSignalParameters> ();
-        txParams->duration = duration;
-        txParams->txPhy = GetObject<SpectrumPhy> ();
-        txParams->psd = m_txPsd;
-        txParams->pss = true;
-        txParams->ctrlMsgList = ctrlMsgList;
-        txParams->txAntenna = m_antenna;
-        m_channel->StartTx (txParams);
-
-        m_endTxEvent = Simulator::Schedule (duration, &MmWaveSidelinkSpectrumPhy::EndTx, this);
-      }
-    }
-  return false;
-}
+// bool
+// MmWaveSidelinkSpectrumPhy::StartTxControlFrames (std::list<Ptr<MmWaveControlMessage> > ctrlMsgList, Time duration)
+// {
+//   NS_LOG_LOGIC (this << " state: " << m_state);
+//
+//   switch (m_state)
+//     {
+//     case RX_DATA:
+//     case RX_CTRL:
+//       NS_FATAL_ERROR ("Cannot transmit while receiving");
+//       break;
+//     case TX:
+//       NS_FATAL_ERROR ("Cannot transmit while a different transmission is still on");
+//       break;
+//     case IDLE:
+//       {
+//         NS_ASSERT (m_txPsd);
+//
+//         m_state = TX;
+//
+//         Ptr<MmWaveSidelinkSpectrumSignalParameters> txParams = Create<MmWaveSidelinkSpectrumSignalParameters> ();
+//         txParams->duration = duration;
+//         txParams->txPhy = GetObject<SpectrumPhy> ();
+//         txParams->psd = m_txPsd;
+//         txParams->pss = true;
+//         txParams->ctrlMsgList = ctrlMsgList;
+//         txParams->txAntenna = m_antenna;
+//
+//         m_channel->StartTx (txParams);
+//
+//         m_endTxEvent = Simulator::Schedule (duration, &MmWaveSidelinkSpectrumPhy::EndTx, this);
+//       }
+//     }
+//   return false;
+// }
 
 void
 MmWaveSidelinkSpectrumPhy::EndTx ()
