@@ -38,11 +38,11 @@ namespace ns3 {
 
 namespace mmwave {
 
-struct SfnSf
+struct SidelinkSfnSf
 {
-  SfnSf () = default;
+  SidelinkSfnSf () = default;
 
-  SfnSf (uint16_t frameNum, uint8_t sfNum, uint16_t slotNum, uint8_t varTtiNum)
+  SidelinkSfnSf (uint16_t frameNum, uint8_t sfNum, uint16_t slotNum, uint8_t varTtiNum)
     : m_frameNum (frameNum),
     m_subframeNum (sfNum),
     m_slotNum (slotNum),
@@ -62,7 +62,7 @@ struct SfnSf
   }
 
   static uint64_t
-  Encode (const SfnSf &p)
+  Encode (const SidelinkSfnSf &p)
   {
     uint64_t ret = 0ULL;
     ret = (static_cast<uint64_t> (p.m_frameNum) << 32 ) |
@@ -81,10 +81,10 @@ struct SfnSf
     m_varTtiNum   = (sfn & 0x00000000000000FF);
   }
 
-  static SfnSf
+  static SidelinkSfnSf
   FromEncoding (uint64_t sfn)
   {
-    SfnSf ret;
+    SidelinkSfnSf ret;
     ret.m_frameNum    = (sfn & 0x0000FFFF00000000) >> 32;
     ret.m_subframeNum = (sfn & 0x00000000FF000000) >> 24;
     ret.m_slotNum     = (sfn & 0x0000000000FFFF00) >> 8;
@@ -92,22 +92,22 @@ struct SfnSf
     return ret;
   }
 
-  SfnSf
+  SidelinkSfnSf
   IncreaseNoOfSlots (uint32_t slotsPerSubframe, uint32_t subframesPerFrame) const
   {
     return IncreaseNoOfSlotsWithLatency (1, slotsPerSubframe, subframesPerFrame);
   }
 
-  SfnSf
+  SidelinkSfnSf
   CalculateUplinkSlot (uint32_t ulSchedDelay, uint32_t slotsPerSubframe, uint32_t subframesPerFrame) const
   {
     return IncreaseNoOfSlotsWithLatency (ulSchedDelay, slotsPerSubframe, subframesPerFrame);
   }
 
-  SfnSf
+  SidelinkSfnSf
   IncreaseNoOfSlotsWithLatency (uint32_t latency, uint32_t slotsPerSubframe, uint32_t subframesPerFrame) const
   {
-    SfnSf retVal = *this;
+    SidelinkSfnSf retVal = *this;
     // currently the default value of L1L2 latency is set to 2 and is interpreted as in the number of slots
     // will be probably reduced to order of symbols
     retVal.m_frameNum += (this->m_subframeNum + (this->m_slotNum + latency) / slotsPerSubframe) / subframesPerFrame;
@@ -117,7 +117,7 @@ struct SfnSf
   }
 
   /**
-   * \brief Add to this SfnSf a number of slot indicated by the first parameter
+   * \brief Add to this SidelinkSfnSf a number of slot indicated by the first parameter
    * \param slotN Number of slot to add
    * \param slotsPerSubframe Number of slot per subframe
    * \param subframesPerFrame Number of subframes per frame
@@ -132,12 +132,12 @@ struct SfnSf
 
   /**
    * \brief operator < (less than)
-   * \param rhs other SfnSf to compare
-   * \return true if this SfnSf is less than rhs
+   * \param rhs other SidelinkSfnSf to compare
+   * \return true if this SidelinkSfnSf is less than rhs
    *
    * The comparison is done on m_frameNum, m_subframeNum, and m_slotNum: not on varTti
    */
-  bool operator < (const SfnSf& rhs) const
+  bool operator < (const SidelinkSfnSf& rhs) const
   {
     if (m_frameNum < rhs.m_frameNum)
       {
@@ -167,7 +167,7 @@ struct SfnSf
    *
    * To check the varTti, please use this operator and IsTtiEqual()
    */
-  bool operator == (const SfnSf &o) const
+  bool operator == (const SidelinkSfnSf &o) const
   {
     return (m_frameNum == o.m_frameNum) && (m_subframeNum == o.m_subframeNum)
            && (m_slotNum == o.m_slotNum);
@@ -180,7 +180,7 @@ struct SfnSf
    *
    * Used in PHY or in situation where VarTti is needed.
    */
-  bool IsTtiEqual (const SfnSf &o) const
+  bool IsTtiEqual (const SidelinkSfnSf &o) const
   {
     return (*this == o) && (m_varTtiNum == o.m_varTtiNum);
   }
@@ -188,15 +188,15 @@ struct SfnSf
   uint16_t m_frameNum   {0}; //!< Frame Number
   uint8_t m_subframeNum {0}; //!< SubFrame Number
   uint16_t m_slotNum    {0}; //!< Slot number (a slot is made by 14 symbols)
-  uint8_t m_varTtiNum   {0}; //!< Equivalent to symStart: it is the symbol in which the sfnsf starts
+  uint8_t m_varTtiNum   {0}; //!< Equivalent to symStart: it is the symbol in which the SidelinkSfnSf starts
 };
 
-struct TbInfoElement
+struct SidelinkTbInfoElement
 {
-  TbInfoElement () :
+  SidelinkTbInfoElement () :
     m_isUplink (0), m_varTtiIdx (0), m_rbBitmap (0), m_rbShift (0), m_rbStart (
       0), m_rbLen (0), m_symStart (0), m_numSym (0), m_resAlloc (0), m_mcs (
-      0), m_tbSize (0), m_ndi (0), m_rv (0), m_harqProcess (0)
+      0), m_tbSize (0), m_ndi (0), m_rv (0)
   {
   }
 
@@ -213,30 +213,12 @@ struct TbInfoElement
   uint32_t m_tbSize;
   uint8_t m_ndi;
   uint8_t m_rv;
-  uint8_t m_harqProcess;
-};
-
-struct DlDciInfoElementTdma
-{
-  DlDciInfoElementTdma () :
-    m_symStart (0), m_numSym (0), m_mcs (0), m_tbSize (0), m_ndi (0), m_rv (
-      0), m_harqProcess (0)
-  {
-  }
-
-  uint8_t m_symStart {0};   // starting symbol index for flexible TTI scheme
-  uint8_t m_numSym   {0};     // number of symbols for flexible TTI scheme
-  uint8_t m_mcs      {2};
-  uint32_t m_tbSize  {0};
-  uint8_t m_ndi      {0};
-  uint8_t m_rv       {0};
-  uint8_t m_harqProcess {14};
 };
 
 /**
  * \brief Scheduling information. Despite the name, it is not TDMA.
  */
-struct DciInfoElementTdma
+struct SidelinkDciInfoElementTdma
 {
   enum DciFormat
   {
@@ -260,7 +242,7 @@ struct DciInfoElementTdma
    * \param numSym Num sym
    * \param rbgBitmask Bitmask of RBG
    */
-  DciInfoElementTdma (uint8_t symStart, uint8_t numSym, DciFormat format, VarTtiType type,
+  SidelinkDciInfoElementTdma (uint8_t symStart, uint8_t numSym, DciFormat format, VarTtiType type,
                       const std::vector<uint8_t> &rbgBitmask)
     : m_format (format),
     m_symStart (symStart),
@@ -283,7 +265,7 @@ struct DciInfoElementTdma
    * \param ndi
    * \param rv
    */
-  DciInfoElementTdma (uint16_t rnti, DciFormat format, uint8_t symStart,
+  SidelinkDciInfoElementTdma (uint16_t rnti, DciFormat format, uint8_t symStart,
                       uint8_t numSym, uint8_t mcs, uint32_t tbs, uint8_t ndi,
                       uint8_t rv, VarTtiType type)
     : m_rnti (rnti), m_format (format), m_symStart (symStart),
@@ -300,8 +282,8 @@ struct DciInfoElementTdma
    * \param rv Retransmission value
    * \param o Other object from which copy all that is not specified as parameter
    */
-  DciInfoElementTdma (uint8_t symStart, uint8_t numSym, uint8_t ndi, uint8_t rv,
-                      const DciInfoElementTdma &o)
+  SidelinkDciInfoElementTdma (uint8_t symStart, uint8_t numSym, uint8_t ndi, uint8_t rv,
+                      const SidelinkDciInfoElementTdma &o)
     : m_rnti (o.m_rnti),
       m_format (o.m_format),
       m_symStart (symStart),
@@ -329,31 +311,31 @@ struct DciInfoElementTdma
   std::vector<uint8_t> m_rbgBitmask  {};   //!< RBG mask: 0 if the RBG is not used, 1 otherwise
 };
 
-struct TbAllocInfo
+struct SidelinkTbAllocInfo
 {
-  TbAllocInfo () :
+  SidelinkTbAllocInfo () :
     m_rnti (0)
   {
 
   }
   //struct
-  SfnSf m_sfnSf;
+  SidelinkSfnSf m_SidelinkSfnSf;
   uint16_t m_rnti;
   std::vector<unsigned> m_rbMap;
-  TbInfoElement m_tbInfo;
+  SidelinkTbInfoElement m_tbInfo;
 };
 
 struct VarTtiAllocInfo
 {
   VarTtiAllocInfo (const VarTtiAllocInfo &o) = default;
 
-  VarTtiAllocInfo (const std::shared_ptr<DciInfoElementTdma> &dci)
+  VarTtiAllocInfo (const std::shared_ptr<SidelinkDciInfoElementTdma> &dci)
     : m_dci (dci)
   {
   }
 
   bool m_isOmni           {false};
-  std::shared_ptr<DciInfoElementTdma> m_dci;
+  std::shared_ptr<SidelinkDciInfoElementTdma> m_dci;
 
   bool operator < (const VarTtiAllocInfo& o) const
   {
@@ -362,10 +344,15 @@ struct VarTtiAllocInfo
   }
 };
 
-struct SlotAllocInfo
+struct SidelinkSlotAllocInfo
 {
-  SlotAllocInfo (SfnSf sfn)
-    : m_sfnSf (sfn)
+
+  SidelinkSlotAllocInfo ()
+  {
+  }
+
+  SidelinkSlotAllocInfo (SidelinkSfnSf sfn)
+    : m_sidelinkSfnSf (sfn)
   {
   }
 
@@ -381,32 +368,26 @@ struct SlotAllocInfo
   };
 
   /**
-   * \brief Merge the input parameter to this SlotAllocInfo
-   * \param other SlotAllocInfo to merge in this allocation
+   * \brief Merge the input parameter to this SidelinkSlotAllocInfo
+   * \param other SidelinkSlotAllocInfo to merge in this allocation
    *
    * After the merge, order the allocation by symStart in DCI
    */
-  void Merge (const SlotAllocInfo & other);
+  void Merge (const SidelinkSlotAllocInfo & other);
 
-  /**
-   * \brief Check if we have data allocations
-   * \return true if m_varTtiAllocInfo contains data allocations
-   */
-  bool ContainsDataAllocation () const;
-
-  SfnSf m_sfnSf          {};     //!< SfnSf of this allocation
+  SidelinkSfnSf m_sidelinkSfnSf          {};     //!< SidelinkSfnSf of this allocation
   uint32_t m_numSymAlloc {0};    //!< Number of allocated symbols
   std::deque<VarTtiAllocInfo> m_varTtiAllocInfo; //!< queue of allocations
   AllocationType m_type {NONE}; //!< Allocations type
 
   /**
    * \brief operator < (less than)
-   * \param rhs other SlotAllocInfo to compare
-   * \return true if this SlotAllocInfo is less than rhs
+   * \param rhs other SidelinkSlotAllocInfo to compare
+   * \return true if this SidelinkSlotAllocInfo is less than rhs
    *
-   * The comparison is done on sfnSf
+   * The comparison is done on SidelinkSfnSf
    */
-  bool operator < (const SlotAllocInfo& rhs) const;
+  bool operator < (const SidelinkSlotAllocInfo& rhs) const;
 };
 
 class MmWaveSidelinkPhyMacCommon : public Object

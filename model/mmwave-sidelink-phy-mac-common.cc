@@ -354,11 +354,11 @@ MmWaveSidelinkPhyMacCommon::SetMaxTbSize (uint32_t bytes)
 }
 
 void
-SlotAllocInfo::Merge (const SlotAllocInfo &other)
+SidelinkSlotAllocInfo::Merge (const SidelinkSlotAllocInfo &other)
 {
   NS_LOG_FUNCTION (this);
   NS_ASSERT (other.m_type != NONE && m_type != NONE);
-  NS_ASSERT (other.m_sfnSf == m_sfnSf);
+  NS_ASSERT (other.m_sidelinkSfnSf == m_sidelinkSfnSf);
 
   if (other.m_type * m_type == 6)
     {
@@ -374,20 +374,6 @@ SlotAllocInfo::Merge (const SlotAllocInfo &other)
 
   // Sort over the symStart of the DCI (VarTtiAllocInfo::operator <)
   std::sort (m_varTtiAllocInfo.begin (), m_varTtiAllocInfo.end ());
-}
-
-bool
-SlotAllocInfo::ContainsDataAllocation () const
-{
-  NS_LOG_FUNCTION (this);
-  for (const auto & allocation : m_varTtiAllocInfo)
-    {
-      if (allocation.m_dci->m_type == DciInfoElementTdma::DATA)
-        {
-          return true;
-        }
-    }
-  return false;
 }
 
 }

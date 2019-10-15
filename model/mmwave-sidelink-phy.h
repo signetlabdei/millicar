@@ -22,6 +22,7 @@
 #define SRC_MMWAVE_MODEL_MMWAVE_SIDELINK_PHY_H_
 
 #include <ns3/mmwave-phy.h>
+#include "mmwave-sidelink-phy-mac-common.h"
 #include <ns3/ptr.h>
 #include <map>
 
@@ -35,7 +36,14 @@ class MmWaveSidelinkPhy : public MmWavePhy
 public:
   MmWaveSidelinkPhy ();
 
-  MmWaveSidelinkPhy (Ptr<MmWaveSpectrumPhy> ulPhy, Ptr<MmWaveSpectrumPhy> dlPhy);
+  /**
+   * \brief MmWaveSidelinkPhy real constructor
+   * \param channelPhy spectrum phy
+   * \param n Pointer to the node owning this instance
+   *
+   * Usually called by the helper. It starts the event loop for the device.
+   */
+  MmWaveSidelinkPhy (Ptr<MmWaveSpectrumPhy> channelPhy, const Ptr<Node> &n);
 
   virtual ~MmWaveSidelinkPhy ();
 
@@ -74,9 +82,10 @@ public:
   void EndVarTti ();
 
 private:
-  
-  Time m_lastSlotStart; //!< Time of the last slot start
 
+  Time m_lastSlotStart; //!< Time of the last slot start
+  SidelinkSlotAllocInfo m_currSlotAllocInfo;
+  uint8_t m_varTtiNum {0};
 };
 
 }

@@ -19,7 +19,6 @@
 
 
 #include "mmwave-sidelink-phy.h"
-#include "ns3/mmwave-spectrum-value-helper.h"
 #include <ns3/double.h>
 #include <ns3/pointer.h>
 
@@ -37,10 +36,14 @@ MmWaveSidelinkPhy::MmWaveSidelinkPhy ()
   NS_FATAL_ERROR ("This constructor should not be called");
 }
 
-MmWaveSidelinkPhy::MmWaveSidelinkPhy (Ptr<MmWaveSpectrumPhy> dlPhy, Ptr<MmWaveSpectrumPhy> ulPhy)
-  : MmWavePhy (dlPhy, ulPhy)
+MmWaveSidelinkPhy::MmWaveSidelinkPhy (Ptr<MmWaveSpectrumPhy> channelPhy,
+                          const Ptr<Node> &n)
+  : MmWavePhy (channelPhy)
 {
   NS_LOG_FUNCTION (this);
+  m_currSlotAllocInfo = SidelinkSfnSf (0,0,0,0);
+  Simulator::ScheduleWithContext (n->GetId (), MilliSeconds (0),
+                                  &MmWaveSidelinkPhy::StartSlot, this, 0, 0, 0);
 }
 
 MmWaveSidelinkPhy::~MmWaveSidelinkPhy ()
@@ -135,20 +138,20 @@ MmWaveSidelinkPhy::StartSlot (uint16_t frameNum, uint8_t subframeNum, uint16_t s
   m_sfNum = subframeNum;
   m_slotNum = static_cast<uint8_t> (slotNum);
   m_lastSlotStart = Simulator::Now ();
-  // m_varTtiNum = 0;
-  //
-  // // Call MAC before doing anything in PHY
-  // m_phySapUser->SlotIndication (SfnSf (m_frameNum, m_subframeNum, m_slotNum, 0));   // trigger mac
+  m_varTtiNum = 0;
+
+  // Call MAC before doing anything in PHY
+  //m_phySapUser->SlotIndication (SidelinkSfnSf (m_frameNum, m_sfNum, m_slotNum, 0));   // trigger mac
   //
   // // update the current slot object, and insert DL/UL CTRL allocations.
   // // That will not be true anymore when true TDD pattern will be used.
   // if (SlotAllocInfoExists (SfnSf (frameNum, sfNum, slotNum, m_varTtiNum)))
   //   {
-  //     m_currSlotAllocInfo = RetrieveSlotAllocInfo (SfnSf (frameNum, sfNum, slotNum, m_varTtiNum));
+  //     m_currSlotAllocInfo = RetrieveSlotAllocInfo (SidelinkSfnSf (frameNum, sfNum, slotNum, m_varTtiNum));
   //   }
   // else
   //   {
-  //     m_currSlotAllocInfo = SlotAllocInfo (SfnSf (frameNum, sfNum, slotNum, m_varTtiNum));
+  //     m_currSlotAllocInfo = SidelinkSlotAllocInfo (SidelinkSfnSf (frameNum, sfNum, slotNum, m_varTtiNum));
   //   }
   //
   // std::vector<uint8_t> rbgBitmask (m_phyMacConfig->GetBandwidthInRbg (), 1);
