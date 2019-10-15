@@ -44,12 +44,14 @@ public:
   virtual void DoInitialize (void);
   virtual void DoDispose (void);
 
-  // void SetTxPower (double pow);
-  // double GetTxPower () const;
-  //
-  // void SetNoiseFigure (double pf);
-  // double GetNoiseFigure () const;
-  //
+  void SetTxPower (double power);
+  double GetTxPower () const;
+
+  void SetNoiseFigure (double pf);
+  double GetNoiseFigure () const;
+
+  virtual Ptr<MmWaveSpectrumPhy> GetSpectrumPhy () const;
+
   // bool SendPacket (Ptr<Packet> packet);
   //
   Ptr<SpectrumValue> CreateTxPowerSpectralDensity ();
@@ -66,10 +68,14 @@ public:
   //
   // Ptr<MmWaveSpectrumPhy> GetDlSpectrumPhy () const;
   // Ptr<MmWaveSpectrumPhy> GetUlSpectrumPhy () const;
-  //
-  // void SubframeIndication (uint16_t frameNum, uint8_t subframeNum);
-  // void StartSlot ();
-  // void EndSlot ();
+
+  void StartSlot (uint16_t frameNum, uint8_t subframeNum, uint16_t slotNum);
+  void StartVarTti ();
+  void EndVarTti ();
+
+private:
+  
+  Time m_lastSlotStart; //!< Time of the last slot start
 
 };
 
