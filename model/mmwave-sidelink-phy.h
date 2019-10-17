@@ -90,9 +90,27 @@ private:
    */
   Time SlData(const std::shared_ptr<SciInfoElement> &sci);
 
-  bool SidelinkSlotAllocInfoExists (const SidelinkSfnSf &retVal) const;
+  /**
+   * \brief Transform a MAC-made vector of RBG to a PHY-ready vector of SINR indices
+   * \param rbgBitmask Bitmask which indicates with 1 the RBG in which there is a transmission,
+   * with 0 a RBG in which there is not a transmission
+   * \return a vector of indices.
+   *
+   * Example (4 RB per RBG, 4 total RBG assignable):
+   * rbgBitmask = <0,1,1,0>
+   * output = <4,5,6,7,8,9,10,11>
+   *
+   * (the rbgBitmask expressed as rbBitmask would be:
+   * <0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0> , and therefore the places in which there
+   * is a 1 are from the 4th to the 11th, and that is reflected in the output)
+   */
+  std::vector<int> FromRBGBitmaskToRBAssignment (const std::vector<uint8_t> rbgBitmask) const;
+
+  void SetSubChannelsForTransmission (std::vector <int> mask);
+
+  bool SidelinkSlotAllocInfoExists (const SfnSf &retVal) const;
   SidelinkSlotAllocInfo RetrieveSidelinkSlotAllocInfo ();
-  SidelinkSlotAllocInfo RetrieveSidelinkSlotAllocInfo (const SidelinkSfnSf &sfnsf);
+  SidelinkSlotAllocInfo RetrieveSidelinkSlotAllocInfo (const SfnSf &sfnsf);
 
 private:
   Time m_lastSlotStart; //!< Time of the last slot start
@@ -100,8 +118,10 @@ private:
   SidelinkSlotAllocInfo m_currSlotAllocInfo;
   Ptr<MmWaveSidelinkPhyMacCommon> m_sidelinkPhyMacConfig;
 
+  void SendDataChannels (Ptr<PacketBurst> pb, Time duration, uint8_t slotInd);
+
   bool m_receptionEnabled {false}; //!< Flag to indicate if we are currently receiveing data
-  
+
   uint8_t m_varTtiNum {0};
   uint32_t m_currTbs {0};          //!< Current TBS of the receiveing DL data (used to compute the feedback)
 };

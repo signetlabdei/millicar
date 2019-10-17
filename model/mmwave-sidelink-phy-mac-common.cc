@@ -358,7 +358,6 @@ SidelinkSlotAllocInfo::Merge (const SidelinkSlotAllocInfo &other)
 {
   NS_LOG_FUNCTION (this);
   NS_ASSERT (other.m_type != NONE && m_type != NONE);
-  NS_ASSERT (other.m_sidelinkSfnSf == m_sidelinkSfnSf);
 
   if (other.m_type * m_type == 6)
     {

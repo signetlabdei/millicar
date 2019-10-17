@@ -31,165 +31,13 @@
 #include <ns3/simulator.h>
 #include <ns3/component-carrier.h>
 #include <ns3/enum.h>
+#include <ns3/mmwave-phy-mac-common.h>
 #include <memory>
 
 
 namespace ns3 {
 
 namespace mmwave {
-
-struct SidelinkSfnSf
-{
-  SidelinkSfnSf () = default;
-
-  SidelinkSfnSf (uint16_t frameNum, uint8_t sfNum, uint16_t slotNum, uint8_t varTtiNum)
-    : m_frameNum (frameNum),
-    m_subframeNum (sfNum),
-    m_slotNum (slotNum),
-    m_varTtiNum (varTtiNum)
-  {
-  }
-
-  uint64_t
-  Encode () const
-  {
-    uint64_t ret = 0ULL;
-    ret = (static_cast<uint64_t> (m_frameNum) << 32 ) |
-      (static_cast<uint64_t> (m_subframeNum) << 24) |
-      (static_cast<uint64_t> (m_slotNum) << 8) |
-      (static_cast<uint64_t> (m_varTtiNum));
-    return ret;
-  }
-
-  static uint64_t
-  Encode (const SidelinkSfnSf &p)
-  {
-    uint64_t ret = 0ULL;
-    ret = (static_cast<uint64_t> (p.m_frameNum) << 32 ) |
-      (static_cast<uint64_t> (p.m_subframeNum) << 24) |
-      (static_cast<uint64_t> (p.m_slotNum) << 8) |
-      (static_cast<uint64_t> (p.m_varTtiNum));
-    return ret;
-  }
-
-  void
-  Decode (uint64_t sfn)
-  {
-    m_frameNum    = (sfn & 0x0000FFFF00000000) >> 32;
-    m_subframeNum = (sfn & 0x00000000FF000000) >> 24;
-    m_slotNum     = (sfn & 0x0000000000FFFF00) >> 8;
-    m_varTtiNum   = (sfn & 0x00000000000000FF);
-  }
-
-  static SidelinkSfnSf
-  FromEncoding (uint64_t sfn)
-  {
-    SidelinkSfnSf ret;
-    ret.m_frameNum    = (sfn & 0x0000FFFF00000000) >> 32;
-    ret.m_subframeNum = (sfn & 0x00000000FF000000) >> 24;
-    ret.m_slotNum     = (sfn & 0x0000000000FFFF00) >> 8;
-    ret.m_varTtiNum   = (sfn & 0x00000000000000FF);
-    return ret;
-  }
-
-  SidelinkSfnSf
-  IncreaseNoOfSlots (uint32_t slotsPerSubframe, uint32_t subframesPerFrame) const
-  {
-    return IncreaseNoOfSlotsWithLatency (1, slotsPerSubframe, subframesPerFrame);
-  }
-
-  SidelinkSfnSf
-  CalculateUplinkSlot (uint32_t ulSchedDelay, uint32_t slotsPerSubframe, uint32_t subframesPerFrame) const
-  {
-    return IncreaseNoOfSlotsWithLatency (ulSchedDelay, slotsPerSubframe, subframesPerFrame);
-  }
-
-  SidelinkSfnSf
-  IncreaseNoOfSlotsWithLatency (uint32_t latency, uint32_t slotsPerSubframe, uint32_t subframesPerFrame) const
-  {
-    SidelinkSfnSf retVal = *this;
-    // currently the default value of L1L2 latency is set to 2 and is interpreted as in the number of slots
-    // will be probably reduced to order of symbols
-    retVal.m_frameNum += (this->m_subframeNum + (this->m_slotNum + latency) / slotsPerSubframe) / subframesPerFrame;
-    retVal.m_subframeNum = (this->m_subframeNum + (this->m_slotNum + latency) / slotsPerSubframe) % subframesPerFrame;
-    retVal.m_slotNum = (this->m_slotNum + latency) % slotsPerSubframe;
-    return retVal;
-  }
-
-  /**
-   * \brief Add to this SidelinkSfnSf a number of slot indicated by the first parameter
-   * \param slotN Number of slot to add
-   * \param slotsPerSubframe Number of slot per subframe
-   * \param subframesPerFrame Number of subframes per frame
-   */
-  void
-  Add (uint32_t slotN, uint32_t slotsPerSubframe, uint32_t subframesPerFrame)
-  {
-    m_frameNum += (m_subframeNum + (m_slotNum + slotN) / slotsPerSubframe) / subframesPerFrame;
-    m_subframeNum = (m_subframeNum + (m_slotNum + slotN) / slotsPerSubframe) % subframesPerFrame;
-    m_slotNum = (m_slotNum + slotN) % slotsPerSubframe;
-  }
-
-  /**
-   * \brief operator < (less than)
-   * \param rhs other SidelinkSfnSf to compare
-   * \return true if this SidelinkSfnSf is less than rhs
-   *
-   * The comparison is done on m_frameNum, m_subframeNum, and m_slotNum: not on varTti
-   */
-  bool operator < (const SidelinkSfnSf& rhs) const
-  {
-    if (m_frameNum < rhs.m_frameNum)
-      {
-        return true;
-      }
-    else if ((m_frameNum == rhs.m_frameNum ) && (m_subframeNum < rhs.m_subframeNum))
-      {
-        return true;
-      }
-    else if (((m_frameNum == rhs.m_frameNum ) && (m_subframeNum == rhs.m_subframeNum)) && (m_slotNum < rhs.m_slotNum))
-      {
-        return true;
-      }
-    else
-      {
-        return false;
-      }
-  }
-
-  /**
-   * \brief operator ==, compares only frame, subframe, and slot
-   * \param o other instance to compare
-   * \return true if this instance and the other have the same frame, subframe, slot
-   *
-   * Used in the MAC operation, in which the varTti is not used (or, it is
-   * its duty to fill it).
-   *
-   * To check the varTti, please use this operator and IsTtiEqual()
-   */
-  bool operator == (const SidelinkSfnSf &o) const
-  {
-    return (m_frameNum == o.m_frameNum) && (m_subframeNum == o.m_subframeNum)
-           && (m_slotNum == o.m_slotNum);
-  }
-
-  /**
-   * \brief Compares frame, subframe, slot, and varTti
-   * \param o other instance to compare
-   * \return true if this instance and the other have the same frame, subframe, slot, and varTti
-   *
-   * Used in PHY or in situation where VarTti is needed.
-   */
-  bool IsTtiEqual (const SidelinkSfnSf &o) const
-  {
-    return (*this == o) && (m_varTtiNum == o.m_varTtiNum);
-  }
-
-  uint16_t m_frameNum   {0}; //!< Frame Number
-  uint8_t m_subframeNum {0}; //!< SubFrame Number
-  uint16_t m_slotNum    {0}; //!< Slot number (a slot is made by 14 symbols)
-  uint8_t m_varTtiNum   {0}; //!< Equivalent to symStart: it is the symbol in which the SidelinkSfnSf starts
-};
 
 struct SidelinkTbInfoElement
 {
@@ -313,7 +161,7 @@ struct SidelinkTbAllocInfo
 
   }
   //struct
-  SidelinkSfnSf m_SidelinkSfnSf;
+  SfnSf m_sfnSf;
   uint16_t m_rnti;
   std::vector<unsigned> m_rbMap;
   SidelinkTbInfoElement m_tbInfo;
@@ -345,8 +193,8 @@ struct SidelinkSlotAllocInfo
   {
   }
 
-  SidelinkSlotAllocInfo (SidelinkSfnSf sfn)
-    : m_sidelinkSfnSf (sfn)
+  SidelinkSlotAllocInfo (SfnSf sfn)
+    : m_sfnSf (sfn)
   {
   }
 
@@ -369,7 +217,7 @@ struct SidelinkSlotAllocInfo
    */
   void Merge (const SidelinkSlotAllocInfo & other);
 
-  SidelinkSfnSf m_sidelinkSfnSf          {};     //!< SidelinkSfnSf of this allocation
+  SfnSf m_sfnSf          {};     //!<  of this allocation
   uint32_t m_numSymAlloc {0};    //!< Number of allocated symbols
   std::deque<VarTtiAllocInfo> m_varTtiAllocInfo; //!< queue of allocations
   AllocationType m_type {NONE}; //!< Allocations type
@@ -394,7 +242,7 @@ public:
 
   uint8_t GetSymbolsPerSlot (void) const;
 
-  Time GetSlotPeriod () const;
+    Time GetSlotPeriod () const;
 
   uint32_t GetVarTtisPerSlot (void) const;
 
