@@ -83,8 +83,14 @@ public:
 
 private:
 
+  bool SidelinkSlotAllocInfoExists (const SidelinkSfnSf &retVal) const;
+  SidelinkSlotAllocInfo RetrieveSidelinkSlotAllocInfo ();
+  SidelinkSlotAllocInfo RetrieveSidelinkSlotAllocInfo (const SidelinkSfnSf &sfnsf);
+
   Time m_lastSlotStart; //!< Time of the last slot start
+  std::list<SidelinkSlotAllocInfo> m_slotAllocInfo; //!< slot allocation info list
   SidelinkSlotAllocInfo m_currSlotAllocInfo;
+  Ptr<MmWaveSidelinkPhyMacCommon> m_sidelinkPhyMacConfig;
   uint8_t m_varTtiNum {0};
 };
 

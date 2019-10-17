@@ -216,15 +216,15 @@ struct SidelinkTbInfoElement
 };
 
 /**
- * \brief Scheduling information. Despite the name, it is not TDMA.
+ * \brief Scheduling information.
  */
-struct SidelinkDciInfoElementTdma
+struct SciInfoElement
 {
-  enum DciFormat
-  {
-    DL = 0,
-    UL = 1
-  };
+  // enum SciFormat
+  // {
+  //   DL = 0,
+  //   UL = 1
+  // };
 
   /**
    * \brief The VarTtiType enum
@@ -237,15 +237,14 @@ struct SidelinkDciInfoElementTdma
   };
 
   /**
-   * \brief Constructor used in MmWaveUePhy to build local DCI for DL and UL control
+   * \brief Constructor used in MmWaveSidelinkPhy to build local SCI
    * \param symStart Sym start
    * \param numSym Num sym
    * \param rbgBitmask Bitmask of RBG
    */
-  SidelinkDciInfoElementTdma (uint8_t symStart, uint8_t numSym, DciFormat format, VarTtiType type,
+  SciInfoElement (uint8_t symStart, uint8_t numSym, VarTtiType type,
                       const std::vector<uint8_t> &rbgBitmask)
-    : m_format (format),
-    m_symStart (symStart),
+    : m_symStart (symStart),
     m_numSym (numSym),
     m_type (type),
     m_rbgBitmask (rbgBitmask)
@@ -253,11 +252,10 @@ struct SidelinkDciInfoElementTdma
   }
 
   /**
-   * \brief Construct to build brand new DCI. Please remember to update manually
-   * the HARQ process ID and the RBG bitmask
+   * \brief Construct to build brand new SCI. Please remember to update manually
+   * the RBG bitmask
    *
    * \param rnti
-   * \param format
    * \param symStart
    * \param numSym
    * \param mcs
@@ -265,10 +263,10 @@ struct SidelinkDciInfoElementTdma
    * \param ndi
    * \param rv
    */
-  SidelinkDciInfoElementTdma (uint16_t rnti, DciFormat format, uint8_t symStart,
+  SciInfoElement (uint16_t rnti, uint8_t symStart,
                       uint8_t numSym, uint8_t mcs, uint32_t tbs, uint8_t ndi,
                       uint8_t rv, VarTtiType type)
-    : m_rnti (rnti), m_format (format), m_symStart (symStart),
+    : m_rnti (rnti), m_symStart (symStart),
     m_numSym (numSym), m_mcs (mcs), m_tbSize (tbs), m_ndi (ndi), m_rv (rv), m_type (type)
   {
   }
@@ -282,10 +280,9 @@ struct SidelinkDciInfoElementTdma
    * \param rv Retransmission value
    * \param o Other object from which copy all that is not specified as parameter
    */
-  SidelinkDciInfoElementTdma (uint8_t symStart, uint8_t numSym, uint8_t ndi, uint8_t rv,
-                      const SidelinkDciInfoElementTdma &o)
+  SciInfoElement (uint8_t symStart, uint8_t numSym, uint8_t ndi, uint8_t rv,
+                      const SciInfoElement &o)
     : m_rnti (o.m_rnti),
-      m_format (o.m_format),
       m_symStart (symStart),
       m_numSym (numSym),
       m_mcs (o.m_mcs),
@@ -293,13 +290,11 @@ struct SidelinkDciInfoElementTdma
       m_ndi (ndi),
       m_rv (rv),
       m_type (o.m_type),
-      m_harqProcess (o.m_harqProcess),
       m_rbgBitmask (o.m_rbgBitmask)
   {
   }
 
   const uint16_t m_rnti       {0};
-  const DciFormat m_format    {DL};
   const uint8_t m_symStart    {0};   // starting symbol index for flexible TTI scheme
   const uint8_t m_numSym      {0};   // number of symbols for flexible TTI scheme
   const uint8_t m_mcs         {0};
@@ -307,7 +302,6 @@ struct SidelinkDciInfoElementTdma
   const uint8_t m_ndi         {0};   // By default is retransmission
   const uint8_t m_rv          {0};   // not used for UL DCI
   const VarTtiType m_type     {CTRL_DATA};
-  uint8_t m_harqProcess {0};
   std::vector<uint8_t> m_rbgBitmask  {};   //!< RBG mask: 0 if the RBG is not used, 1 otherwise
 };
 
@@ -329,18 +323,18 @@ struct VarTtiAllocInfo
 {
   VarTtiAllocInfo (const VarTtiAllocInfo &o) = default;
 
-  VarTtiAllocInfo (const std::shared_ptr<SidelinkDciInfoElementTdma> &dci)
-    : m_dci (dci)
+  VarTtiAllocInfo (const std::shared_ptr<SciInfoElement> &sci)
+    : m_sci (sci)
   {
   }
 
   bool m_isOmni           {false};
-  std::shared_ptr<SidelinkDciInfoElementTdma> m_dci;
+  std::shared_ptr<SciInfoElement> m_sci;
 
   bool operator < (const VarTtiAllocInfo& o) const
   {
-    NS_ASSERT (m_dci != nullptr);
-    return (m_dci->m_symStart < o.m_dci->m_symStart);
+    NS_ASSERT (m_sci != nullptr);
+    return (m_sci->m_symStart < o.m_sci->m_symStart);
   }
 };
 
@@ -380,14 +374,6 @@ struct SidelinkSlotAllocInfo
   std::deque<VarTtiAllocInfo> m_varTtiAllocInfo; //!< queue of allocations
   AllocationType m_type {NONE}; //!< Allocations type
 
-  /**
-   * \brief operator < (less than)
-   * \param rhs other SidelinkSlotAllocInfo to compare
-   * \return true if this SidelinkSlotAllocInfo is less than rhs
-   *
-   * The comparison is done on SidelinkSfnSf
-   */
-  bool operator < (const SidelinkSlotAllocInfo& rhs) const;
 };
 
 class MmWaveSidelinkPhyMacCommon : public Object
