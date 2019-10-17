@@ -83,15 +83,27 @@ public:
 
 private:
 
+  /**
+   * \brief Transmit SL data and return the time at which the transmission will end
+   * \param sci the current SCI
+   * \return the time at which the transmission of SL data will end
+   */
+  Time SlData(const std::shared_ptr<SciInfoElement> &sci);
+
   bool SidelinkSlotAllocInfoExists (const SidelinkSfnSf &retVal) const;
   SidelinkSlotAllocInfo RetrieveSidelinkSlotAllocInfo ();
   SidelinkSlotAllocInfo RetrieveSidelinkSlotAllocInfo (const SidelinkSfnSf &sfnsf);
 
+private:
   Time m_lastSlotStart; //!< Time of the last slot start
   std::list<SidelinkSlotAllocInfo> m_slotAllocInfo; //!< slot allocation info list
   SidelinkSlotAllocInfo m_currSlotAllocInfo;
   Ptr<MmWaveSidelinkPhyMacCommon> m_sidelinkPhyMacConfig;
+
+  bool m_receptionEnabled {false}; //!< Flag to indicate if we are currently receiveing data
+  
   uint8_t m_varTtiNum {0};
+  uint32_t m_currTbs {0};          //!< Current TBS of the receiveing DL data (used to compute the feedback)
 };
 
 }
