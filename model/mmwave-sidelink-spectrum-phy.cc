@@ -234,9 +234,7 @@ MmWaveSidelinkSpectrumPhy::StartRx (Ptr<SpectrumSignalParameters> params)
 
       //if (isAllocated)
       //  {
-      NS_LOG_UNCOND ("ok");
       m_interferenceData->AddSignal (mmwaveSidelinkParams->psd, mmwaveSidelinkParams->duration);
-      NS_LOG_UNCOND ("ok");
       StartRxData (mmwaveSidelinkParams);
       //  }
     }
