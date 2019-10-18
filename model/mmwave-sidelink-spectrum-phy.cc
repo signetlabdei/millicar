@@ -125,6 +125,7 @@ MmWaveSidelinkSpectrumPhy::ResetSpectrumModel ()
   m_rxSpectrumModel = 0;
 }
 
+// TODO these are never used
 void
 MmWaveSidelinkSpectrumPhy::SetDevice (Ptr<NetDevice> d)
 {
@@ -218,7 +219,9 @@ MmWaveSidelinkSpectrumPhy::StartRx (Ptr<SpectrumSignalParameters> params)
 
   if (mmwaveSidelinkParams != 0)
     {
-      bool isAllocated = true;
+      // TODO remove dead code after testing that the following code can be
+      // handled by the MmWaveSidelinkSpectrumPhy state machine
+      //bool isAllocated = true;
 
       // TODO this could be handled by a switch state machine implemented in this class
       // Ptr<mmwave::MmWaveUeNetDevice> ueRx = 0;
@@ -229,11 +232,13 @@ MmWaveSidelinkSpectrumPhy::StartRx (Ptr<SpectrumSignalParameters> params)
       //     isAllocated = false;
       //   }
 
-      if (isAllocated)
-        {
-          m_interferenceData->AddSignal (mmwaveSidelinkParams->psd, mmwaveSidelinkParams->duration);
-          StartRxData (mmwaveSidelinkParams);
-        }
+      //if (isAllocated)
+      //  {
+      NS_LOG_UNCOND ("ok");
+      m_interferenceData->AddSignal (mmwaveSidelinkParams->psd, mmwaveSidelinkParams->duration);
+      NS_LOG_UNCOND ("ok");
+      StartRxData (mmwaveSidelinkParams);
+      //  }
     }
     else
     {
@@ -245,9 +250,9 @@ MmWaveSidelinkSpectrumPhy::StartRx (Ptr<SpectrumSignalParameters> params)
 void
 MmWaveSidelinkSpectrumPhy::StartRxData (Ptr<MmWaveSidelinkSpectrumSignalParameters> params)
 {
+  NS_LOG_FUNCTION (this);
   m_interferenceData->StartRx (params->psd);
 
-  NS_LOG_FUNCTION (this);
 
   switch (m_state)
     {
@@ -334,6 +339,7 @@ MmWaveSidelinkSpectrumPhy::StartRxData (Ptr<MmWaveSidelinkSpectrumSignalParamete
 void
 MmWaveSidelinkSpectrumPhy::EndRxData ()
 {
+  NS_LOG_FUNCTION (this);
   m_interferenceData->EndRx ();
 
   //double sinrAvg = Sum (m_sinrPerceived) / (m_sinrPerceived.GetSpectrumModel ()->GetNumBands ());
@@ -497,11 +503,12 @@ MmWaveSidelinkSpectrumPhy::GetSpectrumChannel ()
   return m_channel;
 }
 
-void
-MmWaveSidelinkSpectrumPhy::SetComponentCarrierId (uint8_t componentCarrierId)
-{
-  m_componentCarrierId = componentCarrierId;
-}
+// TODO remove
+// void
+// MmWaveSidelinkSpectrumPhy::SetComponentCarrierId (uint8_t componentCarrierId)
+// {
+//   m_componentCarrierId = componentCarrierId;
+// }
 
 void
 MmWaveSidelinkSpectrumPhy::AddDataPowerChunkProcessor (Ptr<mmWaveChunkProcessor> p)

@@ -172,7 +172,8 @@ public:
 
   Ptr<SpectrumChannel> GetSpectrumChannel ();
 
-  void SetComponentCarrierId (uint8_t componentCarrierId);
+  // TODO remove
+  // void SetComponentCarrierId (uint8_t componentCarrierId);
 
   /**
   * Start a transmission of data frame in sidelink
@@ -233,7 +234,7 @@ private:
 
   Ptr<mmWaveInterference> m_interferenceData; ///< the data interference
   Ptr<MobilityModel> m_mobility; ///< the modility model
-  Ptr<NetDevice> m_device; ///< the device
+  Ptr<NetDevice> m_device; ///< the device // TODO this is never used
   Ptr<SpectrumChannel> m_channel; ///< the channel
   Ptr<const SpectrumModel> m_rxSpectrumModel; ///< the spectrum model
   Ptr<SpectrumValue> m_txPsd; ///< the transmit PSD
