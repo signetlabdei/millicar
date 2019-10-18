@@ -22,10 +22,10 @@
 #define SRC_MMWAVE_MODEL_MMWAVE_SIDELINK_PHY_H_
 
 #include <ns3/mmwave-phy.h>
-#include "mmwave-sidelink-spectrum-phy.h"
-#include "mmwave-sidelink-phy-mac-common.h"
+#include <ns3/mmwave-phy-mac-common.h>
 #include <ns3/ptr.h>
 #include <map>
+#include "mmwave-sidelink-spectrum-phy.h"
 
 namespace ns3 {
 
@@ -119,7 +119,6 @@ private:
   Time m_lastSlotStart; //!< Time of the last slot start
   std::list<SidelinkSlotAllocInfo> m_slotAllocInfo; //!< slot allocation info list
   SidelinkSlotAllocInfo m_currSlotAllocInfo;
-  Ptr<MmWaveSidelinkPhyMacCommon> m_sidelinkPhyMacConfig;
   Ptr<MmWaveSidelinkSpectrumPhy> m_sidelinkSpectrumPhy;
 
   bool m_receptionEnabled {false}; //!< Flag to indicate if we are currently receiveing data

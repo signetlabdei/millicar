@@ -159,7 +159,7 @@ MmWaveSidelinkPhy::StartSlot (uint16_t frameNum, uint8_t sfNum, uint16_t slotNum
       m_currSlotAllocInfo = SidelinkSlotAllocInfo (SfnSf (frameNum, sfNum, slotNum));
     }
 
-  std::vector<uint8_t> rbgBitmask (m_sidelinkPhyMacConfig->GetBandwidthInRbg (), 1);
+  std::vector<uint8_t> rbgBitmask (m_phyMacConfig->GetNumRb (), 1);
 
   NS_ASSERT ((m_currSlotAllocInfo.m_sfnSf.m_frameNum == m_frameNum)
              && (m_currSlotAllocInfo.m_sfnSf.m_sfNum == m_sfNum
@@ -211,19 +211,12 @@ MmWaveSidelinkPhy::EndVarTti ()
       retVal.m_sfNum = (m_sfNum + (m_slotNum + 1) / slotsPerSubframe) % subframesPerFrame;
       retVal.m_slotNum = (m_slotNum + 1) % slotsPerSubframe;
 
-      Simulator::Schedule (m_lastSlotStart + m_sidelinkPhyMacConfig->GetSlotPeriod () -
-                           Simulator::Now (),
-                           &MmWaveSidelinkPhy::StartSlot,
-                           this,
-                           retVal.m_frameNum,
-                           retVal.m_sfNum,
-                           retVal.m_slotNum);
+      Simulator::Schedule (m_lastSlotStart + Seconds(m_phyMacConfig->GetSlotPeriod ()) - Simulator::Now (), &MmWaveSidelinkPhy::StartSlot, this, retVal.m_frameNum, retVal.m_sfNum, retVal.m_slotNum);
     }
   else
     {
       m_varTtiNum++;
-      Time nextVarTtiStart = m_phyMacConfig->GetSymbolPeriod () *
-                             Time (m_currSlotAllocInfo.m_varTtiAllocInfo[m_varTtiNum].m_sci->m_symStart);
+      Time nextVarTtiStart = m_phyMacConfig->GetSymbolPeriod () * Time (m_currSlotAllocInfo.m_varTtiAllocInfo[m_varTtiNum].m_sci->m_symStart);
 
       Simulator::Schedule (nextVarTtiStart + m_lastSlotStart - Simulator::Now (), &MmWaveSidelinkPhy::StartVarTti, this);
     }
@@ -236,7 +229,7 @@ MmWaveSidelinkPhy::SlData(const std::shared_ptr<SciInfoElement> &sci)
 {
   NS_LOG_FUNCTION (this);
   SetSubChannelsForTransmission (FromRBGBitmaskToRBAssignment (sci->m_rbgBitmask));
-  Time varTtiPeriod = m_sidelinkPhyMacConfig->GetSymbolPeriod () * sci->m_numSym;
+  Time varTtiPeriod = Seconds(m_phyMacConfig->GetSymbolPeriod ()) * sci->m_numSym;
 
   Ptr<PacketBurst> pktBurst = GetPacketBurst (SfnSf (m_frameNum, m_sfNum, m_slotNum));
   if (pktBurst && pktBurst->GetNPackets () > 0)
@@ -263,8 +256,6 @@ MmWaveSidelinkPhy::SlData(const std::shared_ptr<SciInfoElement> &sci)
       header.AddSubheader (subheader);
       emptyPdu->AddHeader (header);
       emptyPdu->AddPacketTag (tag);
-      // LteRadioBearerTag bearerTag (m_rnti, 3, 0);
-      // emptyPdu->AddPacketTag (bearerTag);
       pktBurst = CreateObject<PacketBurst> ();
       pktBurst->AddPacket (emptyPdu);
     }
@@ -287,24 +278,15 @@ MmWaveSidelinkPhy::SendDataChannels (Ptr<PacketBurst> pb,
   uint32_t size,
   std::vector<int> rbBitmap)
 {
-  // if (pb->GetNPackets () > 0)
-  //   {
-  //     LteRadioBearerTag tag;
-  //     if (!pb->GetPackets ().front ()->PeekPacketTag (tag))
-  //       {
-  //         NS_FATAL_ERROR ("No radio bearer tag");
-  //       }
-  //   }
-
   m_sidelinkSpectrumPhy->StartTxDataFrames (pb, duration, slotInd, mcs, size, rbBitmap);
 }
 
 void
 MmWaveSidelinkPhy::SetSubChannelsForTransmission (std::vector <int> mask)
 {
-  // Ptr<SpectrumValue> txPsd = GetTxPowerSpectralDensity (mask);
-  // NS_ASSERT (txPsd);
-  // m_sidelinkSpectrumPhy->SetTxPowerSpectralDensity (txPsd);
+  Ptr<SpectrumValue> txPsd = CreateTxPowerSpectralDensity ();
+  NS_ASSERT (txPsd);
+  m_sidelinkSpectrumPhy->SetTxPowerSpectralDensity (txPsd);
 }
 
 bool
@@ -360,15 +342,17 @@ MmWaveSidelinkPhy::FromRBGBitmaskToRBAssignment (const std::vector<uint8_t> rbgB
     {
       if (rbgBitmask.at (i) == 1)
         {
-          for (uint32_t k = 0; k < m_sidelinkPhyMacConfig->GetNumRbPerRbg (); ++k)
+          for (uint32_t k = 0; k < m_phyMacConfig->GetNumRbPerRbg (); ++k)
             {
-              ret.push_back ((i * m_sidelinkPhyMacConfig->GetNumRbPerRbg ()) + k);
+              ret.push_back ((i * m_phyMacConfig->GetNumRbPerRbg ()) + k);
             }
         }
     }
 
   return ret;
 }
+
+
 
 }
 
