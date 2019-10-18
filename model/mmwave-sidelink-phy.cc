@@ -19,6 +19,9 @@
 
 
 #include "mmwave-sidelink-phy.h"
+#include <ns3/mmwave-spectrum-value-helper.h>
+#include <ns3/mmwave-mac-pdu-tag.h>
+#include <ns3/mmwave-mac-pdu-header.h>
 #include <ns3/double.h>
 #include <ns3/pointer.h>
 
@@ -117,10 +120,10 @@ MmWaveSidelinkPhy::GetNoiseFigure () const
   return m_noiseFigure;
 }
 
-Ptr<MmWaveSpectrumPhy>
+Ptr<MmWaveSidelinkSpectrumPhy>
 MmWaveSidelinkPhy::GetSpectrumPhy () const
 {
-  return m_spectrumPhy;
+  return m_sidelinkSpectrumPhy;
 }
 
 Ptr<SpectrumValue>
@@ -234,45 +237,55 @@ MmWaveSidelinkPhy::SlData(const std::shared_ptr<SciInfoElement> &sci)
   NS_LOG_FUNCTION (this);
   SetSubChannelsForTransmission (FromRBGBitmaskToRBAssignment (sci->m_rbgBitmask));
   Time varTtiPeriod = m_sidelinkPhyMacConfig->GetSymbolPeriod () * sci->m_numSym;
-  //
-  // Ptr<PacketBurst> pktBurst = GetPacketBurst (SfnSf (m_frameNum, m_subframeNum, m_slotNum, dci->m_symStart));
-  // if (pktBurst && pktBurst->GetNPackets () > 0)
-  //   {
-  //     std::list< Ptr<Packet> > pkts = pktBurst->GetPackets ();
-  //     MmWaveMacPduTag tag;
-  //     pkts.front ()->PeekPacketTag (tag);
-  //
-  //     // LteRadioBearerTag bearerTag;
-  //     // if (!pkts.front ()->PeekPacketTag (bearerTag))
-  //     //   {
-  //     //     NS_FATAL_ERROR ("No radio bearer tag");
-  //     //   }
-  //   }
-  // else
-  //   {
-  //     NS_LOG_WARN ("Send an empty PDU .... ");
-  //     // sometimes the UE will be scheduled when no data is queued
-  //     // in this case, send an empty PDU
-  //     MmWaveMacPduTag tag (SfnSf (m_frameNum, m_subframeNum, m_slotNum, dci->m_symStart));
-  //     Ptr<Packet> emptyPdu = Create <Packet> ();
-  //     MmWaveMacPduHeader header;
-  //     MacSubheader subheader (3, 0);    // lcid = 3, size = 0
-  //     header.AddSubheader (subheader);
-  //     emptyPdu->AddHeader (header);
-  //     emptyPdu->AddPacketTag (tag);
-  //     // LteRadioBearerTag bearerTag (m_rnti, 3, 0);
-  //     // emptyPdu->AddPacketTag (bearerTag);
-  //     pktBurst = CreateObject<PacketBurst> ();
-  //     pktBurst->AddPacket (emptyPdu);
-  //   }
-  //
-  // Simulator::Schedule (NanoSeconds (1.0), &MmWaveSidelinkPhy::SendDataChannels, this,
-  //                      pktBurst, ctrlMsg, varTtiPeriod - NanoSeconds (2.0), m_varTtiNum);
+
+  Ptr<PacketBurst> pktBurst = GetPacketBurst (SfnSf (m_frameNum, m_sfNum, m_slotNum));
+  if (pktBurst && pktBurst->GetNPackets () > 0)
+    {
+      std::list< Ptr<Packet> > pkts = pktBurst->GetPackets ();
+      MmWaveMacPduTag tag;
+      pkts.front ()->PeekPacketTag (tag);
+
+      // LteRadioBearerTag bearerTag;
+      // if (!pkts.front ()->PeekPacketTag (bearerTag))
+      //   {
+      //     NS_FATAL_ERROR ("No radio bearer tag");
+      //   }
+    }
+  else
+    {
+      NS_LOG_WARN ("Send an empty PDU .... ");
+      // sometimes the UE will be scheduled when no data is queued
+      // in this case, send an empty PDU
+      MmWaveMacPduTag tag (SfnSf (m_frameNum, m_sfNum, m_slotNum));
+      Ptr<Packet> emptyPdu = Create <Packet> ();
+      MmWaveMacPduHeader header;
+      MacSubheader subheader (3, 0);    // lcid = 3, size = 0
+      header.AddSubheader (subheader);
+      emptyPdu->AddHeader (header);
+      emptyPdu->AddPacketTag (tag);
+      // LteRadioBearerTag bearerTag (m_rnti, 3, 0);
+      // emptyPdu->AddPacketTag (bearerTag);
+      pktBurst = CreateObject<PacketBurst> ();
+      pktBurst->AddPacket (emptyPdu);
+    }
+
+  Simulator::Schedule (NanoSeconds (1.0), &MmWaveSidelinkPhy::SendDataChannels, this,
+                       pktBurst,
+                       varTtiPeriod - NanoSeconds (2.0),
+                       m_varTtiNum,
+                       sci->m_mcs,
+                       sci->m_tbSize,
+                       FromRBGBitmaskToRBAssignment (sci->m_rbgBitmask));
   return varTtiPeriod;
 }
 
 void
-MmWaveSidelinkPhy::SendDataChannels (Ptr<PacketBurst> pb, Time duration, uint8_t slotInd)
+MmWaveSidelinkPhy::SendDataChannels (Ptr<PacketBurst> pb,
+  Time duration,
+  uint8_t slotInd,
+  uint8_t mcs,
+  uint32_t size,
+  std::vector<int> rbBitmap)
 {
   // if (pb->GetNPackets () > 0)
   //   {
@@ -283,7 +296,7 @@ MmWaveSidelinkPhy::SendDataChannels (Ptr<PacketBurst> pb, Time duration, uint8_t
   //       }
   //   }
 
-  //m_spectrumPhy->StartTxDataFrames (pb, ctrlMsg, duration, slotInd);
+  m_sidelinkSpectrumPhy->StartTxDataFrames (pb, duration, slotInd, mcs, size, rbBitmap);
 }
 
 void
@@ -291,7 +304,7 @@ MmWaveSidelinkPhy::SetSubChannelsForTransmission (std::vector <int> mask)
 {
   // Ptr<SpectrumValue> txPsd = GetTxPowerSpectralDensity (mask);
   // NS_ASSERT (txPsd);
-  // m_spectrumPhy->SetTxPowerSpectralDensity (txPsd);
+  // m_sidelinkSpectrumPhy->SetTxPowerSpectralDensity (txPsd);
 }
 
 bool
@@ -340,7 +353,7 @@ MmWaveSidelinkPhy::RetrieveSidelinkSlotAllocInfo (const SfnSf &sfnsf)
 std::vector<int>
 MmWaveSidelinkPhy::FromRBGBitmaskToRBAssignment (const std::vector<uint8_t> rbgBitmask) const
 {
-  
+
   std::vector<int> ret;
 
   for (uint32_t i = 0; i < rbgBitmask.size (); ++i)

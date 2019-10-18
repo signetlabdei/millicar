@@ -22,6 +22,7 @@
 #define SRC_MMWAVE_MODEL_MMWAVE_SIDELINK_PHY_H_
 
 #include <ns3/mmwave-phy.h>
+#include "mmwave-sidelink-spectrum-phy.h"
 #include "mmwave-sidelink-phy-mac-common.h"
 #include <ns3/ptr.h>
 #include <map>
@@ -58,7 +59,7 @@ public:
   void SetNoiseFigure (double pf);
   double GetNoiseFigure () const;
 
-  virtual Ptr<MmWaveSpectrumPhy> GetSpectrumPhy () const;
+  virtual Ptr<MmWaveSidelinkSpectrumPhy> GetSpectrumPhy () const;
 
   // bool SendPacket (Ptr<Packet> packet);
   //
@@ -112,13 +113,14 @@ private:
   SidelinkSlotAllocInfo RetrieveSidelinkSlotAllocInfo ();
   SidelinkSlotAllocInfo RetrieveSidelinkSlotAllocInfo (const SfnSf &sfnsf);
 
+  void SendDataChannels (Ptr<PacketBurst> pb, Time duration, uint8_t slotInd, uint8_t mcs, uint32_t size, std::vector<int> rbBitmap);
+
 private:
   Time m_lastSlotStart; //!< Time of the last slot start
   std::list<SidelinkSlotAllocInfo> m_slotAllocInfo; //!< slot allocation info list
   SidelinkSlotAllocInfo m_currSlotAllocInfo;
   Ptr<MmWaveSidelinkPhyMacCommon> m_sidelinkPhyMacConfig;
-
-  void SendDataChannels (Ptr<PacketBurst> pb, Time duration, uint8_t slotInd);
+  Ptr<MmWaveSidelinkSpectrumPhy> m_sidelinkSpectrumPhy;
 
   bool m_receptionEnabled {false}; //!< Flag to indicate if we are currently receiveing data
 
