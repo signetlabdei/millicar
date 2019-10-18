@@ -249,8 +249,6 @@ void
 MmWaveSidelinkSpectrumPhy::StartRxData (Ptr<MmWaveSidelinkSpectrumSignalParameters> params)
 {
   NS_LOG_FUNCTION (this);
-  m_interferenceData->StartRx (params->psd);
-
 
   switch (m_state)
     {
@@ -263,6 +261,9 @@ MmWaveSidelinkSpectrumPhy::StartRxData (Ptr<MmWaveSidelinkSpectrumSignalParamete
     case RX_DATA:
     case IDLE:
       {
+        // this is a useful signal
+        m_interferenceData->StartRx (params->psd);
+
         if (m_rxTransportBlock.empty ())
           {
             NS_ASSERT (m_state == IDLE);
