@@ -20,6 +20,7 @@ def build(bld):
     module_test = bld.create_ns3_module_test_library('mmwave-vehicular')
     module_test.source = [
         'test/mmwave-vehicular-test-suite.cc',
+        'test/mmwave-vehicular-sidelink-spectrum-phy-test.cc',
         ]
 
     headers = bld(features='ns3header')
