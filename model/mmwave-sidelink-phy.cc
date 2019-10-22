@@ -178,7 +178,12 @@ MmWaveSidelinkPhy::StartSlot (uint16_t slotNum)
 //   auto currentSci = m_currSlotAllocInfo.m_varTtiAllocInfo[m_varTtiNum].m_sci;
 //   auto nextVarTtiStart = m_phyMacConfig->GetSymbolPeriod () * Time (currentSci->m_symStart);
 //
-//   Simulator::Schedule (nextVarTtiStart, &MmWaveSidelinkPhy::StartVarTti, this);
+
+  // convert the slot period from seconds to milliseconds
+  // TODO change GetSlotPeriod to return a TimeValue
+  double slotPeriod = m_phyMacConfig->GetSlotPeriod ();
+  slotPeriod *= 1000;
+  Simulator::Schedule (MilliSeconds (slotPeriod), &MmWaveSidelinkPhy::StartSlot, this, ++slotNum);
 }
 //
 // void
