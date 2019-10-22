@@ -58,6 +58,9 @@ public:
   void SetNoiseFigure (double pf);
   double GetNoiseFigure () const;
 
+  void SetConfigurationParameters (Ptr<MmWavePhyMacCommon> ptrConfig);
+  Ptr<MmWavePhyMacCommon> GetConfigurationParameters (void) const;
+
   virtual Ptr<MmWaveSidelinkSpectrumPhy> GetSpectrumPhy () const;
 
   // bool SendPacket (Ptr<Packet> packet);
@@ -126,6 +129,7 @@ private:
   uint8_t m_varTtiNum {0};
   uint32_t m_currTbs {0};          //!< Current TBS of the receiveing DL data (used to compute the feedback)
   Ptr<MmWaveSidelinkSpectrumPhy> m_sidelinkSpectrumPhy; //!< the SpectrumPhy instance associated with this PHY
+  Ptr<MmWavePhyMacCommon> m_phyMacConfig; //!< the configuration parameters
 };
 
 }

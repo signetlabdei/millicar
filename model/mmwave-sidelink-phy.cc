@@ -124,6 +124,18 @@ MmWaveSidelinkPhy::GetSpectrumPhy () const
   return m_sidelinkSpectrumPhy;
 }
 
+void
+MmWaveSidelinkPhy::SetConfigurationParameters (Ptr<MmWavePhyMacCommon> ptrConfig)
+{
+  m_phyMacConfig = ptrConfig;
+}
+
+Ptr<MmWavePhyMacCommon>
+MmWaveSidelinkPhy::GetConfigurationParameters (void) const
+{
+  return m_phyMacConfig;
+}
+
 // Ptr<SpectrumValue>
 // MmWaveSidelinkPhy::CreateTxPowerSpectralDensity ()
 // {
@@ -134,7 +146,7 @@ MmWaveSidelinkPhy::GetSpectrumPhy () const
 void
 MmWaveSidelinkPhy::StartSlot (uint16_t slotNum)
 {
-//   NS_LOG_FUNCTION (this);
+   NS_LOG_FUNCTION (this);
 //   m_frameNum = frameNum;
 //   m_sfNum = sfNum;
 //   m_slotNum = static_cast<uint8_t> (slotNum);
