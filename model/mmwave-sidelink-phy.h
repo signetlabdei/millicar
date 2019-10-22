@@ -30,7 +30,7 @@ namespace ns3 {
 
 namespace mmwave {
 
-class MmWaveSidelinkPhy
+class MmWaveSidelinkPhy : public Object
 {
 
 public:
@@ -43,7 +43,7 @@ public:
    *
    * Usually called by the helper. It starts the event loop for the device.
    */
-  MmWaveSidelinkPhy (Ptr<MmWaveSpectrumPhy> channelPhy);
+  MmWaveSidelinkPhy (Ptr<MmWaveSidelinkSpectrumPhy> spectrumPhy);
 
   virtual ~MmWaveSidelinkPhy ();
 
@@ -77,7 +77,7 @@ public:
   // Ptr<MmWaveSpectrumPhy> GetDlSpectrumPhy () const;
   // Ptr<MmWaveSpectrumPhy> GetUlSpectrumPhy () const;
 
-  void StartSlot (uint16_t frameNum, uint8_t subframeNum, uint16_t slotNum);
+  void StartSlot (uint16_t slotNum);
   void StartVarTti ();
   void EndVarTti ();
 
@@ -115,15 +115,17 @@ private:
   void SendDataChannels (Ptr<PacketBurst> pb, Time duration, uint8_t slotInd, uint8_t mcs, uint32_t size, std::vector<int> rbBitmap);
 
 private:
+  double m_txPower; //!< the transmission power in dBm
+  double m_noiseFigure; //!< the noise figure in dB
   Time m_lastSlotStart; //!< Time of the last slot start
   std::list<SidelinkSlotAllocInfo> m_slotAllocInfo; //!< slot allocation info list
   SidelinkSlotAllocInfo m_currSlotAllocInfo;
-  Ptr<MmWaveSidelinkSpectrumPhy> m_sidelinkSpectrumPhy;
 
   bool m_receptionEnabled {false}; //!< Flag to indicate if we are currently receiveing data
 
   uint8_t m_varTtiNum {0};
   uint32_t m_currTbs {0};          //!< Current TBS of the receiveing DL data (used to compute the feedback)
+  Ptr<MmWaveSidelinkSpectrumPhy> m_sidelinkSpectrumPhy; //!< the SpectrumPhy instance associated with this PHY
 };
 
 }
