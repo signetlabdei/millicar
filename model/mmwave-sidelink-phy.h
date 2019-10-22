@@ -44,7 +44,7 @@ public:
    *
    * Usually called by the helper. It starts the event loop for the device.
    */
-  MmWaveSidelinkPhy (Ptr<MmWaveSpectrumPhy> channelPhy, const Ptr<Node> &n);
+  MmWaveSidelinkPhy (Ptr<MmWaveSpectrumPhy> channelPhy);
 
   virtual ~MmWaveSidelinkPhy ();
 

@@ -39,13 +39,11 @@ MmWaveSidelinkPhy::MmWaveSidelinkPhy ()
   NS_FATAL_ERROR ("This constructor should not be called");
 }
 
-MmWaveSidelinkPhy::MmWaveSidelinkPhy (Ptr<MmWaveSidelinkSpectrumPhy> channelPhy,
-                                      const Ptr<Node> &n)
+MmWaveSidelinkPhy::MmWaveSidelinkPhy (Ptr<MmWaveSidelinkSpectrumPhy> channelPhy)
 {
   NS_LOG_FUNCTION (this);
-  m_currSlotAllocInfo = SfnSf (0,0,0);
-  Simulator::ScheduleWithContext (n->GetId (), MilliSeconds (0),
-                                  &MmWaveSidelinkPhy::StartSlot, this, 0, 0, 0);
+  //m_currSlotAllocInfo = SfnSf (0,0,0);
+  Simulator::ScheduleNow (&MmWaveSidelinkPhy::StartSlot, this, 0);
 }
 
 MmWaveSidelinkPhy::~MmWaveSidelinkPhy ()
