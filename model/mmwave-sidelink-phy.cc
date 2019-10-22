@@ -136,6 +136,12 @@ MmWaveSidelinkPhy::GetConfigurationParameters (void) const
   return m_phyMacConfig;
 }
 
+void
+MmWaveSidelinkPhy::AddPacketBurst (Ptr<PacketBurst> pb)
+{
+  m_packetBurstBuffer.push_back (pb);
+}
+
 // Ptr<SpectrumValue>
 // MmWaveSidelinkPhy::CreateTxPowerSpectralDensity ()
 // {
@@ -178,6 +184,11 @@ MmWaveSidelinkPhy::StartSlot (uint16_t slotNum)
 //   auto currentSci = m_currSlotAllocInfo.m_varTtiAllocInfo[m_varTtiNum].m_sci;
 //   auto nextVarTtiStart = m_phyMacConfig->GetSymbolPeriod () * Time (currentSci->m_symStart);
 //
+
+  if (m_packetBurstBuffer.size () != 0)
+  {
+    SlData (slotNum);
+  }
 
   // convert the slot period from seconds to milliseconds
   // TODO change GetSlotPeriod to return a TimeValue
@@ -239,51 +250,29 @@ MmWaveSidelinkPhy::StartSlot (uint16_t slotNum)
 //   m_receptionEnabled = false;
 // }
 //
-// Time
-// MmWaveSidelinkPhy::SlData(const std::shared_ptr<SciInfoElement> &sci)
-// {
-//   NS_LOG_FUNCTION (this);
-//   SetSubChannelsForTransmission (FromRBGBitmaskToRBAssignment (sci->m_rbgBitmask));
-//   Time varTtiPeriod = Seconds(m_phyMacConfig->GetSymbolPeriod ()) * sci->m_numSym;
-//
-//   Ptr<PacketBurst> pktBurst = GetPacketBurst (SfnSf (m_frameNum, m_sfNum, m_slotNum));
-//   if (pktBurst && pktBurst->GetNPackets () > 0)
-//     {
-//       std::list< Ptr<Packet> > pkts = pktBurst->GetPackets ();
-//       MmWaveMacPduTag tag;
-//       pkts.front ()->PeekPacketTag (tag);
-//
-//       // LteRadioBearerTag bearerTag;
-//       // if (!pkts.front ()->PeekPacketTag (bearerTag))
-//       //   {
-//       //     NS_FATAL_ERROR ("No radio bearer tag");
-//       //   }
-//     }
-//   else
-//     {
-//       NS_LOG_WARN ("Send an empty PDU .... ");
-//       // sometimes the UE will be scheduled when no data is queued
-//       // in this case, send an empty PDU
-//       MmWaveMacPduTag tag (SfnSf (m_frameNum, m_sfNum, m_slotNum));
-//       Ptr<Packet> emptyPdu = Create <Packet> ();
-//       MmWaveMacPduHeader header;
-//       MacSubheader subheader (3, 0);    // lcid = 3, size = 0
-//       header.AddSubheader (subheader);
-//       emptyPdu->AddHeader (header);
-//       emptyPdu->AddPacketTag (tag);
-//       pktBurst = CreateObject<PacketBurst> ();
-//       pktBurst->AddPacket (emptyPdu);
-//     }
-//
-//   Simulator::Schedule (NanoSeconds (1.0), &MmWaveSidelinkPhy::SendDataChannels, this,
-//                        pktBurst,
-//                        varTtiPeriod - NanoSeconds (2.0),
-//                        m_varTtiNum,
-//                        sci->m_mcs,
-//                        sci->m_tbSize,
-//                        FromRBGBitmaskToRBAssignment (sci->m_rbgBitmask));
-//   return varTtiPeriod;
-// }
+Time
+MmWaveSidelinkPhy::SlData(uint16_t slotNum)
+{
+  NS_LOG_FUNCTION (this);
+  // SetSubChannelsForTransmission (FromRBGBitmaskToRBAssignment (sci->m_rbgBitmask));
+  // Time varTtiPeriod = Seconds(m_phyMacConfig->GetSymbolPeriod ()) * sci->m_numSym;
+
+  Ptr<PacketBurst> pktBurst = m_packetBurstBuffer.front ();
+
+  // convert the slot period from seconds to milliseconds
+  // TODO change GetSlotPeriod to return a TimeValue
+  Time slotPeriod = MilliSeconds (m_phyMacConfig->GetSlotPeriod () * 1000);
+
+
+  // Simulator::Schedule (NanoSeconds (1.0), &MmWaveSidelinkPhy::SendDataChannels, this,
+  //                      pktBurst,
+  //                      MilliSeconds (slotPeriod),
+  //                      slotNum,
+  //                      10, // TODO how to set the mcs?
+  //                      pktBurst->GetSize (), // TODO how to set the tbsize
+  //                      m_subChannelsForTransmission);
+  return slotPeriod;
+}
 //
 // void
 // MmWaveSidelinkPhy::SendDataChannels (Ptr<PacketBurst> pb,

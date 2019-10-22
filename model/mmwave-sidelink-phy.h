@@ -84,14 +84,15 @@ public:
   void StartVarTti ();
   void EndVarTti ();
 
+  void AddPacketBurst (Ptr<PacketBurst> pb);
+
 private:
 
   /**
-   * \brief Transmit SL data and return the time at which the transmission will end
-   * \param sci the current SCI
-   * \return the time at which the transmission of SL data will end
+   * \brief Transmit SL data
+   * \param slotNum the slot index
    */
-  Time SlData(const std::shared_ptr<SciInfoElement> &sci);
+  Time SlData (uint16_t slotNum);
 
   /**
    * \brief Transform a MAC-made vector of RBG to a PHY-ready vector of SINR indices
@@ -130,6 +131,7 @@ private:
   uint32_t m_currTbs {0};          //!< Current TBS of the receiveing DL data (used to compute the feedback)
   Ptr<MmWaveSidelinkSpectrumPhy> m_sidelinkSpectrumPhy; //!< the SpectrumPhy instance associated with this PHY
   Ptr<MmWavePhyMacCommon> m_phyMacConfig; //!< the configuration parameters
+  std::list<Ptr<PacketBurst>> m_packetBurstBuffer; //!< buffer of packet bursts to send
 };
 
 }
