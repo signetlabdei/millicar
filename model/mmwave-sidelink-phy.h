@@ -21,7 +21,6 @@
 #ifndef SRC_MMWAVE_MODEL_MMWAVE_SIDELINK_PHY_H_
 #define SRC_MMWAVE_MODEL_MMWAVE_SIDELINK_PHY_H_
 
-#include <ns3/mmwave-phy.h>
 #include <ns3/mmwave-phy-mac-common.h>
 #include <ns3/ptr.h>
 #include <map>
@@ -31,7 +30,7 @@ namespace ns3 {
 
 namespace mmwave {
 
-class MmWaveSidelinkPhy : public MmWavePhy
+class MmWaveSidelinkPhy
 {
 
 public:
