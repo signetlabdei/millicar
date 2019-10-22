@@ -254,44 +254,62 @@ Time
 MmWaveSidelinkPhy::SlData(uint16_t slotNum)
 {
   NS_LOG_FUNCTION (this);
-  // SetSubChannelsForTransmission (FromRBGBitmaskToRBAssignment (sci->m_rbgBitmask));
-  // Time varTtiPeriod = Seconds(m_phyMacConfig->GetSymbolPeriod ()) * sci->m_numSym;
 
+  // create the tx PSD
+  //TODO do we need to create a new psd at each slot?
+  std::vector<int> subChannelsForTx = SetSubChannelsForTransmission ();
+
+  // retrieve the first packet burst in the list
   Ptr<PacketBurst> pktBurst = m_packetBurstBuffer.front ();
 
   // convert the slot period from seconds to milliseconds
   // TODO change GetSlotPeriod to return a TimeValue
   Time slotPeriod = MilliSeconds (m_phyMacConfig->GetSlotPeriod () * 1000);
 
+  // send the packet burst
+  Simulator::Schedule (NanoSeconds (1.0), &MmWaveSidelinkPhy::SendDataChannels, this,
+                       pktBurst,
+                       MilliSeconds (slotPeriod),
+                       slotNum,
+                       10, // TODO how to set the mcs?
+                       pktBurst->GetSize (), // TODO how to set the tbsize
+                       subChannelsForTx);
 
-  // Simulator::Schedule (NanoSeconds (1.0), &MmWaveSidelinkPhy::SendDataChannels, this,
-  //                      pktBurst,
-  //                      MilliSeconds (slotPeriod),
-  //                      slotNum,
-  //                      10, // TODO how to set the mcs?
-  //                      pktBurst->GetSize (), // TODO how to set the tbsize
-  //                      m_subChannelsForTransmission);
+  // remove the packet burst from the list
+  m_packetBurstBuffer.pop_front ();
+
   return slotPeriod;
 }
-//
-// void
-// MmWaveSidelinkPhy::SendDataChannels (Ptr<PacketBurst> pb,
-//   Time duration,
-//   uint8_t slotInd,
-//   uint8_t mcs,
-//   uint32_t size,
-//   std::vector<int> rbBitmap)
-// {
-//   m_sidelinkSpectrumPhy->StartTxDataFrames (pb, duration, slotInd, mcs, size, rbBitmap);
-// }
-//
-// void
-// MmWaveSidelinkPhy::SetSubChannelsForTransmission (std::vector <int> mask)
-// {
-//   Ptr<SpectrumValue> txPsd = CreateTxPowerSpectralDensity ();
-//   NS_ASSERT (txPsd);
-//   m_sidelinkSpectrumPhy->SetTxPowerSpectralDensity (txPsd);
-// }
+
+void
+MmWaveSidelinkPhy::SendDataChannels (Ptr<PacketBurst> pb,
+  Time duration,
+  uint8_t slotInd,
+  uint8_t mcs,
+  uint32_t size,
+  std::vector<int> rbBitmap)
+{
+  m_sidelinkSpectrumPhy->StartTxDataFrames (pb, duration, slotInd, mcs, size, rbBitmap);
+}
+
+std::vector<int>
+MmWaveSidelinkPhy::SetSubChannelsForTransmission ()
+  {
+    // create the transmission mask, use all the available subchannels
+    std::vector<int> subChannelsForTx (m_phyMacConfig->GetTotalNumChunk ());
+    for (uint8_t i = 0; i < subChannelsForTx.size (); i++)
+    {
+      subChannelsForTx [i] = i;
+    }
+
+    // create the tx PSD
+    Ptr<SpectrumValue> txPsd = MmWaveSpectrumValueHelper::CreateTxPowerSpectralDensity (m_phyMacConfig, m_txPower, subChannelsForTx);
+
+    // set the tx PSD in the spectrum phy
+    m_sidelinkSpectrumPhy->SetTxPowerSpectralDensity (txPsd);
+
+    return subChannelsForTx;
+  }
 //
 // bool
 // MmWaveSidelinkPhy::SidelinkSlotAllocInfoExists (const SfnSf &retVal) const

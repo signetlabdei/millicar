@@ -110,7 +110,7 @@ private:
    */
   std::vector<int> FromRBGBitmaskToRBAssignment (const std::vector<uint8_t> rbgBitmask) const;
 
-  void SetSubChannelsForTransmission (std::vector <int> mask);
+  std::vector<int> SetSubChannelsForTransmission ();
 
   bool SidelinkSlotAllocInfoExists (const SfnSf &retVal) const;
   SidelinkSlotAllocInfo RetrieveSidelinkSlotAllocInfo ();
