@@ -39,9 +39,8 @@ MmWaveSidelinkPhy::MmWaveSidelinkPhy ()
   NS_FATAL_ERROR ("This constructor should not be called");
 }
 
-MmWaveSidelinkPhy::MmWaveSidelinkPhy (Ptr<MmWaveSpectrumPhy> channelPhy,
-                          const Ptr<Node> &n)
-  : MmWavePhy (channelPhy)
+MmWaveSidelinkPhy::MmWaveSidelinkPhy (Ptr<MmWaveSidelinkSpectrumPhy> channelPhy,
+                                      const Ptr<Node> &n)
 {
   NS_LOG_FUNCTION (this);
   m_currSlotAllocInfo = SfnSf (0,0,0);
@@ -75,7 +74,8 @@ MmWaveSidelinkPhy::GetTypeId (void)
                     " are connected to sources at the standard noise temperature T0.\" "
                    "In this model, we consider T0 = 290K.",
                     DoubleValue (5.0),
-                    MakeDoubleAccessor (&MmWaveSidelinkPhy::m_noiseFigure),
+                    MakeDoubleAccessor (&MmWaveSidelinkPhy::SetNoiseFigure,
+                                        &MmWaveSidelinkPhy::GetNoiseFigure),
                     MakeDoubleChecker<double> ())
     .AddAttribute ("SpectrumPhy",
                    "The SpectrumPhy associated to this MmWavePhy",
@@ -90,7 +90,6 @@ void
 MmWaveSidelinkPhy::DoInitialize (void)
 {
   NS_LOG_FUNCTION (this);
-  MmWavePhy::DoInitialize ();
 }
 
 void
@@ -110,8 +109,9 @@ MmWaveSidelinkPhy::GetTxPower () const
 }
 
 void
-MmWaveSidelinkPhy::SetNoiseFigure (double pf)
+MmWaveSidelinkPhy::SetNoiseFigure (double nf)
 {
+  m_noiseFigure = nf;
 }
 
 double
@@ -129,7 +129,7 @@ MmWaveSidelinkPhy::GetSpectrumPhy () const
 Ptr<SpectrumValue>
 MmWaveSidelinkPhy::CreateTxPowerSpectralDensity ()
 {
-  Ptr<SpectrumValue> psd;
+  Ptr<SpectrumValue> psd = MmWaveSpectrumValueHelper::CreateTxPowerSpectralDensity (m_phyMacConfig, m_txPower, m_subChannelsForTx);
   return psd;
 }
 
