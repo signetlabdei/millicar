@@ -55,6 +55,7 @@ TypeId
 MmWaveSidelinkPhy::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::MmWaveSidelinkPhy")
+    .SetParent<Object> ()
     .AddConstructor<MmWaveSidelinkPhy> ()
     .AddAttribute ("TxPower",
                    "Transmission power in dBm",
