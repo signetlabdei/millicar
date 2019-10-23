@@ -273,12 +273,12 @@ MmWaveSidelinkPhy::SlData(uint16_t slotNum)
 
   // convert the slot period from seconds to milliseconds
   // TODO change GetSlotPeriod to return a TimeValue
-  Time slotPeriod = MilliSeconds (m_phyMacConfig->GetSlotPeriod () * 1000);
+  Time slotPeriod = NanoSeconds (m_phyMacConfig->GetSlotPeriod () * 1e9);
 
   // send the packet burst
   Simulator::Schedule (NanoSeconds (1.0), &MmWaveSidelinkPhy::SendDataChannels, this,
                        pktBurst,
-                       MilliSeconds (slotPeriod),
+                       slotPeriod,
                        slotNum,
                        10, // TODO how to set the mcs?
                        pktBurst->GetSize (), // TODO how to set the tbsize
