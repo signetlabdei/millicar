@@ -415,6 +415,10 @@ MmWaveSidelinkSpectrumPhy::StartTxDataFrames (Ptr<PacketBurst> pb,
   uint32_t size,
   std::vector<int> rbBitmap)
 {
+  NS_LOG_FUNCTION (this);
+
+  NS_ASSERT_MSG (m_channel, "First configure the SpectrumChannel");
+  
   switch (m_state)
     {
     case RX_DATA:
