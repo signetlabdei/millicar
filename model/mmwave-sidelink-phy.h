@@ -133,6 +133,7 @@ private:
   Ptr<MmWaveSidelinkSpectrumPhy> m_sidelinkSpectrumPhy; //!< the SpectrumPhy instance associated with this PHY
   Ptr<MmWavePhyMacCommon> m_phyMacConfig; //!< the configuration parameters
   std::list<Ptr<PacketBurst>> m_packetBurstBuffer; //!< buffer of packet bursts to send
+  uint8_t m_mcs; //!< modulation and coding scheme value
 };
 
 }

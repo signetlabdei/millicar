@@ -86,7 +86,12 @@ MmWaveSidelinkPhy::GetTypeId (void)
                    TypeId::ATTR_GET,
                    PointerValue (),
                    MakePointerAccessor (&MmWaveSidelinkPhy::GetSpectrumPhy),
-                   MakePointerChecker <MmWaveSidelinkSpectrumPhy> ());
+                   MakePointerChecker <MmWaveSidelinkSpectrumPhy> ())
+    .AddAttribute ("MCS",
+                   "Modulation and coding scheme value",
+                   UintegerValue (0),
+                   MakeUintegerAccessor (&MmWaveSidelinkPhy::m_mcs),
+                   MakeUintegerChecker<uint8_t> (0, 28));
   return tid;
 }
 
@@ -280,7 +285,7 @@ MmWaveSidelinkPhy::SlData(uint16_t slotNum)
                        pktBurst,
                        slotPeriod,
                        slotNum,
-                       10, // TODO how to set the mcs?
+                       m_mcs,
                        pktBurst->GetSize (), // TODO how to set the tbsize
                        subChannelsForTx);
 
