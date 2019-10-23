@@ -192,9 +192,8 @@ MmWaveSidelinkPhy::StartSlot (uint16_t slotNum)
 
   // convert the slot period from seconds to milliseconds
   // TODO change GetSlotPeriod to return a TimeValue
-  double slotPeriod = m_phyMacConfig->GetSlotPeriod ();
-  slotPeriod *= 1000;
-  Simulator::Schedule (MilliSeconds (slotPeriod), &MmWaveSidelinkPhy::StartSlot, this, ++slotNum);
+  double slotPeriod = m_phyMacConfig->GetSlotPeriod () * 1e9;
+  Simulator::Schedule (NanoSeconds (slotPeriod), &MmWaveSidelinkPhy::StartSlot, this, ++slotNum);
 }
 //
 // void
