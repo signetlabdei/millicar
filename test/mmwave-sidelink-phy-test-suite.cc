@@ -104,6 +104,9 @@ MmWaveVehicularSpectrumPhyTestCase1::DoRun (void)
   SpectrumChannelHelper sh = SpectrumChannelHelper::Default ();
   Ptr<SpectrumChannel> sc = sh.Create ();
 
+  // create the configuration
+  Ptr<MmWavePhyMacCommon> pmc = CreateObject<MmWavePhyMacCommon> ();
+
   // create and configure the tx spectrum phy
   Ptr<MmWaveSidelinkSpectrumPhy> tx_ssp = CreateObject<MmWaveSidelinkSpectrumPhy> ();
   tx_ssp->SetMobility (tx_mm);
@@ -111,7 +114,7 @@ MmWaveVehicularSpectrumPhyTestCase1::DoRun (void)
   tx_ssp->SetChannel (sc);
 
   // create the tx phy
-  Ptr<MmWaveSidelinkPhy> tx_phy = CreateObject<MmWaveSidelinkPhy> (tx_ssp, n.Get (0));
+  Ptr<MmWaveSidelinkPhy> tx_phy = CreateObject<MmWaveSidelinkPhy> (tx_ssp, pmc);
 
   // create and configure the tx spectrum phy
   Ptr<MmWaveSidelinkSpectrumPhy> rx_ssp = CreateObject<MmWaveSidelinkSpectrumPhy> ();
@@ -122,6 +125,9 @@ MmWaveVehicularSpectrumPhyTestCase1::DoRun (void)
   // add the rx spectrum phy instance to the spectrum channel
   sc->AddRx (rx_ssp);
 
+  // create the rx phy
+  Ptr<MmWaveSidelinkPhy> rx_phy = CreateObject<MmWaveSidelinkPhy> (rx_ssp, pmc);
+
   // connect the rx callback to the sink
   rx_ssp->SetPhyRxDataEndOkCallback (MakeCallback (&MmWaveVehicularSpectrumPhyTestCase1::Rx, this));
 
@@ -131,8 +137,7 @@ MmWaveVehicularSpectrumPhyTestCase1::DoRun (void)
   pData->AddCallback (MakeCallback (&MmWaveVehicularSpectrumPhyTestCase1::UpdateSinrPerceived, this));
   rx_ssp->AddDataSinrChunkProcessor (pData);
 
-  // create the tx psd
-  Ptr<MmWavePhyMacCommon> pmc = CreateObject<MmWavePhyMacCommon> ();
+
   double txp = 30.0; // transmission power in dBm
   std::vector<int> subChannelsForTx (72);
   // create the transmission mask, use all the available subchannels

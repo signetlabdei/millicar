@@ -39,10 +39,16 @@ MmWaveSidelinkPhy::MmWaveSidelinkPhy ()
   NS_FATAL_ERROR ("This constructor should not be called");
 }
 
-MmWaveSidelinkPhy::MmWaveSidelinkPhy (Ptr<MmWaveSidelinkSpectrumPhy> spectrumPhy)
+MmWaveSidelinkPhy::MmWaveSidelinkPhy (Ptr<MmWaveSidelinkSpectrumPhy> spectrumPhy, Ptr<MmWavePhyMacCommon> confParams)
 {
   NS_LOG_FUNCTION (this);
   m_sidelinkSpectrumPhy = spectrumPhy;
+  m_phyMacConfig = confParams;
+
+  // create the noise PSD
+  Ptr<SpectrumValue> noisePsd = MmWaveSpectrumValueHelper::CreateNoisePowerSpectralDensity (m_phyMacConfig, m_noiseFigure);
+  m_sidelinkSpectrumPhy->SetNoisePowerSpectralDensity (noisePsd);
+
   Simulator::ScheduleNow (&MmWaveSidelinkPhy::StartSlot, this, 0);
 }
 
@@ -110,6 +116,10 @@ void
 MmWaveSidelinkPhy::SetNoiseFigure (double nf)
 {
   m_noiseFigure = nf;
+
+  // update the noise PSD
+  Ptr<SpectrumValue> noisePsd = MmWaveSpectrumValueHelper::CreateNoisePowerSpectralDensity (m_phyMacConfig, m_noiseFigure);
+  m_sidelinkSpectrumPhy->SetNoisePowerSpectralDensity (noisePsd);
 }
 
 double

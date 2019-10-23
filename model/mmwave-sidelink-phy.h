@@ -39,11 +39,12 @@ public:
   /**
    * \brief MmWaveSidelinkPhy real constructor
    * \param channelPhy spectrum phy
-   * \param n Pointer to the node owning this instance
+   * \param confParams instance of MmWavePhyMacCommon containing the
+   *        configuration parameters
    *
    * Usually called by the helper. It starts the event loop for the device.
    */
-  MmWaveSidelinkPhy (Ptr<MmWaveSidelinkSpectrumPhy> spectrumPhy);
+  MmWaveSidelinkPhy (Ptr<MmWaveSidelinkSpectrumPhy> spectrumPhy, Ptr<MmWavePhyMacCommon> confParams);
 
   virtual ~MmWaveSidelinkPhy ();
 
