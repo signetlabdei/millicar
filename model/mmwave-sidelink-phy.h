@@ -18,8 +18,8 @@
 */
 
 
-#ifndef SRC_MMWAVE_MODEL_MMWAVE_SIDELINK_PHY_H_
-#define SRC_MMWAVE_MODEL_MMWAVE_SIDELINK_PHY_H_
+#ifndef SRC_MMWAVE_SIDELINK_PHY_H_
+#define SRC_MMWAVE_SIDELINK_PHY_H_
 
 #include <ns3/mmwave-phy-mac-common.h>
 #include <ns3/ptr.h>
@@ -140,4 +140,4 @@ private:
 
 }
 
-#endif /* SRC_MMWAVE_MODEL_MMWAVE_SIDELINK_PHY_H_ */
+#endif /* SRC_MMWAVE_SIDELINK_PHY_H_ */
