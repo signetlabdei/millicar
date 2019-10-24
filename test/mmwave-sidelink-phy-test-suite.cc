@@ -49,8 +49,6 @@ private:
    * \param sinr the sinr value
    */
   void UpdateSinrPerceived (const SpectrumValue& sinr);
-
-  double m_expectedSinr; //!< expected average SINR
 };
 
 MmWaveVehicularSpectrumPhyTestCase1::MmWaveVehicularSpectrumPhyTestCase1 ()
@@ -65,15 +63,14 @@ MmWaveVehicularSpectrumPhyTestCase1::~MmWaveVehicularSpectrumPhyTestCase1 ()
 void
 MmWaveVehicularSpectrumPhyTestCase1::Rx (Ptr<Packet> p)
 {
-  NS_LOG_UNCOND ("Rx event");
+  NS_LOG_UNCOND ("Rx packet of size " << p->GetSize ());
 }
 
 void
 MmWaveVehicularSpectrumPhyTestCase1::UpdateSinrPerceived (const SpectrumValue& sinr)
 {
   double actualSnr = 10 * log10 (Sum (sinr) / sinr.GetSpectrumModel ()->GetNumBands ());
-  NS_LOG_DEBUG ("expected SINR " << m_expectedSinr << " actual SINR " << actualSnr << " dB" );
-  NS_TEST_EXPECT_MSG_EQ_TOL (actualSnr, m_expectedSinr, 1e-2, "Got unexpected value");
+  NS_LOG_UNCOND ("SINR " << actualSnr << " dB" );
 }
 
 void
@@ -137,37 +134,14 @@ MmWaveVehicularSpectrumPhyTestCase1::DoRun (void)
   pData->AddCallback (MakeCallback (&MmWaveVehicularSpectrumPhyTestCase1::UpdateSinrPerceived, this));
   rx_ssp->AddDataSinrChunkProcessor (pData);
 
+  // send a dummy packet burst
+  Ptr<Packet> p = Create<Packet> (20); //TODO how to set the size?
+  Ptr<PacketBurst> pb1 = CreateObject<PacketBurst> ();
+  pb1->AddPacket (p);
+  pb1->AddPacket (p);
+  tx_phy->AddPacketBurst (pb1);
 
-  double txp = 30.0; // transmission power in dBm
-  std::vector<int> subChannelsForTx (72);
-  // create the transmission mask, use all the available subchannels
-  for (uint8_t i = 0; i < subChannelsForTx.size (); i++)
-  {
-    subChannelsForTx [i] = i;
-  }
-  Ptr<SpectrumValue> txPsd = MmWaveSpectrumValueHelper::CreateTxPowerSpectralDensity (pmc, txp, subChannelsForTx);
-  tx_ssp->SetTxPowerSpectralDensity (txPsd);
-
-  // set the rx noise psd
-  double noiseFigure = 5.0; // noise figure in dB
-  Ptr<SpectrumValue> noisePsd = MmWaveSpectrumValueHelper::CreateNoisePowerSpectralDensity (pmc, noiseFigure);
-  rx_ssp->SetNoisePowerSpectralDensity (noisePsd);
-
-  // send an empty packet burst
-  Ptr<Packet> p = Create<Packet> (20);
-  Ptr<PacketBurst> pb = CreateObject<PacketBurst> ();
-  pb->AddPacket (p);
-  Time duration = MilliSeconds (1); // packet duration
-  uint8_t slotInd = 0; // slot index
-  uint8_t mcs = 28; // MCS
-  uint8_t size = 20; // size of the transport block
-
-  // send the transport block through the spectrum channel
-  tx_ssp->StartTxDataFrames (pb, duration, slotInd, mcs, size, subChannelsForTx);
-
-  // compute the expected SINR
-  m_expectedSinr = txp + 20 * log10 (3e8 / (4 * M_PI * distance * pmc->GetCenterFrequency ())) + 114 - noiseFigure - 10 * log10 (pmc->GetSystemBandwidth () / 1e6);
-
+  Simulator::Stop (Seconds (2));
   Simulator::Run ();
   Simulator::Destroy ();
 
