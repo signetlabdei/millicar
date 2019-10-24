@@ -14,8 +14,7 @@ using namespace ns3;
 using namespace mmwave;
 
 /**
- * This is a test to check if the class MmWaveSidelinkSpectrumPhy correctly
- * computes the SNR.
+ * In this test, two packets are sent from the tx node the rx node.
  */
 class MmWaveVehicularSpectrumPhyTestCase1 : public TestCase
 {
@@ -148,7 +147,7 @@ MmWaveVehicularSpectrumPhyTestCase1::DoRun (void)
 }
 
 /**
- * Test suite for the class MmWaveSidelinkSpectrumPhy
+ * Test suite for the class MmWaveSidelinkPhy
  */
 class MmWaveVehicularSpectrumPhyTestSuite : public TestSuite
 {
