@@ -84,8 +84,6 @@ public:
    */
   double GetNoiseFigure () const;
 
-  //void SetConfigurationParameters (Ptr<MmWavePhyMacCommon> ptrConfig);
-
   /**
    * Returns the MmWavePhyMacCommon instance associated with this phy containing
    * the configuration parameters
@@ -97,7 +95,7 @@ public:
    * Returns the SpectrumPhy instance associated with this phy
    * \return the SpectrumPhy instance
    */
-  virtual Ptr<MmWaveSidelinkSpectrumPhy> GetSpectrumPhy () const;
+  Ptr<MmWaveSidelinkSpectrumPhy> GetSpectrumPhy () const;
 
   /**
    * Add a packet burst to the transmission buffer
@@ -148,6 +146,6 @@ private:
 };
 
 } // namespace mmwave
-} // namespace ns3 
+} // namespace ns3
 
 #endif /* SRC_MMWAVE_SIDELINK_PHY_H_ */
