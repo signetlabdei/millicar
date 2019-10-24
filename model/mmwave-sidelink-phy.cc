@@ -81,12 +81,6 @@ MmWaveSidelinkPhy::GetTypeId (void)
                     MakeDoubleAccessor (&MmWaveSidelinkPhy::SetNoiseFigure,
                                         &MmWaveSidelinkPhy::GetNoiseFigure),
                     MakeDoubleChecker<double> ())
-    .AddAttribute ("SpectrumPhy",
-                   "The SpectrumPhy associated to this MmWavePhy",
-                   TypeId::ATTR_GET,
-                   PointerValue (),
-                   MakePointerAccessor (&MmWaveSidelinkPhy::GetSpectrumPhy),
-                   MakePointerChecker <MmWaveSidelinkSpectrumPhy> ())
     .AddAttribute ("MCS",
                    "Modulation and coding scheme value",
                    UintegerValue (0),
