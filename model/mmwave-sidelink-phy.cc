@@ -65,7 +65,7 @@ MmWaveSidelinkPhy::GetTypeId (void)
     .AddConstructor<MmWaveSidelinkPhy> ()
     .AddAttribute ("TxPower",
                    "Transmission power in dBm",
-                   DoubleValue (30.0),         //TBD zml
+                   DoubleValue (30.0),
                    MakeDoubleAccessor (&MmWaveSidelinkPhy::SetTxPower,
                                        &MmWaveSidelinkPhy::GetTxPower),
                    MakeDoubleChecker<double> ())
@@ -157,48 +157,10 @@ MmWaveSidelinkPhy::AddPacketBurst (Ptr<PacketBurst> pb)
   m_packetBurstBuffer.push_back (pb);
 }
 
-// Ptr<SpectrumValue>
-// MmWaveSidelinkPhy::CreateTxPowerSpectralDensity ()
-// {
-//   Ptr<SpectrumValue> psd = MmWaveSpectrumValueHelper::CreateTxPowerSpectralDensity (m_phyMacConfig, m_txPower, m_subChannelsForTx);
-//   return psd;
-// }
-//
 void
 MmWaveSidelinkPhy::StartSlot (uint16_t slotNum)
 {
-   NS_LOG_FUNCTION (this);
-//   m_frameNum = frameNum;
-//   m_sfNum = sfNum;
-//   m_slotNum = static_cast<uint8_t> (slotNum);
-//   m_lastSlotStart = Simulator::Now ();
-//   m_varTtiNum = 0;
-//
-//   // Call MAC before doing anything in PHY
-//   // m_phySapUser->SlotIndication (SfnSf (m_frameNum, m_sfNum, m_slotNum));   // trigger mac
-//   // TODO: need to define a deterministic scheduling procedure. We could do it
-//   // directly here OR define a dummy MAC as discussed
-//
-//   // update the current slot object, and insert DL/UL CTRL allocations.
-//   // That will not be true anymore when true TDD pattern will be used.
-//   if (SidelinkSlotAllocInfoExists (SfnSf (frameNum, sfNum, slotNum)))
-//     {
-//       m_currSlotAllocInfo = RetrieveSidelinkSlotAllocInfo (SfnSf (frameNum, sfNum, slotNum));
-//     }
-//   else
-//     {
-//       m_currSlotAllocInfo = SidelinkSlotAllocInfo (SfnSf (frameNum, sfNum, slotNum));
-//     }
-//
-//   std::vector<uint8_t> rbgBitmask (m_phyMacConfig->GetNumRb (), 1);
-//
-//   NS_ASSERT ((m_currSlotAllocInfo.m_sfnSf.m_frameNum == m_frameNum)
-//              && (m_currSlotAllocInfo.m_sfnSf.m_sfNum == m_sfNum
-//                  && m_currSlotAllocInfo.m_sfnSf.m_slotNum == m_slotNum));
-//
-//   auto currentSci = m_currSlotAllocInfo.m_varTtiAllocInfo[m_varTtiNum].m_sci;
-//   auto nextVarTtiStart = m_phyMacConfig->GetSymbolPeriod () * Time (currentSci->m_symStart);
-//
+   NS_LOG_FUNCTION (this << slotNum);
 
   if (m_packetBurstBuffer.size () != 0)
   {
@@ -210,60 +172,7 @@ MmWaveSidelinkPhy::StartSlot (uint16_t slotNum)
   double slotPeriod = m_phyMacConfig->GetSlotPeriod () * 1e9;
   Simulator::Schedule (NanoSeconds (slotPeriod), &MmWaveSidelinkPhy::StartSlot, this, ++slotNum);
 }
-//
-// void
-// MmWaveSidelinkPhy::StartVarTti ()
-// {
-//   NS_LOG_FUNCTION (this);
-//   Time varTtiPeriod;
-//   const VarTtiAllocInfo & currSlot = m_currSlotAllocInfo.m_varTtiAllocInfo[m_varTtiNum];
-//
-//   m_currTbs = currSlot.m_sci->m_tbSize;
-//   m_receptionEnabled = false;
-//
-//   if (currSlot.m_sci->m_type == SciInfoElement::DATA)
-//     {
-//       varTtiPeriod = SlData (currSlot.m_sci);
-//     }
-//   else
-//     {
-//       NS_FATAL_ERROR("There are no different slot types defined.");
-//     }
-//
-//   Simulator::Schedule (varTtiPeriod, &MmWaveSidelinkPhy::EndVarTti, this);
-// }
-//
-// void
-// MmWaveSidelinkPhy::EndVarTti ()
-// {
-//   NS_LOG_FUNCTION (this);
-//   NS_LOG_INFO ("Executed varTti " << (+m_varTtiNum) + 1 << " of " << m_currSlotAllocInfo.m_varTtiAllocInfo.size ());
-//
-//   if (m_varTtiNum == m_currSlotAllocInfo.m_varTtiAllocInfo.size () - 1)
-//     {
-//       // end of slot
-//       SfnSf retVal = SfnSf (m_frameNum, m_sfNum, m_slotNum);
-//
-//       auto slotsPerSubframe = m_phyMacConfig->GetSlotsPerSubframe ();
-//       auto subframesPerFrame = m_phyMacConfig->GetSubframesPerFrame ();
-//
-//       retVal.m_frameNum += (m_sfNum + (m_slotNum + 1) / slotsPerSubframe) / subframesPerFrame;
-//       retVal.m_sfNum = (m_sfNum + (m_slotNum + 1) / slotsPerSubframe) % subframesPerFrame;
-//       retVal.m_slotNum = (m_slotNum + 1) % slotsPerSubframe;
-//
-//       Simulator::Schedule (m_lastSlotStart + Seconds(m_phyMacConfig->GetSlotPeriod ()) - Simulator::Now (), &MmWaveSidelinkPhy::StartSlot, this, retVal.m_frameNum, retVal.m_sfNum, retVal.m_slotNum);
-//     }
-//   else
-//     {
-//       m_varTtiNum++;
-//       Time nextVarTtiStart = m_phyMacConfig->GetSymbolPeriod () * Time (m_currSlotAllocInfo.m_varTtiAllocInfo[m_varTtiNum].m_sci->m_symStart);
-//
-//       Simulator::Schedule (nextVarTtiStart + m_lastSlotStart - Simulator::Now (), &MmWaveSidelinkPhy::StartVarTti, this);
-//     }
-//
-//   m_receptionEnabled = false;
-// }
-//
+
 Time
 MmWaveSidelinkPhy::SlData(uint16_t slotNum)
 {
@@ -324,72 +233,6 @@ MmWaveSidelinkPhy::SetSubChannelsForTransmission ()
 
     return subChannelsForTx;
   }
-//
-// bool
-// MmWaveSidelinkPhy::SidelinkSlotAllocInfoExists (const SfnSf &retVal) const
-// {
-//   NS_LOG_FUNCTION (this);
-//   for (const auto & alloc : m_slotAllocInfo)
-//     {
-//       if (alloc.m_sfnSf == retVal)
-//         {
-//           return true;
-//         }
-//     }
-//   return false;
-// }
-//
-// SidelinkSlotAllocInfo
-// MmWaveSidelinkPhy::RetrieveSidelinkSlotAllocInfo ()
-// {
-//   NS_LOG_FUNCTION (this);
-//   SidelinkSlotAllocInfo ret = *m_slotAllocInfo.begin ();
-//   m_slotAllocInfo.erase(m_slotAllocInfo.begin ());
-//   return ret;
-// }
-//
-// SidelinkSlotAllocInfo
-// MmWaveSidelinkPhy::RetrieveSidelinkSlotAllocInfo (const SfnSf &sfnsf)
-// {
-//   NS_LOG_FUNCTION (this);
-//   // NS_LOG_FUNCTION ("ccId:" << +GetCcId () << " slot " << sfnsf);
-//
-//   for (auto allocIt = m_slotAllocInfo.begin(); allocIt != m_slotAllocInfo.end (); ++allocIt)
-//     {
-//       if (allocIt->m_sfnSf == sfnsf)
-//         {
-//           SidelinkSlotAllocInfo ret = *allocIt;
-//           m_slotAllocInfo.erase (allocIt);
-//           return ret;
-//         }
-//     }
-//
-//   NS_FATAL_ERROR("Didn't found the slot");
-//   return SidelinkSlotAllocInfo (sfnsf);
-// }
-//
-// std::vector<int>
-// MmWaveSidelinkPhy::FromRBGBitmaskToRBAssignment (const std::vector<uint8_t> rbgBitmask) const
-// {
-//
-//   std::vector<int> ret;
-//
-//   for (uint32_t i = 0; i < rbgBitmask.size (); ++i)
-//     {
-//       if (rbgBitmask.at (i) == 1)
-//         {
-//           for (uint32_t k = 0; k < m_phyMacConfig->GetNumRbPerRbg (); ++k)
-//             {
-//               ret.push_back ((i * m_phyMacConfig->GetNumRbPerRbg ()) + k);
-//             }
-//         }
-//     }
-//
-//   return ret;
-// }
-//
-//
 
-}
-
-}
+} // namespace mmwave
+} // namespace ns3
