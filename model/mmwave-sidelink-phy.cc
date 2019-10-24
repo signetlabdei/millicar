@@ -133,12 +133,6 @@ MmWaveSidelinkPhy::GetSpectrumPhy () const
   return m_sidelinkSpectrumPhy;
 }
 
-void
-MmWaveSidelinkPhy::SetConfigurationParameters (Ptr<MmWavePhyMacCommon> ptrConfig)
-{
-  m_phyMacConfig = ptrConfig;
-}
-
 Ptr<MmWavePhyMacCommon>
 MmWaveSidelinkPhy::GetConfigurationParameters (void) const
 {

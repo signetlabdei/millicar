@@ -34,10 +34,14 @@ class MmWaveSidelinkPhy : public Object
 {
 
 public:
+
+  /**
+   * Dummy constructor, it is not used
+   */
   MmWaveSidelinkPhy ();
 
   /**
-   * \brief MmWaveSidelinkPhy real constructor
+   * MmWaveSidelinkPhy real constructor
    * \param channelPhy spectrum phy
    * \param confParams instance of MmWavePhyMacCommon containing the
    *        configuration parameters
@@ -46,6 +50,9 @@ public:
    */
   MmWaveSidelinkPhy (Ptr<MmWaveSidelinkSpectrumPhy> spectrumPhy, Ptr<MmWavePhyMacCommon> confParams);
 
+  /**
+   * Desctructor
+   */
   virtual ~MmWaveSidelinkPhy ();
 
   // inherited from Object
@@ -53,91 +60,94 @@ public:
   virtual void DoInitialize (void);
   virtual void DoDispose (void);
 
+  /**
+   * Set the tx power
+   * \param the tx power in dBm
+   */
   void SetTxPower (double power);
+
+  /**
+   * Returns the tx power
+   * \return the tx power in dBm
+   */
   double GetTxPower () const;
 
+  /**
+   * Set the noise figure
+   * \param the noise figure in dB
+   */
   void SetNoiseFigure (double pf);
+
+  /**
+   * Returns the noise figure
+   * \return the noise figure in dB
+   */
   double GetNoiseFigure () const;
 
-  void SetConfigurationParameters (Ptr<MmWavePhyMacCommon> ptrConfig);
+  //void SetConfigurationParameters (Ptr<MmWavePhyMacCommon> ptrConfig);
+
+  /**
+   * Returns the MmWavePhyMacCommon instance associated with this phy containing
+   * the configuration parameters
+   * \return the MmWavePhyMacCommon instance
+   */
   Ptr<MmWavePhyMacCommon> GetConfigurationParameters (void) const;
 
+  /**
+   * Returns the SpectrumPhy instance associated with this phy
+   * \return the SpectrumPhy instance
+   */
   virtual Ptr<MmWaveSidelinkSpectrumPhy> GetSpectrumPhy () const;
 
-  // bool SendPacket (Ptr<Packet> packet);
-  //
-  Ptr<SpectrumValue> CreateTxPowerSpectralDensity ();
-  //
-  // void DoSetSubChannels ();
-  //
-  // void SetSubChannelsForReception (std::vector <int> mask);
-  // std::vector <int> GetSubChannelsForReception (void);
-  //
-  // void SetSubChannelsForTransmission (std::vector <int> mask);
-  // std::vector <int> GetSubChannelsForTransmission (void);
-  //
-  // void DoSendControlMessage (Ptr<MmWaveControlMessage> msg);
-  //
-  // Ptr<MmWaveSpectrumPhy> GetDlSpectrumPhy () const;
-  // Ptr<MmWaveSpectrumPhy> GetUlSpectrumPhy () const;
-
-  void StartSlot (uint16_t slotNum);
-  void StartVarTti ();
-  void EndVarTti ();
-
+  /**
+   * Add a packet burst to the transmission buffer
+   * \param pb the packet burst
+   */
   void AddPacketBurst (Ptr<PacketBurst> pb);
 
 private:
 
   /**
-   * \brief Transmit SL data
+   * Start a slot
+   * \param slotNum the slot index
+   */
+  void StartSlot (uint16_t slotNum);
+
+  /**
+   * Transmit SL data
    * \param slotNum the slot index
    */
   Time SlData (uint16_t slotNum);
 
   /**
-   * \brief Transform a MAC-made vector of RBG to a PHY-ready vector of SINR indices
-   * \param rbgBitmask Bitmask which indicates with 1 the RBG in which there is a transmission,
-   * with 0 a RBG in which there is not a transmission
-   * \return a vector of indices.
-   *
-   * Example (4 RB per RBG, 4 total RBG assignable):
-   * rbgBitmask = <0,1,1,0>
-   * output = <4,5,6,7,8,9,10,11>
-   *
-   * (the rbgBitmask expressed as rbBitmask would be:
-   * <0,0,0,0,1,1,1,1,1,1,1,1,0,0,0,0> , and therefore the places in which there
-   * is a 1 are from the 4th to the 11th, and that is reflected in the output)
+   * Set the transmission mask and creates the power spectral density for the
+   * transmission
+   * \return mask indicating the suchannels used for the transmission
    */
-  std::vector<int> FromRBGBitmaskToRBAssignment (const std::vector<uint8_t> rbgBitmask) const;
-
   std::vector<int> SetSubChannelsForTransmission ();
 
-  bool SidelinkSlotAllocInfoExists (const SfnSf &retVal) const;
-  SidelinkSlotAllocInfo RetrieveSidelinkSlotAllocInfo ();
-  SidelinkSlotAllocInfo RetrieveSidelinkSlotAllocInfo (const SfnSf &sfnsf);
-
+  /**
+   * Send the packet burts
+   * \param pb the packet burst
+   * \param duration the duration of the transmissin
+   * \param slotInd the slot index
+   * \param mcs the MCS value
+   * \param size the size of the transport block to send
+   * \param rbBitmap the mask indicating the suchannels to be used for the
+            transmission
+   */
   void SendDataChannels (Ptr<PacketBurst> pb, Time duration, uint8_t slotInd, uint8_t mcs, uint32_t size, std::vector<int> rbBitmap);
 
 private:
   double m_txPower; //!< the transmission power in dBm
   double m_noiseFigure; //!< the noise figure in dB
-  Time m_lastSlotStart; //!< Time of the last slot start
-  std::list<SidelinkSlotAllocInfo> m_slotAllocInfo; //!< slot allocation info list
-  SidelinkSlotAllocInfo m_currSlotAllocInfo;
-
-  bool m_receptionEnabled {false}; //!< Flag to indicate if we are currently receiveing data
-
-  uint8_t m_varTtiNum {0};
-  uint32_t m_currTbs {0};          //!< Current TBS of the receiveing DL data (used to compute the feedback)
   Ptr<MmWaveSidelinkSpectrumPhy> m_sidelinkSpectrumPhy; //!< the SpectrumPhy instance associated with this PHY
   Ptr<MmWavePhyMacCommon> m_phyMacConfig; //!< the configuration parameters
   std::list<Ptr<PacketBurst>> m_packetBurstBuffer; //!< buffer of packet bursts to send
   uint8_t m_mcs; //!< modulation and coding scheme value
 };
 
-}
-
-}
+} // namespace mmwave
+} // namespace ns3 
 
 #endif /* SRC_MMWAVE_SIDELINK_PHY_H_ */
