@@ -21,9 +21,6 @@
 #ifndef SRC_MMWAVE_SIDELINK_PHY_H_
 #define SRC_MMWAVE_SIDELINK_PHY_H_
 
-#include <ns3/mmwave-phy-mac-common.h>
-#include <ns3/ptr.h>
-#include <map>
 #include "mmwave-sidelink-spectrum-phy.h"
 
 namespace ns3 {
