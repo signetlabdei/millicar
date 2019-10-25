@@ -30,11 +30,32 @@ public:
   virtual ~MmWaveVehicularSpectrumPhyTestCase1 ();
 
 private:
+  /**
+   * Struct used to store the test parameters
+   */
+  struct TestVector
+  {
+    double distance; //!< distance between tx and rx
+    Time ipi; //!< interpacket interval
+  };
 
   /**
-   * This method run the test
+   * This method creates the test vectors and calls StartTest
    */
   virtual void DoRun (void);
+
+  /**
+   * This method runs the simulation using the specified parameters
+   * \param testVector the TestVector instance containing the parameters
+   */
+  void StartTest (TestVector testVector);
+
+  /**
+   * Periodically transmit a dummy packet burst containing a single packet
+   * \param tx_phy the tx PHY instance
+   * \param ipi the interpacket interval
+   */
+  void Tx (Ptr<MmWaveSidelinkPhy> tx_phy, Time ipi);
 
   /**
    * This method is a callback sink which is fired when the rx receives a packet
@@ -48,6 +69,10 @@ private:
    * \param sinr the sinr value
    */
   void UpdateSinrPerceived (const SpectrumValue& sinr);
+
+  uint32_t m_tx; //!< tx packet counter
+  uint32_t m_rx; //!< rx packet counter
+  std::vector<double> m_sinr; //!< stores the perceived sinrs for each packet
 };
 
 MmWaveVehicularSpectrumPhyTestCase1::MmWaveVehicularSpectrumPhyTestCase1 ()
@@ -60,23 +85,83 @@ MmWaveVehicularSpectrumPhyTestCase1::~MmWaveVehicularSpectrumPhyTestCase1 ()
 }
 
 void
+MmWaveVehicularSpectrumPhyTestCase1::Tx (Ptr<MmWaveSidelinkPhy> tx_phy, Time ipi)
+{
+  // send a dummy packet burst
+  Ptr<Packet> p = Create<Packet> (1024); //TODO how to set the size?
+  Ptr<PacketBurst> pb1 = CreateObject<PacketBurst> ();
+  pb1->AddPacket (p);
+  tx_phy->AddPacketBurst (pb1);
+
+  NS_LOG_DEBUG ("Tx packet of size " << p->GetSize ());
+
+  Simulator::Schedule (ipi, &MmWaveVehicularSpectrumPhyTestCase1::Tx, this, tx_phy, ipi);
+
+  ++m_tx;
+}
+
+void
 MmWaveVehicularSpectrumPhyTestCase1::Rx (Ptr<Packet> p)
 {
-  NS_LOG_UNCOND ("Rx packet of size " << p->GetSize ());
+  NS_LOG_DEBUG ("Rx packet of size " << p->GetSize ());
+  ++m_rx;
 }
 
 void
 MmWaveVehicularSpectrumPhyTestCase1::UpdateSinrPerceived (const SpectrumValue& sinr)
 {
   double actualSnr = 10 * log10 (Sum (sinr) / sinr.GetSpectrumModel ()->GetNumBands ());
-  NS_LOG_UNCOND ("SINR " << actualSnr << " dB" );
+  m_sinr.push_back (actualSnr);
+  NS_LOG_DEBUG ("SINR " << actualSnr << " dB" );
 }
 
 void
 MmWaveVehicularSpectrumPhyTestCase1::DoRun (void)
 {
+  std::list<TestVector> tests;
 
-  double distance = 100; // distance between tx and rx
+  TestVector test1;
+  test1.distance = 400;
+  test1.ipi = MilliSeconds (10);
+  tests.push_back (test1);
+
+  TestVector test2;
+  test2.distance = 450;
+  test2.ipi = MilliSeconds (10);
+  tests.push_back (test2);
+
+  TestVector test3;
+  test3.distance = 500;
+  test3.ipi = MilliSeconds (10);
+  tests.push_back (test3);
+
+  TestVector test4;
+  test4.distance = 550;
+  test4.ipi = MilliSeconds (10);
+  tests.push_back (test4);
+
+  TestVector test5;
+  test5.distance = 600;
+  test5.ipi = MilliSeconds (10);
+  tests.push_back (test5);
+
+  for (auto t : tests)
+  {
+    // reset the counters
+    m_rx = 0;
+    m_tx = 0;
+    m_sinr.clear ();
+
+    // perform the test
+    StartTest (t);
+  }
+}
+
+void
+MmWaveVehicularSpectrumPhyTestCase1::StartTest (TestVector testVector)
+{
+  double distance = testVector.distance; // distance between tx and rx
+  Time ipi =testVector.ipi; // interpacket interval
 
   // create the tx and rx nodes
   NodeContainer n;
@@ -133,17 +218,22 @@ MmWaveVehicularSpectrumPhyTestCase1::DoRun (void)
   pData->AddCallback (MakeCallback (&MmWaveVehicularSpectrumPhyTestCase1::UpdateSinrPerceived, this));
   rx_ssp->AddDataSinrChunkProcessor (pData);
 
-  // send a dummy packet burst
-  Ptr<Packet> p = Create<Packet> (20); //TODO how to set the size?
-  Ptr<PacketBurst> pb1 = CreateObject<PacketBurst> ();
-  pb1->AddPacket (p);
-  pb1->AddPacket (p);
-  tx_phy->AddPacketBurst (pb1);
+  Simulator::Schedule (MilliSeconds (10), &MmWaveVehicularSpectrumPhyTestCase1::Tx, this, tx_phy, ipi);
 
   Simulator::Stop (Seconds (2));
   Simulator::Run ();
   Simulator::Destroy ();
 
+  // compute the metrics
+  double average_sinr = 0;
+  for (auto s : m_sinr)
+  {
+    average_sinr += s;
+  }
+  average_sinr /= m_sinr.size ();
+
+  NS_LOG_UNCOND ("distance " << distance << " average SINR " << average_sinr << " PRR " << double (m_rx) / double (m_tx));
+  //NS_LOG_UNCOND (distance << " " << average_sinr << " " << double (m_rx) / double (m_tx));
 }
 
 /**
