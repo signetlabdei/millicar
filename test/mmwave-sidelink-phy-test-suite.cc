@@ -87,11 +87,25 @@ MmWaveVehicularSpectrumPhyTestCase1::~MmWaveVehicularSpectrumPhyTestCase1 ()
 void
 MmWaveVehicularSpectrumPhyTestCase1::Tx (Ptr<MmWaveSidelinkPhy> tx_phy, Time ipi)
 {
-  // send a dummy packet burst
+  // create a dummy packet burst
   Ptr<Packet> p = Create<Packet> (1024); //TODO how to set the size?
   Ptr<PacketBurst> pb1 = CreateObject<PacketBurst> ();
   pb1->AddPacket (p);
-  tx_phy->AddPacketBurst (pb1);
+
+  // create the associated DCI
+  DciInfoElementTdma dci;
+  dci.m_mcs = 0; // dummy value
+  dci.m_tbSize = p->GetSize (); // dummy value
+  dci.m_symStart = 0; // dummy value
+  dci.m_numSym = 30; // dummy value
+
+  // create the SlotAllocInfo containing the transmission information
+  SlotAllocInfo info;
+  info.m_slotType = SlotAllocInfo::DATA;
+  info.m_slotIdx = (ipi.GetNanoSeconds () / (tx_phy->GetConfigurationParameters ()->GetSlotPeriod () * 1e9)) * (m_tx+1);
+  info.m_dci = dci;
+
+  tx_phy->AddTransportBlock (pb1, info);
 
   NS_LOG_DEBUG ("Tx packet of size " << p->GetSize ());
 

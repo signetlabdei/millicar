@@ -1,4 +1,4 @@
-/* -*-  Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil; -*- */
+/*-  Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil; -*- */
 /*
 *
 *   This program is free software; you can redistribute it and/or modify
@@ -95,24 +95,28 @@ public:
   Ptr<MmWaveSidelinkSpectrumPhy> GetSpectrumPhy () const;
 
   /**
-   * Add a packet burst to the transmission buffer
-   * \param pb the packet burst
+   * Add a transport block to the transmission buffer, which will be sent in the
+   * current slot.
+   * \param pb the packet burst containing the packets to be sent
+   * \param info the SlotAllocInfo instance containg the transmission information
    */
-  void AddPacketBurst (Ptr<PacketBurst> pb);
+  void AddTransportBlock (Ptr<PacketBurst> pb, SlotAllocInfo info);
 
 private:
 
   /**
-   * Start a slot
+   * Start a slot. Send all the transport blocks in the buffer.
    * \param slotNum the slot index
    */
-  void StartSlot (uint16_t slotNum);
+  void StartSlot (uint8_t slotNum);
 
   /**
-   * Transmit SL data
-   * \param slotNum the slot index
+   * Transmit a transport block
+   * \param pb the packet burst containing the packets to be sent
+   * \param info the SlotAllocInfo instance containg the transmission information
+   * \return the number of symbols used to send this TB
    */
-  Time SlData (uint16_t slotNum);
+  uint8_t SlData (Ptr<PacketBurst> pb, SlotAllocInfo info);
 
   /**
    * Set the transmission mask and creates the power spectral density for the
@@ -138,8 +142,8 @@ private:
   double m_noiseFigure; //!< the noise figure in dB
   Ptr<MmWaveSidelinkSpectrumPhy> m_sidelinkSpectrumPhy; //!< the SpectrumPhy instance associated with this PHY
   Ptr<MmWavePhyMacCommon> m_phyMacConfig; //!< the configuration parameters
-  std::list<Ptr<PacketBurst>> m_packetBurstBuffer; //!< buffer of packet bursts to send
-  uint8_t m_mcs; //!< modulation and coding scheme value
+  typedef std::pair<Ptr<PacketBurst>, SlotAllocInfo> PhyBufferEntry; //!< type of the phy buffer entries
+  std::list<PhyBufferEntry> m_phyBuffer; //!< buffer of transport blocks to send in the current slot
 };
 
 } // namespace mmwave

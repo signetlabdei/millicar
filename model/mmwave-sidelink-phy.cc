@@ -80,12 +80,7 @@ MmWaveSidelinkPhy::GetTypeId (void)
                     DoubleValue (5.0),
                     MakeDoubleAccessor (&MmWaveSidelinkPhy::SetNoiseFigure,
                                         &MmWaveSidelinkPhy::GetNoiseFigure),
-                    MakeDoubleChecker<double> ())
-    .AddAttribute ("MCS",
-                   "Modulation and coding scheme value",
-                   UintegerValue (0),
-                   MakeUintegerAccessor (&MmWaveSidelinkPhy::m_mcs),
-                   MakeUintegerChecker<uint8_t> (0, 28));
+                    MakeDoubleChecker<double> ());
   return tid;
 }
 
@@ -140,19 +135,51 @@ MmWaveSidelinkPhy::GetConfigurationParameters (void) const
 }
 
 void
-MmWaveSidelinkPhy::AddPacketBurst (Ptr<PacketBurst> pb)
+MmWaveSidelinkPhy::AddTransportBlock (Ptr<PacketBurst> pb, SlotAllocInfo info)
 {
-  m_packetBurstBuffer.push_back (pb);
+  // create a new entry for the PHY buffer
+  PhyBufferEntry e = std::make_pair (pb, info);
+
+  // add the new entry to the buffer
+  m_phyBuffer.push_back (e);
 }
 
 void
-MmWaveSidelinkPhy::StartSlot (uint16_t slotNum)
+MmWaveSidelinkPhy::StartSlot (uint8_t slotNum)
 {
    NS_LOG_FUNCTION (this << slotNum);
 
-  if (m_packetBurstBuffer.size () != 0)
+  while (m_phyBuffer.size () != 0)
   {
-    SlData (slotNum);
+    uint8_t usedSymbols = 0; // the symbol index
+
+    // retrieve the first element in the list
+    Ptr<PacketBurst> pktBurst;
+    SlotAllocInfo info;
+    std::tie (pktBurst, info) = m_phyBuffer.front ();
+
+    // check if this TB has to be sent in this slot, otherwise raise an error
+    NS_ASSERT_MSG (info.m_slotIdx == slotNum, "This TB is not intended for this slot");
+
+    // send the transport block
+    if (info.m_slotType == SlotAllocInfo::DATA)
+    {
+      usedSymbols += SlData (pktBurst, info);
+    }
+    else if (info.m_slotType == SlotAllocInfo::CTRL)
+    {
+      NS_FATAL_ERROR ("Control messages are not currently supported");
+    }
+    else
+    {
+      NS_FATAL_ERROR ("Unknown TB type");
+    }
+
+    // check if we exceeded the slot boundaries
+    NS_ASSERT_MSG (usedSymbols <= m_phyMacConfig->GetSymbPerSlot (), "Exceeded number of available symbols");
+
+    // remove the transport block from the buffer
+    m_phyBuffer.pop_front ();
   }
 
   // convert the slot period from seconds to milliseconds
@@ -161,35 +188,33 @@ MmWaveSidelinkPhy::StartSlot (uint16_t slotNum)
   Simulator::Schedule (NanoSeconds (slotPeriod), &MmWaveSidelinkPhy::StartSlot, this, ++slotNum);
 }
 
-Time
-MmWaveSidelinkPhy::SlData(uint16_t slotNum)
+uint8_t
+MmWaveSidelinkPhy::SlData (Ptr<PacketBurst> pb, SlotAllocInfo info)
 {
   NS_LOG_FUNCTION (this);
 
   // create the tx PSD
-  //TODO do we need to create a new psd at each slot?
+  //TODO do we need to create a new psd at each TTI?
   std::vector<int> subChannelsForTx = SetSubChannelsForTransmission ();
 
-  // retrieve the first packet burst in the list
-  Ptr<PacketBurst> pktBurst = m_packetBurstBuffer.front ();
+  // compute the tx start time (IndexOfTheFirstSymbol * SymbolDuration)
+  Time startTime = NanoSeconds (info.m_dci.m_symStart * m_phyMacConfig->GetSymbolPeriod () * 1e3);
+  NS_ASSERT_MSG (startTime.GetNanoSeconds () == info.m_dci.m_symStart * m_phyMacConfig->GetSymbolPeriod () * 1e3, "startTime was not been correctly set");
 
-  // convert the slot period from seconds to milliseconds
-  // TODO change GetSlotPeriod to return a TimeValue
-  Time slotPeriod = NanoSeconds (m_phyMacConfig->GetSlotPeriod () * 1e9);
+  // compute the duration of the transmission (NumberOfSymbols * SymbolDuration)
+  Time duration = NanoSeconds (info.m_dci.m_numSym * m_phyMacConfig->GetSymbolPeriod () * 1e3);
+  NS_ASSERT_MSG (duration.GetNanoSeconds () != info.m_dci.m_numSym * m_phyMacConfig->GetSymbolPeriod () * 1e3, "duration was not been correctly set");
 
-  // send the packet burst
-  Simulator::Schedule (NanoSeconds (1.0), &MmWaveSidelinkPhy::SendDataChannels, this,
-                       pktBurst,
-                       slotPeriod,
-                       slotNum,
-                       m_mcs,
-                       pktBurst->GetSize (), // TODO how to set the tbsize
+  // send the transport block
+  Simulator::Schedule (startTime + NanoSeconds (1.0), &MmWaveSidelinkPhy::SendDataChannels, this,
+                       pb,
+                       duration,
+                       info.m_slotIdx,
+                       info.m_dci.m_mcs,
+                       info.m_dci.m_tbSize,
                        subChannelsForTx);
 
-  // remove the packet burst from the list
-  m_packetBurstBuffer.pop_front ();
-
-  return slotPeriod;
+  return info.m_dci.m_numSym;
 }
 
 void
