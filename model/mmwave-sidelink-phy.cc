@@ -29,6 +29,20 @@ namespace ns3 {
 
 namespace mmwave {
 
+MacSidelinkMemberPhySapProvider::MacSidelinkMemberPhySapProvider (Ptr<MmWaveSidelinkPhy> phy)
+  : m_phy (phy)
+{
+
+}
+
+void
+MacSidelinkMemberPhySapProvider::AddTransportBlock (Ptr<PacketBurst> pb, SlotAllocInfo info)
+{
+  m_phy->DoAddTransportBlock (pb, info);
+}
+
+//-----------------------------------------------------------------------
+
 NS_LOG_COMPONENT_DEFINE ("MmWaveSidelinkPhy");
 
 NS_OBJECT_ENSURE_REGISTERED (MmWaveSidelinkPhy);
@@ -135,7 +149,7 @@ MmWaveSidelinkPhy::GetConfigurationParameters (void) const
 }
 
 void
-MmWaveSidelinkPhy::AddTransportBlock (Ptr<PacketBurst> pb, SlotAllocInfo info)
+MmWaveSidelinkPhy::DoAddTransportBlock (Ptr<PacketBurst> pb, SlotAllocInfo info)
 {
   // create a new entry for the PHY buffer
   PhyBufferEntry e = std::make_pair (pb, info);

@@ -22,6 +22,7 @@
 #define SRC_MMWAVE_SIDELINK_PHY_H_
 
 #include "mmwave-sidelink-spectrum-phy.h"
+#include "mmwave-sidelink-sap.h"
 
 namespace ns3 {
 
@@ -100,7 +101,7 @@ public:
    * \param pb the packet burst containing the packets to be sent
    * \param info the SlotAllocInfo instance containg the transmission information
    */
-  void AddTransportBlock (Ptr<PacketBurst> pb, SlotAllocInfo info);
+  void DoAddTransportBlock (Ptr<PacketBurst> pb, SlotAllocInfo info);
 
 private:
 
@@ -144,6 +145,19 @@ private:
   Ptr<MmWavePhyMacCommon> m_phyMacConfig; //!< the configuration parameters
   typedef std::pair<Ptr<PacketBurst>, SlotAllocInfo> PhyBufferEntry; //!< type of the phy buffer entries
   std::list<PhyBufferEntry> m_phyBuffer; //!< buffer of transport blocks to send in the current slot
+};
+
+class MacSidelinkMemberPhySapProvider : public MmWaveSidelinkPhySapProvider
+{
+
+public:
+  MacSidelinkMemberPhySapProvider (Ptr<MmWaveSidelinkPhy> phy);
+
+  void AddTransportBlock (Ptr<PacketBurst> pb, SlotAllocInfo info) override;
+
+private:
+  Ptr<MmWaveSidelinkPhy> m_phy;
+
 };
 
 } // namespace mmwave

@@ -26,6 +26,22 @@ namespace ns3 {
 
 namespace mmwave {
 
+class MmWaveSidelinkPhySapProvider
+{
+public:
+  virtual ~MmWaveSidelinkPhySapProvider ()
+  {
+  }
+
+  /**
+   * \brief Called by the upper layers to fill PHY's buffer
+   * \param pb burst of packets to be forwarded to the PHY layer
+   * \param info information about slot allocation necessary to determine the transmission parameters
+   */
+  virtual void AddTransportBlock (Ptr<PacketBurst> pb, SlotAllocInfo info) = 0;
+
+};
+
 class MmWaveSidelinkPhySapUser
 {
 public:
