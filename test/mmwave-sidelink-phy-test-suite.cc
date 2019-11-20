@@ -105,7 +105,7 @@ MmWaveVehicularSpectrumPhyTestCase1::Tx (Ptr<MmWaveSidelinkPhy> tx_phy, Time ipi
   info.m_slotIdx = (ipi.GetNanoSeconds () / (tx_phy->GetConfigurationParameters ()->GetSlotPeriod () * 1e9)) * (m_tx+1);
   info.m_dci = dci;
 
-  tx_phy->AddTransportBlock (pb1, info);
+  tx_phy->DoAddTransportBlock (pb1, info);
 
   NS_LOG_DEBUG ("Tx packet of size " << p->GetSize ());
 
