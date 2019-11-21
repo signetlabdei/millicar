@@ -63,7 +63,8 @@ MmWaveSidelinkPhy::MmWaveSidelinkPhy (Ptr<MmWaveSidelinkSpectrumPhy> spectrumPhy
   Ptr<SpectrumValue> noisePsd = MmWaveSpectrumValueHelper::CreateNoisePowerSpectralDensity (m_phyMacConfig, m_noiseFigure);
   m_sidelinkSpectrumPhy->SetNoisePowerSpectralDensity (noisePsd);
 
-  Simulator::ScheduleNow (&MmWaveSidelinkPhy::StartSlot, this, 0);
+  // schedule the first slot
+  Simulator::ScheduleNow (&MmWaveSidelinkPhy::StartSlot, this, SfnSf (0, 0, 0));
 }
 
 MmWaveSidelinkPhy::~MmWaveSidelinkPhy ()
@@ -159,9 +160,9 @@ MmWaveSidelinkPhy::DoAddTransportBlock (Ptr<PacketBurst> pb, SlotAllocInfo info)
 }
 
 void
-MmWaveSidelinkPhy::StartSlot (uint8_t slotNum)
+MmWaveSidelinkPhy::StartSlot (SfnSf timingInfo)
 {
-   NS_LOG_FUNCTION (this << slotNum);
+   NS_LOG_FUNCTION (this << " frame " << timingInfo.m_frameNum << " subframe " << timingInfo.m_sfNum << " slot " << timingInfo.m_slotNum);
 
   while (m_phyBuffer.size () != 0)
   {
@@ -173,7 +174,7 @@ MmWaveSidelinkPhy::StartSlot (uint8_t slotNum)
     std::tie (pktBurst, info) = m_phyBuffer.front ();
 
     // check if this TB has to be sent in this slot, otherwise raise an error
-    NS_ASSERT_MSG (info.m_slotIdx == slotNum, "This TB is not intended for this slot");
+    NS_ASSERT_MSG (info.m_slotIdx == timingInfo.m_slotNum, "This TB is not intended for this slot");
 
     // send the transport block
     if (info.m_slotType == SlotAllocInfo::DATA)
@@ -199,7 +200,11 @@ MmWaveSidelinkPhy::StartSlot (uint8_t slotNum)
   // convert the slot period from seconds to milliseconds
   // TODO change GetSlotPeriod to return a TimeValue
   double slotPeriod = m_phyMacConfig->GetSlotPeriod () * 1e9;
-  Simulator::Schedule (NanoSeconds (slotPeriod), &MmWaveSidelinkPhy::StartSlot, this, ++slotNum);
+
+  // update the timing information
+  timingInfo = UpdateTimingInfo (timingInfo);
+
+  Simulator::Schedule (NanoSeconds (slotPeriod), &MmWaveSidelinkPhy::StartSlot, this, timingInfo);
 }
 
 uint8_t
@@ -260,6 +265,35 @@ MmWaveSidelinkPhy::SetSubChannelsForTransmission ()
 
     return subChannelsForTx;
   }
+
+SfnSf
+MmWaveSidelinkPhy::UpdateTimingInfo (SfnSf info) const
+{
+  NS_LOG_INFO (this);
+  
+  uint32_t nextSlot = info.m_slotNum + 1;
+  uint32_t nextSf = info.m_sfNum;
+  uint32_t nextFrame = info.m_frameNum;
+
+  if (nextSlot == m_phyMacConfig->GetSlotsPerSubframe ())
+  {
+    nextSlot = 0;
+    ++nextSf;
+
+    if (nextSf == m_phyMacConfig->GetSubframesPerFrame ())
+    {
+      nextSf = 0;
+      ++nextFrame;
+    }
+  }
+
+  // update the SfnSf structure
+  info.m_slotNum = nextSlot;
+  info.m_sfNum = nextSf;
+  info.m_frameNum = nextFrame;
+
+  return info;
+}
 
 } // namespace mmwave
 } // namespace ns3

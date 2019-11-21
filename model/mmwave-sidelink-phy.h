@@ -107,9 +107,9 @@ private:
 
   /**
    * Start a slot. Send all the transport blocks in the buffer.
-   * \param slotNum the slot index
+   * \param timingInfo the structure containing the timing information
    */
-  void StartSlot (uint8_t slotNum);
+  void StartSlot (SfnSf timingInfo);
 
   /**
    * Transmit a transport block
@@ -137,6 +137,18 @@ private:
             transmission
    */
   void SendDataChannels (Ptr<PacketBurst> pb, Time duration, uint8_t slotInd, uint8_t mcs, uint32_t size, std::vector<int> rbBitmap);
+
+  /**
+   * TODO: this can be done by overloading the operator ++ of the SfnSf struct
+   * Update the SfnSf structure to point to the next slot. If the current slot
+   * the last slot of the subframe, the next slot index will be 0 and the
+   * subframe index will be incremented. If the current subframe is the last
+   * subframe of the frame, the next subframe index will be 0 and the frame
+   * frame index will be incremented.
+   * \param info the SfnSf structure containg frame, subframe and slot indeces
+   * \return the updated SnfSn structure pointing to the next slot
+   */
+  SfnSf UpdateTimingInfo (SfnSf info) const;
 
 private:
   double m_txPower; //!< the transmission power in dBm

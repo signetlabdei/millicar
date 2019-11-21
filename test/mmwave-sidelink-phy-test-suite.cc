@@ -102,7 +102,7 @@ MmWaveVehicularSpectrumPhyTestCase1::Tx (Ptr<MmWaveSidelinkPhy> tx_phy, Time ipi
   // create the SlotAllocInfo containing the transmission information
   SlotAllocInfo info;
   info.m_slotType = SlotAllocInfo::DATA;
-  info.m_slotIdx = (ipi.GetNanoSeconds () / (tx_phy->GetConfigurationParameters ()->GetSlotPeriod () * 1e9)) * (m_tx+1);
+  info.m_slotIdx = 0;
   info.m_dci = dci;
 
   tx_phy->DoAddTransportBlock (pb1, info);
@@ -136,27 +136,27 @@ MmWaveVehicularSpectrumPhyTestCase1::DoRun (void)
 
   TestVector test1;
   test1.distance = 400;
-  test1.ipi = MilliSeconds (10);
+  test1.ipi = MicroSeconds (800); // subframe period is 800 us in default configuration
   tests.push_back (test1);
 
   TestVector test2;
   test2.distance = 450;
-  test2.ipi = MilliSeconds (10);
+  test2.ipi = MicroSeconds (800);
   tests.push_back (test2);
 
   TestVector test3;
   test3.distance = 500;
-  test3.ipi = MilliSeconds (10);
+  test3.ipi = MicroSeconds (800);
   tests.push_back (test3);
 
   TestVector test4;
   test4.distance = 550;
-  test4.ipi = MilliSeconds (10);
+  test4.ipi = MicroSeconds (800);
   tests.push_back (test4);
 
   TestVector test5;
   test5.distance = 600;
-  test5.ipi = MilliSeconds (10);
+  test5.ipi = MicroSeconds (800);
   tests.push_back (test5);
 
   for (auto t : tests)
@@ -232,7 +232,7 @@ MmWaveVehicularSpectrumPhyTestCase1::StartTest (TestVector testVector)
   pData->AddCallback (MakeCallback (&MmWaveVehicularSpectrumPhyTestCase1::UpdateSinrPerceived, this));
   rx_ssp->AddDataSinrChunkProcessor (pData);
 
-  Simulator::Schedule (MilliSeconds (10), &MmWaveVehicularSpectrumPhyTestCase1::Tx, this, tx_phy, ipi);
+  Simulator::Schedule (MicroSeconds (800), &MmWaveVehicularSpectrumPhyTestCase1::Tx, this, tx_phy, ipi);
 
   Simulator::Stop (Seconds (2));
   Simulator::Run ();
