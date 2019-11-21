@@ -16,7 +16,10 @@
 *
 */
 
+#include "ns3/mmwave-phy-mac-common.h"
+#include "ns3/mmwave-amc.h"
 #include "mmwave-sidelink-mac.h"
+#include "ns3/log.h"
 
 namespace ns3 {
 
@@ -37,9 +40,9 @@ MacSidelinkMemberPhySapUser::ReceivePhyPdu (Ptr<Packet> p)
 }
 
 void
-MacSidelinkMemberPhySapUser::SlotIndication (SfnSf sfn)
+MacSidelinkMemberPhySapUser::SlotIndication (SfnSf timingInfo)
 {
-  m_mac->DoSlotIndication (sfn);
+  m_mac->DoSlotIndication (timingInfo);
 }
 
 //-----------------------------------------------------------------------
@@ -60,6 +63,7 @@ MmWaveSidelinkMac::MmWaveSidelinkMac (void)
 {
   NS_LOG_FUNCTION (this);
   m_phySapUser = new MacSidelinkMemberPhySapUser (this);
+  m_amc = CreateObject <MmWaveAmc> (m_phyMacConfig);
 }
 
 MmWaveSidelinkMac::~MmWaveSidelinkMac (void)
@@ -76,15 +80,40 @@ MmWaveSidelinkMac::DoDispose ()
 }
 
 void
-MmWaveSidelinkMac::DoSlotIndication (SfnSf sfn)
+MmWaveSidelinkMac::DoSlotIndication (SfnSf timingInfo)
 {
+  NS_LOG_FUNCTION (this);
+
+  uint8_t mcs = 9; // TODO: just a placeholder for testing purposes
+
+  if(m_sfAllocInfo[timingInfo.m_slotNum] == m_rnti) // check if this slot is associated to the user who required it
+  {
+    Ptr<PacketBurst> pb = CreateObject <PacketBurst> ();
+    SlotAllocInfo info;
+
+    info.m_dci.m_rnti = m_rnti;
+    info.m_dci.m_numSym = 14;
+    info.m_dci.m_mcs = mcs;
+    info.m_dci.m_tbSize = m_amc->GetTbSizeFromMcsSymbols(mcs, info.m_dci.m_numSym) / 8; // this method returns the size in number of bits, that are then converted in number of bytes
+
+    Ptr<Packet> pkt = Create <Packet> (info.m_dci.m_tbSize);
+
+    pb->AddPacket(pkt);
+
+    m_phySapProvider->AddTransportBlock(pb, info);
+
+  }
+  else
+  {
+    NS_LOG_DEBUG("This slot was not associated to this user.");
+  }
 
 }
 
 void
 MmWaveSidelinkMac::DoTransmitPdu ()
 {
-
+  // TODO: to be defined when upper layers will be added
 }
 
 void
@@ -97,6 +126,18 @@ MmWaveSidelinkPhySapUser*
 MmWaveSidelinkMac::GetPhySapUser ()
 {
   return m_phySapUser;
+}
+
+void
+MmWaveSidelinkMac::SetRnti (uint16_t rnti)
+{
+  m_rnti = rnti;
+}
+
+uint16_t
+MmWaveSidelinkMac::GetRnti () const
+{
+  return m_rnti;
 }
 
 } // mmwave namespace

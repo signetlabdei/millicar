@@ -20,7 +20,6 @@
 #define SRC_MMWAVE_MODEL_MMWAVE_SIDELINK_MAC_H_
 
 #include "mmwave-sidelink-sap.h"
-#include "mmwave-sidelink-phy.h"
 #include "ns3/mmwave-phy-mac-common.h"
 
 namespace ns3 {
@@ -38,47 +37,66 @@ public:
    * \return the object TypeId
    */
   static TypeId GetTypeId (void);
+
   /**
    * \brief Class constructor
    */
   MmWaveSidelinkMac (void);
+
   /**
    * \brief Class destructor
    */
   ~MmWaveSidelinkMac (void);
+
   /**
    * \brief Destructor implementation
    */
   virtual void DoDispose (void);
+
   /**
   * \brief trigger the start of a new slot with all the necessary information
-  *
-  * \param SfnSf subframe and slot information
+  * \param timingInfo the structure containing the timing information
   */
-  void DoSlotIndication (SfnSf sfn);
+  void DoSlotIndication (SfnSf timingInfo);
+
   /**
   * \brief Get the PHY SAP user
   * \return a pointer to the SAP user of the PHY
   */
   MmWaveSidelinkPhySapUser* GetPhySapUser ();
 
+  /**
+  * \brief assign a proper value to the RNTI associated to a specific user
+  * \param rnti value of the rnti
+  */
+  void SetRnti (uint16_t rnti);
+
+  /**
+  * \brief return the RNTI associated to a specific user
+  * \return the RNTI
+  */
+  uint16_t GetRnti () const;
+
 private:
   // forwarded from MAC SAP
  /**
   * Transmit PDU function
-  *
   */
   void DoTransmitPdu ();
+
   // forwarded from PHY SAP
  /**
   * Receive PHY PDU function
-  *
   * \param p the packet
   */
   void DoReceivePhyPdu (Ptr<Packet> p);
 
-  MmWaveSidelinkPhySapUser* m_phySapUser; ///< Sidelink PHY SAP user
-  Ptr<MmWavePhyMacCommon> m_phyMacConfig; ///< PHY and MAC configuration pointer
+  MmWaveSidelinkPhySapUser* m_phySapUser; //!< Sidelink PHY SAP user
+  MmWaveSidelinkPhySapProvider* m_phySapProvider; //!< Sidelink PHY SAP provider
+  Ptr<MmWavePhyMacCommon> m_phyMacConfig; //!< PHY and MAC configuration pointer
+  Ptr<MmWaveAmc> m_amc; //!< pointer to AMC instance
+  uint16_t m_rnti; //!< radio network temporary identifier
+  std::vector<uint16_t> m_sfAllocInfo; //!< size of this vector correspond to the number of slot associated to the subframe, depending on the numerology
 
 };
 
@@ -90,7 +108,7 @@ public:
 
   void ReceivePhyPdu (Ptr<Packet> p) override;
 
-  void SlotIndication (SfnSf sfn) override;
+  void SlotIndication (SfnSf timingInfo) override;
 
 private:
   Ptr<MmWaveSidelinkMac> m_mac;

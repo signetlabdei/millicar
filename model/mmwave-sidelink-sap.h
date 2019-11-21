@@ -57,10 +57,9 @@ public:
 
   /**
    * \brief Trigger the start from a new slot (input from PHY layer)
-   * \param frameNo frame number
-   * \param subframeNo subframe number
+   * \param timingInfo the structure containing the timing information
    */
-  virtual void SlotIndication (SfnSf) = 0;
+  virtual void SlotIndication (SfnSf timingInfo) = 0;
 
 };
 
