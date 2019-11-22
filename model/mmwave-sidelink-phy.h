@@ -96,6 +96,15 @@ public:
   Ptr<MmWaveSidelinkSpectrumPhy> GetSpectrumPhy () const;
 
   /**
+   * Add a <rnti, device> pair to m_deviceMap. All the devices we want to
+   * communicate with must be inserted in this map, otherwise we would not
+   * be able to correctly configure the beamforming.
+   * \param rnti the RNTI identifier
+   * \param dev pointer to the NetDevice object
+   */
+  void AddDevice (uint64_t rnti, Ptr<NetDevice> dev);
+
+  /**
    * Add a transport block to the transmission buffer, which will be sent in the
    * current slot.
    * \param pb the packet burst containing the packets to be sent
@@ -150,13 +159,13 @@ private:
    */
   SfnSf UpdateTimingInfo (SfnSf info) const;
 
-private:
   double m_txPower; //!< the transmission power in dBm
   double m_noiseFigure; //!< the noise figure in dB
   Ptr<MmWaveSidelinkSpectrumPhy> m_sidelinkSpectrumPhy; //!< the SpectrumPhy instance associated with this PHY
   Ptr<MmWavePhyMacCommon> m_phyMacConfig; //!< the configuration parameters
   typedef std::pair<Ptr<PacketBurst>, SlotAllocInfo> PhyBufferEntry; //!< type of the phy buffer entries
   std::list<PhyBufferEntry> m_phyBuffer; //!< buffer of transport blocks to send in the current slot
+  std::map<uint64_t, Ptr<NetDevice>> m_deviceMap; //!< map containing the <rnti, device> pairs of the nodes we want to communicate with
 };
 
 class MacSidelinkMemberPhySapProvider : public MmWaveSidelinkPhySapProvider

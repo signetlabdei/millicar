@@ -212,6 +212,12 @@ MmWaveSidelinkPhy::SlData (Ptr<PacketBurst> pb, SlotAllocInfo info)
 {
   NS_LOG_FUNCTION (this);
 
+  // retrieve the RNTI of the device we want to communicate with and properly
+  // configure the beamforming
+  // NOTE: this information is contained in SlotAllocInfo.m_rnti parameter
+  NS_ASSERT_MSG (m_deviceMap.find (info.m_rnti) != m_deviceMap.end (), "Device not found");
+  m_sidelinkSpectrumPhy->ConfigureBeamforming (m_deviceMap.at (info.m_rnti));
+
   // create the tx PSD
   //TODO do we need to create a new psd at each TTI?
   std::vector<int> subChannelsForTx = SetSubChannelsForTransmission ();
@@ -270,7 +276,7 @@ SfnSf
 MmWaveSidelinkPhy::UpdateTimingInfo (SfnSf info) const
 {
   NS_LOG_INFO (this);
-  
+
   uint32_t nextSlot = info.m_slotNum + 1;
   uint32_t nextSf = info.m_sfNum;
   uint32_t nextFrame = info.m_frameNum;
@@ -293,6 +299,21 @@ MmWaveSidelinkPhy::UpdateTimingInfo (SfnSf info) const
   info.m_frameNum = nextFrame;
 
   return info;
+}
+
+void
+MmWaveSidelinkPhy::AddDevice (uint64_t rnti, Ptr<NetDevice> dev)
+{
+  NS_LOG_FUNCTION (this);
+
+  if (m_deviceMap.find (rnti) == m_deviceMap.end ())
+  {
+    m_deviceMap.insert (std::make_pair (rnti,dev));
+  }
+  else
+  {
+    NS_FATAL_ERROR ("Device with rnti " << rnti << " already present in the map");
+  }
 }
 
 } // namespace mmwave

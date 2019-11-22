@@ -219,6 +219,12 @@ public:
   */
   void UpdateSinrPerceived (const SpectrumValue& sinr);
 
+  /**
+  * Configure the beamforming to communicate with a specific device
+  * \param dev the device we want to communicate with
+  */
+  void ConfigureBeamforming (Ptr<NetDevice> dev);
+
 private:
   /**
   * \brief Change state function

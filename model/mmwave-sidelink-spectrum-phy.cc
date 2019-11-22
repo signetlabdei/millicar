@@ -418,7 +418,7 @@ MmWaveSidelinkSpectrumPhy::StartTxDataFrames (Ptr<PacketBurst> pb,
   NS_LOG_FUNCTION (this);
 
   NS_ASSERT_MSG (m_channel, "First configure the SpectrumChannel");
-  
+
   switch (m_state)
     {
     case RX_DATA:
@@ -530,6 +530,18 @@ MmWaveSidelinkSpectrumPhy::UpdateSinrPerceived (const SpectrumValue& sinr)
 {
   NS_LOG_FUNCTION (this << sinr);
   m_sinrPerceived = sinr;
+}
+
+void
+MmWaveSidelinkSpectrumPhy::ConfigureBeamforming (Ptr<NetDevice> dev)
+{
+  NS_LOG_FUNCTION (this);
+
+  Ptr<AntennaArrayModel> antennaArray = DynamicCast<AntennaArrayModel> (m_antenna);
+  if (antennaArray)
+  {
+    antennaArray->ChangeBeamformingVectorPanel (dev);
+  }
 }
 
 }
