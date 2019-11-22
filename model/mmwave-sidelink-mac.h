@@ -20,6 +20,7 @@
 #define SRC_MMWAVE_MODEL_MMWAVE_SIDELINK_MAC_H_
 
 #include "mmwave-sidelink-sap.h"
+#include "ns3/mmwave-amc.h"
 #include "ns3/mmwave-phy-mac-common.h"
 
 namespace ns3 {

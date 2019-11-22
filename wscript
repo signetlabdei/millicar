@@ -16,6 +16,7 @@ def build(bld):
         'model/mmwave-sidelink-spectrum-signal-parameters.cc',
         'model/mmwave-sidelink-phy.cc',
         'model/mmwave-sidelink-mac.cc',
+        'model/mmwave-vehicular-net-device.cc',
         'helper/mmwave-vehicular-helper.cc',
         ]
 
@@ -37,6 +38,7 @@ def build(bld):
         'model/mmwave-sidelink-phy.h',
         'model/mmwave-sidelink-mac.h',
         'model/mmwave-sidelink-sap.h',
+        'model/mmwave-vehicular-net-device.h',
         'helper/mmwave-vehicular-helper.h',
         ]
 
