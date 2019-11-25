@@ -22,6 +22,7 @@
 #include "mmwave-sidelink-sap.h"
 #include "ns3/mmwave-amc.h"
 #include "ns3/mmwave-phy-mac-common.h"
+#include "ns3/lte-mac-sap.h"
 
 namespace ns3 {
 
@@ -83,7 +84,7 @@ private:
  /**
   * Transmit PDU function
   */
-  void DoTransmitPdu ();
+  void DoTransmitPdu (LteMacSapProvider::TransmitPduParameters params);
 
   // forwarded from PHY SAP
  /**
@@ -96,9 +97,10 @@ private:
   MmWaveSidelinkPhySapProvider* m_phySapProvider; //!< Sidelink PHY SAP provider
   Ptr<MmWavePhyMacCommon> m_phyMacConfig; //!< PHY and MAC configuration pointer
   Ptr<MmWaveAmc> m_amc; //!< pointer to AMC instance
+  uint8_t m_mcs; //!< the MCS used to transmit the packets
   uint16_t m_rnti; //!< radio network temporary identifier
   std::vector<uint16_t> m_sfAllocInfo; //!< size of this vector correspond to the number of slot associated to the subframe, depending on the numerology
-
+  std::list< LteMacSapProvider::TransmitPduParameters > m_txBuffer; //!< buffer containing the packets to be sent
 };
 
 class MacSidelinkMemberPhySapUser : public MmWaveSidelinkPhySapUser

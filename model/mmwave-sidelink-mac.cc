@@ -20,6 +20,7 @@
 #include "ns3/mmwave-amc.h"
 #include "mmwave-sidelink-mac.h"
 #include "ns3/log.h"
+#include "ns3/uinteger.h"
 
 namespace ns3 {
 
@@ -55,6 +56,11 @@ MmWaveSidelinkMac::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::MmWaveSidelinkMac")
     .SetParent<Object> ()
     .AddConstructor<MmWaveSidelinkMac> ()
+    .AddAttribute ("Mcs",
+                   "Modulation and Coding Scheme.",
+                   UintegerValue (0),
+                   MakeUintegerAccessor (&MmWaveSidelinkMac::m_mcs),
+                   MakeUintegerChecker<uint8_t> (0, 28))
   ;
   return tid;
 }
@@ -84,24 +90,47 @@ MmWaveSidelinkMac::DoSlotIndication (SfnSf timingInfo)
 {
   NS_LOG_FUNCTION (this);
 
-  uint8_t mcs = 9; // TODO: just a placeholder for testing purposes
-
   if(m_sfAllocInfo[timingInfo.m_slotNum] == m_rnti) // check if this slot is associated to the user who required it
   {
-    Ptr<PacketBurst> pb = CreateObject <PacketBurst> ();
-    SlotAllocInfo info;
+    // compute the available bytes
+    uint32_t availableBytes = m_amc->GetTbSizeFromMcsSymbols(m_mcs, m_phyMacConfig->GetSymbPerSlot ()) / 8; // this method returns the size in number of bits, that are then converted in number of bytes
 
-    info.m_dci.m_rnti = m_rnti;
-    info.m_dci.m_numSym = 14;
-    info.m_dci.m_mcs = mcs;
-    info.m_dci.m_tbSize = m_amc->GetTbSizeFromMcsSymbols(mcs, info.m_dci.m_numSym) / 8; // this method returns the size in number of bits, that are then converted in number of bytes
+    while (availableBytes > 0 && m_txBuffer.size () > 0)
+    {
+      // retrieve the first element of the buffer
+      LteMacSapProvider::TransmitPduParameters pduInfo = m_txBuffer.front ();
+      Ptr<Packet> pdu = pduInfo.pdu; // the packet to transmit
+      uint16_t rntiDest = pduInfo.rnti; // the RNTI of the destination node
 
-    Ptr<Packet> pkt = Create <Packet> (info.m_dci.m_tbSize);
+      // compute the number of symbols needed to transmit the packet
+      uint32_t requiredSymbols = m_amc->GetNumSymbolsFromTbsMcs (pdu->GetSize (), m_mcs);
 
-    pb->AddPacket(pkt);
+      // compute the corresponding number of bytes
+      uint32_t requiredBytes = m_amc->GetTbSizeFromMcsSymbols(m_mcs, requiredSymbols) / 8;
 
-    m_phySapProvider->AddTransportBlock(pb, info);
+      if (requiredBytes < availableBytes)
+      {
+        // create a new transport block
+        Ptr<PacketBurst> pb = CreateObject <PacketBurst> ();
+        pb->AddPacket(pdu);
 
+        SlotAllocInfo info;
+        info.m_rnti = rntiDest; // the RNTI of the destination node
+        info.m_dci.m_rnti = m_rnti; // my RNTI
+        info.m_dci.m_numSym = requiredSymbols; // the number of symbols required to tx the packet
+        info.m_dci.m_mcs = m_mcs;
+        info.m_dci.m_tbSize = requiredBytes;
+
+        // forward the transport block to the PHY
+        m_phySapProvider->AddTransportBlock(pb, info);
+
+        // remove the packet from the buffer
+        m_txBuffer.pop_front ();
+
+        // update the number of available bytes
+        availableBytes-=requiredBytes;
+      }
+    }
   }
   else
   {
@@ -111,9 +140,13 @@ MmWaveSidelinkMac::DoSlotIndication (SfnSf timingInfo)
 }
 
 void
-MmWaveSidelinkMac::DoTransmitPdu ()
+MmWaveSidelinkMac::DoTransmitPdu (LteMacSapProvider::TransmitPduParameters params)
 {
-  // TODO: to be defined when upper layers will be added
+  NS_LOG_FUNCTION (this);
+
+  // insert the packet at the end of the buffer
+  m_txBuffer.push_back (params);
+
 }
 
 void
