@@ -18,6 +18,7 @@
 
 #include <ns3/uinteger.h>
 #include <ns3/log.h>
+#include <ns3/lte-mac-sap.h>
 #include "mmwave-vehicular-net-device.h"
 
 namespace ns3 {
@@ -81,6 +82,20 @@ MmWaveVehicularNetDevice::GetAddress (void) const
   return m_macAddr;
 }
 
+Ptr<MmWaveSidelinkMac>
+MmWaveVehicularNetDevice::GetMac (void) const
+{
+  NS_LOG_FUNCTION (this);
+  return m_mac;
+}
+
+Ptr<MmWaveSidelinkPhy>
+MmWaveVehicularNetDevice::GetPhy (void) const
+{
+  NS_LOG_FUNCTION (this);
+  return m_phy;
+}
+
 bool
 MmWaveVehicularNetDevice::SetMtu (const uint16_t mtu)
 {
@@ -95,6 +110,15 @@ MmWaveVehicularNetDevice::GetMtu (void) const
 }
 
 void
+MmWaveVehicularNetDevice::RegisterDevice (const Address& dest, uint16_t rnti)
+{
+  NS_LOG_FUNCTION (this);
+
+  NS_ASSERT_MSG(m_macRnti.find (dest) != m_macRnti.end (), "This device had already been registered ");
+  m_macRnti.insert (std::make_pair (dest, rnti));
+}
+
+void
 MmWaveVehicularNetDevice::Receive (Ptr<Packet> p)
 {
   NS_LOG_FUNCTION (this << p);
@@ -103,8 +127,13 @@ MmWaveVehicularNetDevice::Receive (Ptr<Packet> p)
 bool
 MmWaveVehicularNetDevice::Send (Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber)
 {
-  // TODO: need to associate destination address to a proper IP/RNTI/NetDevice of the destination node
-  // TODO: need to call DoTransmitPdu of MmWaveSidelinkMac
+  NS_ASSERT_MSG(m_macRnti.find (dest) != m_macRnti.end (), "No registered device corresponding to the destination MAC address.");
+  LteMacSapProvider::TransmitPduParameters params;
+  params.pdu = packet;
+  params.rnti = (m_macRnti.find(dest))->second; // association between destination address and destination RNTI
+
+  m_mac->DoTransmitPdu(params);
+
   return true;
 }
 

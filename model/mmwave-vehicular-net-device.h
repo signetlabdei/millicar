@@ -62,6 +62,13 @@ public:
   virtual void DoDispose (void);
 
   /**
+   * \brief Associate to the device a univocal (with respect to the transmitting device) RNTI
+   * \param address MAC address
+   * \param rnti univocal RNTI
+   */
+  virtual void RegisterDevice (const Address& address, uint16_t rnti);
+
+  /**
    * \brief Set MAC address associated to the NetDevice
    * \param address MAC address
    */
@@ -71,6 +78,16 @@ public:
    * \brief Returns MAC address associated to the NetDevice
    */
   virtual Address GetAddress (void) const;
+
+  /**
+   * \brief Returns pointer to MAC
+   */
+  virtual Ptr<MmWaveSidelinkMac> GetMac (void) const;
+
+  /**
+   * \brief Returns pointer to PHY
+   */
+  virtual Ptr<MmWaveSidelinkPhy> GetPhy (void) const;
 
   /**
    * \brief Send a packet to the vehicular stack
@@ -101,7 +118,7 @@ private:
   Ptr<MmWaveSidelinkPhy> m_phy; //!< pointer to the PHY instance to be associated to the NetDevice
   Mac64Address m_macAddr; //!< MAC address associated to the NetDevice
   mutable uint16_t m_mtu; //!< MTU associated to the NetDevice
-
+  std::map<Address, uint16_t> m_macRnti; //!< map that associates each MAC address to a specific univocal (with respect to the transmitting device) RNTI
 };
 
 } // mmwave namespace

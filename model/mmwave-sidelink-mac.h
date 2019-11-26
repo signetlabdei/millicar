@@ -79,12 +79,12 @@ public:
   */
   uint16_t GetRnti () const;
 
-private:
-  // forwarded from MAC SAP
- /**
+  /**
   * Transmit PDU function
   */
   void DoTransmitPdu (LteMacSapProvider::TransmitPduParameters params);
+
+private:
 
   // forwarded from PHY SAP
  /**
