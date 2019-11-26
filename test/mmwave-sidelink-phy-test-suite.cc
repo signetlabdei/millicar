@@ -7,7 +7,7 @@
 #include "ns3/mmwave-spectrum-value-helper.h"
 #include "ns3/test.h"
 #include "ns3/mmwave-sidelink-phy.h"
-#include "ns3/simple-net-device.h"
+#include "ns3/mmwave-vehicular-net-device.h"
 
 NS_LOG_COMPONENT_DEFINE ("MmWaveVehicularSpectrumPhyTestSuite");
 
@@ -184,8 +184,8 @@ MmWaveVehicularSpectrumPhyTestCase1::StartTest (TestVector testVector)
   n.Create (2); // node 0 is tx, node 1 is rx
 
   // create the tx and rx devices
-  Ptr<NetDevice> txDev = CreateObject<SimpleNetDevice> ();
-  Ptr<NetDevice> rxDev = CreateObject<SimpleNetDevice> ();
+  Ptr<NetDevice> txDev = CreateObject<MmWaveVehicularNetDevice> ();
+  Ptr<NetDevice> rxDev = CreateObject<MmWaveVehicularNetDevice> ();
   n.Get (0)->AddDevice (txDev);
   n.Get (1)->AddDevice (rxDev);
   txDev->SetNode (n.Get (0));

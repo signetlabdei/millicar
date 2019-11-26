@@ -61,6 +61,46 @@ public:
    */
   virtual void DoDispose (void);
 
+  // For the following methods refer to NetDevice doxy
+
+  virtual void SetIfIndex (const uint32_t index);
+
+  virtual uint32_t GetIfIndex (void) const;
+
+  virtual Ptr<Channel> GetChannel (void) const;
+
+  virtual bool IsLinkUp (void) const;
+
+  virtual void AddLinkChangeCallback (Callback<void> callback);
+
+  virtual bool IsBroadcast (void) const;
+
+  virtual Address GetBroadcast (void) const;
+
+  virtual bool IsMulticast (void) const;
+
+  virtual Address GetMulticast (Ipv4Address multicastGroup) const;
+
+  virtual bool IsBridge (void) const;
+
+  virtual bool IsPointToPoint (void) const;
+
+  virtual bool SendFrom (Ptr<Packet> packet, const Address& source, const Address& dest, uint16_t protocolNumber);
+
+  virtual Ptr<Node> GetNode (void) const;
+
+  virtual void SetNode (Ptr<Node> node);
+
+  virtual bool NeedsArp (void) const;
+
+  virtual Address GetMulticast (Ipv6Address addr) const;
+
+  virtual void SetReceiveCallback (ReceiveCallback cb);
+
+  virtual void SetPromiscReceiveCallback (PromiscReceiveCallback cb);
+
+  virtual bool SupportsSendFrom (void) const;
+
   /**
    * \brief Associate to the device a univocal (with respect to the transmitting device) RNTI
    * \param address MAC address
@@ -113,12 +153,18 @@ public:
    */
   void Receive (Ptr<Packet> p);
 
+protected:
+  NetDevice::ReceiveCallback m_rxCallback; //!< callback that is fired when a packet is received
+
 private:
   Ptr<MmWaveSidelinkMac> m_mac; //!< pointer to the MAC instance to be associated to the NetDevice
   Ptr<MmWaveSidelinkPhy> m_phy; //!< pointer to the PHY instance to be associated to the NetDevice
   Mac64Address m_macAddr; //!< MAC address associated to the NetDevice
   mutable uint16_t m_mtu; //!< MTU associated to the NetDevice
   std::map<Address, uint16_t> m_macRnti; //!< map that associates each MAC address to a specific univocal (with respect to the transmitting device) RNTI
+  uint32_t m_ifIndex;
+  bool m_linkUp; //!< boolean that indicates if the link is UP (true) or DOWN (false)
+  Ptr<Node> m_node; //!< pointer to the node associated to the NetDevice
 };
 
 } // mmwave namespace
