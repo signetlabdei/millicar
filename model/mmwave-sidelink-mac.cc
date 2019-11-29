@@ -156,9 +156,17 @@ MmWaveSidelinkMac::DoReceivePhyPdu (Ptr<Packet> p)
 }
 
 MmWaveSidelinkPhySapUser*
-MmWaveSidelinkMac::GetPhySapUser ()
+MmWaveSidelinkMac::GetPhySapUser () const
 {
+  NS_LOG_FUNCTION (this);
   return m_phySapUser;
+}
+
+void
+MmWaveSidelinkMac::SetPhySapProvider (MmWaveSidelinkPhySapProvider* sap)
+{
+  NS_LOG_FUNCTION (this);
+  m_phySapProvider = sap;
 }
 
 void

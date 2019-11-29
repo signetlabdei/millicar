@@ -96,6 +96,18 @@ public:
   Ptr<MmWaveSidelinkSpectrumPhy> GetSpectrumPhy () const;
 
   /**
+  * Get the PHY SAP provider
+  * \return a pointer to the SAP provider to the MAC
+  */
+  MmWaveSidelinkPhySapProvider* GetPhySapProvider () const;
+
+  /**
+  * Set the PHY SAP user
+  * \param sap the PHY SAP user
+  */
+  void SetPhySapUser (MmWaveSidelinkPhySapUser* sap);
+
+  /**
    * Add a <rnti, device> pair to m_deviceMap. All the devices we want to
    * communicate with must be inserted in this map, otherwise we would not
    * be able to correctly configure the beamforming.
@@ -159,6 +171,8 @@ private:
    */
   SfnSf UpdateTimingInfo (SfnSf info) const;
 
+  MmWaveSidelinkPhySapUser* m_phySapUser; //!< Sidelink PHY SAP user
+  MmWaveSidelinkPhySapProvider* m_phySapProvider; //!< Sidelink PHY SAP provider
   double m_txPower; //!< the transmission power in dBm
   double m_noiseFigure; //!< the noise figure in dB
   Ptr<MmWaveSidelinkSpectrumPhy> m_sidelinkSpectrumPhy; //!< the SpectrumPhy instance associated with this PHY

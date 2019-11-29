@@ -63,9 +63,15 @@ public:
 
   /**
   * \brief Get the PHY SAP user
-  * \return a pointer to the SAP user of the PHY
+  * \return a pointer to the SAP user
   */
-  MmWaveSidelinkPhySapUser* GetPhySapUser ();
+  MmWaveSidelinkPhySapUser* GetPhySapUser () const;
+
+  /**
+  * \brief Set the PHY SAP provider
+  * \param sap the PHY SAP provider
+  */
+  void SetPhySapProvider (MmWaveSidelinkPhySapProvider* sap);
 
   /**
   * \brief assign a proper value to the RNTI associated to a specific user

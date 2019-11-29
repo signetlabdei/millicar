@@ -59,6 +59,9 @@ MmWaveSidelinkPhy::MmWaveSidelinkPhy (Ptr<MmWaveSidelinkSpectrumPhy> spectrumPhy
   m_sidelinkSpectrumPhy = spectrumPhy;
   m_phyMacConfig = confParams;
 
+  // create the PHY SAP provider
+  m_phySapProvider = new MacSidelinkMemberPhySapProvider (this);
+
   // create the noise PSD
   Ptr<SpectrumValue> noisePsd = MmWaveSpectrumValueHelper::CreateNoisePowerSpectralDensity (m_phyMacConfig, m_noiseFigure);
   m_sidelinkSpectrumPhy->SetNoisePowerSpectralDensity (noisePsd);
@@ -108,6 +111,8 @@ MmWaveSidelinkPhy::DoInitialize (void)
 void
 MmWaveSidelinkPhy::DoDispose (void)
 {
+  NS_LOG_FUNCTION (this);
+  delete m_phySapProvider;
 }
 
 void
@@ -149,6 +154,20 @@ MmWaveSidelinkPhy::GetConfigurationParameters (void) const
   return m_phyMacConfig;
 }
 
+MmWaveSidelinkPhySapProvider*
+MmWaveSidelinkPhy::GetPhySapProvider () const
+{
+  NS_LOG_FUNCTION (this);
+  return m_phySapProvider;
+}
+
+void
+MmWaveSidelinkPhy::SetPhySapUser (MmWaveSidelinkPhySapUser* sap)
+{
+  NS_LOG_FUNCTION (this);
+  m_phySapUser = sap;
+}
+
 void
 MmWaveSidelinkPhy::DoAddTransportBlock (Ptr<PacketBurst> pb, SlotAllocInfo info)
 {
@@ -164,6 +183,9 @@ MmWaveSidelinkPhy::StartSlot (SfnSf timingInfo)
 {
    NS_LOG_FUNCTION (this << " frame " << timingInfo.m_frameNum << " subframe " << timingInfo.m_sfNum << " slot " << timingInfo.m_slotNum);
 
+  // trigger the MAC
+  m_phySapUser->SlotIndication (timingInfo);
+  
   while (m_phyBuffer.size () != 0)
   {
     uint8_t usedSymbols = 0; // the symbol index
