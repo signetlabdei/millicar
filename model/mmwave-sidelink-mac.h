@@ -41,9 +41,16 @@ public:
   static TypeId GetTypeId (void);
 
   /**
-   * \brief Class constructor
+   * \brief Delete default constructor to avoid misuse
    */
-  MmWaveSidelinkMac (void);
+  MmWaveSidelinkMac (void) = delete;
+
+  /**
+   * \brief Class constructor
+   * \param pmc pointer to the MmWavePhyMacCommon instance which specifies the
+   *        PHY/MAC parameters
+   */
+  MmWaveSidelinkMac (Ptr<MmWavePhyMacCommon> pmc);
 
   /**
    * \brief Class destructor
@@ -86,12 +93,19 @@ public:
   uint16_t GetRnti () const;
 
   /**
+  * \brief set the subframe allocation pattern
+  * \param pattern the allocation pattern. The number of element must be equal to
+  *        number of slots per subframe. Each element represents the RNTI of the
+  *        device scheduled in the corresponding slot.
+  */
+  void SetSfAllocationInfo (std::vector<uint16_t> pattern);
+
+  /**
   * Transmit PDU function
   */
   void DoTransmitPdu (LteMacSapProvider::TransmitPduParameters params);
 
 private:
-
   // forwarded from PHY SAP
  /**
   * Receive PHY PDU function
@@ -105,7 +119,7 @@ private:
   Ptr<MmWaveAmc> m_amc; //!< pointer to AMC instance
   uint8_t m_mcs; //!< the MCS used to transmit the packets
   uint16_t m_rnti; //!< radio network temporary identifier
-  std::vector<uint16_t> m_sfAllocInfo; //!< size of this vector correspond to the number of slot associated to the subframe, depending on the numerology
+  std::vector<uint16_t> m_sfAllocInfo; //!< defines the subframe allocation, m_sfAllocInfo[i] = RNTI of the device scheduled for slot i
   std::list< LteMacSapProvider::TransmitPduParameters > m_txBuffer; //!< buffer containing the packets to be sent
 };
 

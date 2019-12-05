@@ -55,7 +55,6 @@ MmWaveSidelinkMac::GetTypeId (void)
 {
   static TypeId tid = TypeId ("ns3::MmWaveSidelinkMac")
     .SetParent<Object> ()
-    .AddConstructor<MmWaveSidelinkMac> ()
     .AddAttribute ("Mcs",
                    "Modulation and Coding Scheme.",
                    UintegerValue (0),
@@ -65,11 +64,24 @@ MmWaveSidelinkMac::GetTypeId (void)
   return tid;
 }
 
-MmWaveSidelinkMac::MmWaveSidelinkMac (void)
+MmWaveSidelinkMac::MmWaveSidelinkMac (Ptr<MmWavePhyMacCommon> pmc)
 {
   NS_LOG_FUNCTION (this);
+
+  m_phyMacConfig = pmc;
+
+  // initialize the RNTI to 0
+  m_rnti = 0;
+
+  // create the PHY SAP USER
   m_phySapUser = new MacSidelinkMemberPhySapUser (this);
+
+  // create the MmWaveAmc instance
   m_amc = CreateObject <MmWaveAmc> (m_phyMacConfig);
+
+  // initialize the scheduling patter
+  std::vector<uint16_t> pattern (m_phyMacConfig->GetSlotsPerSubframe (), 0);
+  m_sfAllocInfo = pattern;
 }
 
 MmWaveSidelinkMac::~MmWaveSidelinkMac (void)
@@ -90,6 +102,8 @@ MmWaveSidelinkMac::DoSlotIndication (SfnSf timingInfo)
 {
   NS_LOG_FUNCTION (this);
 
+  NS_ASSERT_MSG (m_rnti != 0, "First set the RNTI");
+  NS_ASSERT_MSG (!m_sfAllocInfo.empty (), "First set the scheduling patter");
   if(m_sfAllocInfo[timingInfo.m_slotNum] == m_rnti) // check if this slot is associated to the user who required it
   {
     // compute the available bytes
@@ -179,6 +193,14 @@ uint16_t
 MmWaveSidelinkMac::GetRnti () const
 {
   return m_rnti;
+}
+
+void
+MmWaveSidelinkMac::SetSfAllocationInfo (std::vector<uint16_t> pattern)
+{
+  NS_LOG_FUNCTION (this);
+  NS_ASSERT_MSG (pattern.size () == m_phyMacConfig->GetSlotsPerSubframe (), "The number of pattern elements must be equal to the number of slots per subframe");
+  m_sfAllocInfo = pattern;
 }
 
 } // mmwave namespace
