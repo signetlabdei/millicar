@@ -124,6 +124,13 @@ public:
    */
   void DoAddTransportBlock (Ptr<PacketBurst> pb, SlotAllocInfo info);
 
+  /**
+   * Prepare for the reception from another device by properly configuring
+   * the beamforming vector
+   * \param rnti the RNTI of the transmitting device
+   */
+  void DoPrepareForReceptionFrom (uint16_t rnti);
+
 private:
 
   /**
@@ -189,6 +196,8 @@ public:
   MacSidelinkMemberPhySapProvider (Ptr<MmWaveSidelinkPhy> phy);
 
   void AddTransportBlock (Ptr<PacketBurst> pb, SlotAllocInfo info) override;
+
+  void PrepareForReception (uint16_t rnti) override;
 
 private:
   Ptr<MmWaveSidelinkPhy> m_phy;

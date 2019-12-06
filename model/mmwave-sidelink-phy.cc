@@ -41,6 +41,12 @@ MacSidelinkMemberPhySapProvider::AddTransportBlock (Ptr<PacketBurst> pb, SlotAll
   m_phy->DoAddTransportBlock (pb, info);
 }
 
+void
+MacSidelinkMemberPhySapProvider::PrepareForReception (uint16_t rnti)
+{
+  m_phy->DoPrepareForReceptionFrom (rnti);
+}
+
 //-----------------------------------------------------------------------
 
 NS_LOG_COMPONENT_DEFINE ("MmWaveSidelinkPhy");
@@ -321,6 +327,14 @@ MmWaveSidelinkPhy::UpdateTimingInfo (SfnSf info) const
   info.m_frameNum = nextFrame;
 
   return info;
+}
+
+void
+MmWaveSidelinkPhy::DoPrepareForReceptionFrom (uint16_t rnti)
+{
+  NS_LOG_FUNCTION (this);
+  NS_ASSERT_MSG (m_deviceMap.find (rnti) != m_deviceMap.end (), "Cannot find device with rnti " << rnti);
+  m_sidelinkSpectrumPhy->ConfigureBeamforming (m_deviceMap.at (rnti));
 }
 
 void

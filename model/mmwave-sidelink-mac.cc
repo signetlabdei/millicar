@@ -146,9 +146,14 @@ MmWaveSidelinkMac::DoSlotIndication (SfnSf timingInfo)
       }
     }
   }
-  else
+  else if (m_sfAllocInfo[timingInfo.m_slotNum] != 0) // if the slot is assigned to another device, prepare for reception
   {
-    NS_LOG_DEBUG("This slot was not associated to this user.");
+    NS_LOG_INFO ("Prepare for reception from rnti " << m_sfAllocInfo[timingInfo.m_slotNum]);
+    m_phySapProvider->PrepareForReception (m_sfAllocInfo[timingInfo.m_slotNum]);
+  }
+  else // the slot is not assigned to any user
+  {
+    NS_LOG_INFO ("Empty slot");
   }
 
 }

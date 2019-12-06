@@ -40,6 +40,13 @@ public:
    */
   virtual void AddTransportBlock (Ptr<PacketBurst> pb, SlotAllocInfo info) = 0;
 
+  /**
+   * \brief Called by the upper layer to prepare the PHY for the reception from
+   *        another device
+   * \param rnti the rnti of the transmitting device
+   */
+  virtual void PrepareForReception (uint16_t rnti) = 0;
+
 };
 
 class MmWaveSidelinkPhySapUser
