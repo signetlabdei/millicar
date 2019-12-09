@@ -267,7 +267,9 @@ MmWaveVehicularSpectrumPropagationLossModel::DoCalcRxPowerSpectralDensity (Ptr<c
   //I only update the forward channel.
   if ((it == m_channelMap.end () && itReverse == m_channelMap.end ())
       || (it != m_channelMap.end () && it->second->m_channel.size () == 0)
-      || (it != m_channelMap.end () && it->second->m_condition != condition))
+      || (it != m_channelMap.end () && it->second->m_condition != condition)
+      || (itReverse != m_channelMap.end () && itReverse->second->m_channel.size () == 0)
+      || (itReverse != m_channelMap.end () && itReverse->second->m_condition != condition))
     {
       NS_LOG_INFO ("Update or create the forward channel");
       NS_LOG_LOGIC ("it == m_channelMap.end () " << (it == m_channelMap.end ()));
@@ -776,6 +778,7 @@ MmWaveVehicularSpectrumPropagationLossModel::Get3gppTable (char condition, bool 
 void
 MmWaveVehicularSpectrumPropagationLossModel::DeleteChannel (Ptr<const MobilityModel> a, Ptr<const MobilityModel> b) const
 {
+  NS_LOG_FUNCTION (this);
   Ptr<NetDevice> dev1 = a->GetObject<Node> ()->GetDevice (0);
   Ptr<NetDevice> dev2 = b->GetObject<Node> ()->GetDevice (0);
   NS_LOG_INFO ("a position " << a->GetPosition () << " b " << b->GetPosition ());

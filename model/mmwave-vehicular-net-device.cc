@@ -234,7 +234,7 @@ MmWaveVehicularNetDevice::RegisterDevice (const Address& dest, uint16_t rnti)
 {
   NS_LOG_FUNCTION (this);
 
-  NS_ASSERT_MSG(m_macRnti.find (dest) != m_macRnti.end (), "This device had already been registered ");
+  NS_ASSERT_MSG(m_macRnti.find (dest) == m_macRnti.end (), "This device had already been registered ");
   m_macRnti.insert (std::make_pair (dest, rnti));
 }
 

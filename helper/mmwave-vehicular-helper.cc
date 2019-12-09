@@ -21,6 +21,8 @@
 #include "ns3/mmwave-vehicular-net-device.h"
 #include "ns3/single-model-spectrum-channel.h"
 #include "ns3/antenna-array-model.h"
+#include "ns3/mmwave-vehicular-spectrum-propagation-loss-model.h"
+#include "ns3/pointer.h"
 
 namespace ns3 {
 
@@ -98,6 +100,15 @@ MmWaveVehicularHelper::DoInitialize ()
     ObjectFactory factory (m_propagationDelayModelType);
     m_channel->SetPropagationDelayModel (factory.Create<PropagationDelayModel> ());
   }
+
+  // 3GPP vehicular channel needs proper configuration
+  if (m_spectrumPropagationLossModelType == "ns3::MmWaveVehicularSpectrumPropagationLossModel")
+  {
+    Ptr<MmWaveVehicularSpectrumPropagationLossModel> threeGppSplm = DynamicCast<MmWaveVehicularSpectrumPropagationLossModel> (m_channel->GetSpectrumPropagationLossModel ());
+    PointerValue plm;
+    m_channel->GetAttribute ("PropagationLossModel", plm);
+    threeGppSplm->SetPathlossModel (plm.Get<PropagationLossModel> ()); // associate pathloss and fast fading models
+  }
 }
 
 void
@@ -144,6 +155,7 @@ MmWaveVehicularHelper::InstallSingleMmWaveVehicularNetDevice (Ptr<Node> node, ui
 
   // create and configure the tx spectrum phy
   Ptr<MmWaveSidelinkSpectrumPhy> ssp = CreateObject<MmWaveSidelinkSpectrumPhy> ();
+  NS_ASSERT_MSG (node->GetObject<MobilityModel> (), "Missing mobility model");
   ssp->SetMobility (node->GetObject<MobilityModel> ());
   ssp->SetAntenna (aam);
   NS_ASSERT_MSG (m_channel, "First create the channel");
@@ -172,8 +184,16 @@ MmWaveVehicularHelper::InstallSingleMmWaveVehicularNetDevice (Ptr<Node> node, ui
   phy->SetPhySapUser (mac->GetPhySapUser ());
   mac->SetPhySapProvider (phy->GetPhySapProvider ());
 
-  // create the device
+  // create and configure the device
   Ptr<MmWaveVehicularNetDevice> device = CreateObject<MmWaveVehicularNetDevice> (phy, mac);
+  node->AddDevice (device);
+  device->SetNode (node);
+  ssp->SetDevice (device);
+
+  // initialize the channel (if needed)
+  Ptr<MmWaveVehicularSpectrumPropagationLossModel> splm = DynamicCast<MmWaveVehicularSpectrumPropagationLossModel> (m_channel->GetSpectrumPropagationLossModel ());
+  if (splm)
+    splm->AddDevice (device, aam);
 
   return device;
 }

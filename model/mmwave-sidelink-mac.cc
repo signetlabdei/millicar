@@ -129,11 +129,13 @@ MmWaveSidelinkMac::DoSlotIndication (SfnSf timingInfo)
         pb->AddPacket(pdu);
 
         SlotAllocInfo info;
+        info.m_slotIdx = timingInfo.m_slotNum; // the TB will be sent in this slot
         info.m_rnti = rntiDest; // the RNTI of the destination node
         info.m_dci.m_rnti = m_rnti; // my RNTI
         info.m_dci.m_numSym = requiredSymbols; // the number of symbols required to tx the packet
         info.m_dci.m_mcs = m_mcs;
         info.m_dci.m_tbSize = requiredBytes;
+        info.m_slotType = SlotAllocInfo::DATA; // the TB carries data
 
         // forward the transport block to the PHY
         m_phySapProvider->AddTransportBlock(pb, info);

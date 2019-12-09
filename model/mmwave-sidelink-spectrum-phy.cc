@@ -366,6 +366,7 @@ MmWaveSidelinkSpectrumPhy::EndRxData ()
            }
 
            // Do we need the LteRadioBearerTag also here to check the rnti? I don't think so.
+           NS_ASSERT_MSG (!m_phyRxDataEndOkCallback.IsNull (), "First set the rx callback");
            m_phyRxDataEndOkCallback (*j);
          }
        }
@@ -540,7 +541,9 @@ MmWaveSidelinkSpectrumPhy::ConfigureBeamforming (Ptr<NetDevice> dev)
   Ptr<AntennaArrayModel> antennaArray = DynamicCast<AntennaArrayModel> (m_antenna);
   if (antennaArray)
   {
-    antennaArray->ChangeBeamformingVectorPanel (dev);
+    //TODO consider to update this in order to not recompute the beamforming
+    // vectors each time
+    antennaArray->SetBeamformingVectorPanelDevices (m_device, dev);
   }
 }
 
