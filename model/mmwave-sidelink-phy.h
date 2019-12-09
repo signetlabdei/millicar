@@ -131,6 +131,12 @@ public:
    */
   void DoPrepareForReceptionFrom (uint16_t rnti);
 
+  /**
+  * Receive the packet from SpectrumPhy and forward it up to the MAC
+  * \param p received packet
+  */
+  void Receive (Ptr<Packet> p);
+
 private:
 
   /**

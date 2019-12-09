@@ -191,7 +191,7 @@ MmWaveSidelinkPhy::StartSlot (SfnSf timingInfo)
 
   // trigger the MAC
   m_phySapUser->SlotIndication (timingInfo);
-  
+
   while (m_phyBuffer.size () != 0)
   {
     uint8_t usedSymbols = 0; // the symbol index
@@ -350,6 +350,15 @@ MmWaveSidelinkPhy::AddDevice (uint64_t rnti, Ptr<NetDevice> dev)
   {
     NS_FATAL_ERROR ("Device with rnti " << rnti << " already present in the map");
   }
+}
+
+void
+MmWaveSidelinkPhy::Receive (Ptr<Packet> p)
+{
+  NS_LOG_FUNCTION (this);
+
+  // Forward the received packet to the MAC layer using the PHY SAP USER
+  m_phySapUser->ReceivePhyPdu(p);
 }
 
 } // namespace mmwave

@@ -171,7 +171,8 @@ MmWaveSidelinkMac::DoTransmitPdu (LteMacSapProvider::TransmitPduParameters param
 void
 MmWaveSidelinkMac::DoReceivePhyPdu (Ptr<Packet> p)
 {
-
+  NS_LOG_FUNCTION(this << p);
+  NS_LOG_DEBUG("A packet has been received.");
 }
 
 MmWaveSidelinkPhySapUser*

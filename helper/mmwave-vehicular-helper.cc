@@ -152,9 +152,6 @@ MmWaveVehicularHelper::InstallSingleMmWaveVehicularNetDevice (Ptr<Node> node, ui
   // add the spectrum phy to the spectrum channel
   m_channel->AddRx (ssp);
 
-  //TODO connect the rx callback to the sink
-  //rx_ssp->SetPhyRxDataEndOkCallback (MakeCallback (&MmWaveVehicularSpectrumPhyTestCase1::Rx, this));
-
   // create and configure the chunk processor
   Ptr<mmWaveChunkProcessor> pData = Create<mmWaveChunkProcessor> ();
   pData->AddCallback (MakeCallback (&MmWaveSidelinkSpectrumPhy::UpdateSinrPerceived, ssp));
@@ -163,6 +160,9 @@ MmWaveVehicularHelper::InstallSingleMmWaveVehicularNetDevice (Ptr<Node> node, ui
   // create the phy
   NS_ASSERT_MSG (m_phyMacConfig, "First set the configuration parameters");
   Ptr<MmWaveSidelinkPhy> phy = CreateObject<MmWaveSidelinkPhy> (ssp, m_phyMacConfig);
+
+  // connect the rx callback to the sink
+  ssp->SetPhyRxDataEndOkCallback (MakeCallback (&MmWaveSidelinkPhy::Receive, phy));
 
   // create the mac
   Ptr<MmWaveSidelinkMac> mac = CreateObject<MmWaveSidelinkMac> (m_phyMacConfig);
