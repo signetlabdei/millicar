@@ -173,7 +173,7 @@ MmWaveVehicularHelper::InstallSingleMmWaveVehicularNetDevice (Ptr<Node> node, ui
   NS_ASSERT_MSG (m_phyMacConfig, "First set the configuration parameters");
   Ptr<MmWaveSidelinkPhy> phy = CreateObject<MmWaveSidelinkPhy> (ssp, m_phyMacConfig);
 
-  // connect the rx callback to the sink
+  // connect the rx callback of the spectrum object to the sink
   ssp->SetPhyRxDataEndOkCallback (MakeCallback (&MmWaveSidelinkPhy::Receive, phy));
 
   // create the mac
@@ -189,6 +189,9 @@ MmWaveVehicularHelper::InstallSingleMmWaveVehicularNetDevice (Ptr<Node> node, ui
   node->AddDevice (device);
   device->SetNode (node);
   ssp->SetDevice (device);
+
+  // connect the rx callback of the mac object to the rx method of the NetDevice
+  mac->SetForwardUpCallback(MakeCallback(&MmWaveVehicularNetDevice::Receive, device));
 
   // initialize the channel (if needed)
   Ptr<MmWaveVehicularSpectrumPropagationLossModel> splm = DynamicCast<MmWaveVehicularSpectrumPropagationLossModel> (m_channel->GetSpectrumPropagationLossModel ());

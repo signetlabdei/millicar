@@ -167,14 +167,13 @@ MmWaveSidelinkMac::DoTransmitPdu (LteMacSapProvider::TransmitPduParameters param
 
   // insert the packet at the end of the buffer
   m_txBuffer.push_back (params);
-
 }
 
 void
 MmWaveSidelinkMac::DoReceivePhyPdu (Ptr<Packet> p)
 {
   NS_LOG_FUNCTION(this << p);
-  NS_LOG_DEBUG("A packet has been received.");
+  m_forwardUpCallback(p);
 }
 
 MmWaveSidelinkPhySapUser*
@@ -209,6 +208,12 @@ MmWaveSidelinkMac::SetSfAllocationInfo (std::vector<uint16_t> pattern)
   NS_LOG_FUNCTION (this);
   NS_ASSERT_MSG (pattern.size () == m_phyMacConfig->GetSlotsPerSubframe (), "The number of pattern elements must be equal to the number of slots per subframe");
   m_sfAllocInfo = pattern;
+}
+
+void
+MmWaveSidelinkMac::SetForwardUpCallback (Callback <void, Ptr<Packet> > cb)
+{
+  m_forwardUpCallback = cb;
 }
 
 } // mmwave namespace

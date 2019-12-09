@@ -101,9 +101,15 @@ public:
   void SetSfAllocationInfo (std::vector<uint16_t> pattern);
 
   /**
-  * Transmit PDU function
+  * \brief Transmit PDU function
   */
   void DoTransmitPdu (LteMacSapProvider::TransmitPduParameters params);
+
+  /**
+   * \brief set the callback used to forward data packets up to the NetDevice
+   * \param cb the callback
+   */
+  void SetForwardUpCallback (Callback <void, Ptr<Packet> > cb);
 
 private:
   // forwarded from PHY SAP
@@ -121,6 +127,7 @@ private:
   uint16_t m_rnti; //!< radio network temporary identifier
   std::vector<uint16_t> m_sfAllocInfo; //!< defines the subframe allocation, m_sfAllocInfo[i] = RNTI of the device scheduled for slot i
   std::list< LteMacSapProvider::TransmitPduParameters > m_txBuffer; //!< buffer containing the packets to be sent
+  Callback <void, Ptr<Packet> > m_forwardUpCallback; ///< upward callback to the NetDevice
 };
 
 class MacSidelinkMemberPhySapUser : public MmWaveSidelinkPhySapUser
