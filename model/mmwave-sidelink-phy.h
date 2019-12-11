@@ -164,13 +164,11 @@ private:
    * Send the packet burts
    * \param pb the packet burst
    * \param duration the duration of the transmissin
-   * \param slotInd the slot index
-   * \param mcs the MCS value
-   * \param size the size of the transport block to send
+   * \param info the SlotAllocInfo instance containg the transmission information
    * \param rbBitmap the mask indicating the suchannels to be used for the
             transmission
    */
-  void SendDataChannels (Ptr<PacketBurst> pb, Time duration, uint8_t slotInd, uint8_t mcs, uint32_t size, std::vector<int> rbBitmap);
+  void SendDataChannels (Ptr<PacketBurst> pb, Time duration, SlotAllocInfo info, std::vector<int> rbBitmap);
 
   /**
    * TODO: this can be done by overloading the operator ++ of the SfnSf struct

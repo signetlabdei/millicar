@@ -47,6 +47,8 @@ struct TbInfo_t
   Ptr<PacketBurst> packetBurst; ///< Packet burst associated to the transport block
   uint32_t size; ///< Transport block size
   uint8_t mcs; ///< MCS
+  uint8_t numSym; ///< number of symbols used to transmit this TB
+  uint16_t rnti; ///< RNTI of the device which is sending the packet
   std::vector<int> rbBitmap; ///< Resource block bitmap
 };
 
@@ -180,11 +182,16 @@ public:
   *
   * @param pb the burst of packets to be transmitted
   * @param duration the duration of the data frame
+  * @param mcs MCS to use for the transmission of the data frame
+  * @param size size of the transport block
+  * @param numSym number of OFDM symbols dedicated to the TB
+  * @param rnti the RNTI of the destination device
+  * @param rbBitmap resource block bitmap
   *
   * @return true if an error occurred and the transmission was not
   * started, false otherwise.
   */
-  bool StartTxDataFrames (Ptr<PacketBurst> pb, Time duration, uint8_t slotInd, uint8_t mcs, uint32_t size, std::vector<int> rbBitmap);
+  bool StartTxDataFrames (Ptr<PacketBurst> pb, Time duration, uint8_t slotInd, uint8_t mcs, uint32_t size, uint8_t numSym, uint16_t rnti, std::vector<int> rbBitmap);
 
   //bool StartTxControlFrames (std::list<Ptr<MmWaveControlMessage> > ctrlMsgList, Time duration);       // control frames from enb to ue
 

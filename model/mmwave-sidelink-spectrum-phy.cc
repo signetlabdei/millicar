@@ -287,7 +287,7 @@ MmWaveSidelinkSpectrumPhy::StartRxData (Ptr<MmWaveSidelinkSpectrumSignalParamete
         ChangeState (RX_DATA);
         if (params->packetBurst && !params->packetBurst->GetPackets ().empty ())
           {
-            TbInfo_t tbInfo = {params->packetBurst, params->size, params->mcs, params->rbBitmap};
+            TbInfo_t tbInfo = {params->packetBurst, params->size, params->mcs, params->numSym, params->rnti, params->rbBitmap};
             m_rxTransportBlock.push_back (tbInfo);
           }
         //m_rxControlMessageList.insert (m_rxControlMessageList.end (), params->ctrlMsgList.begin (), params->ctrlMsgList.end ());
@@ -414,6 +414,8 @@ MmWaveSidelinkSpectrumPhy::StartTxDataFrames (Ptr<PacketBurst> pb,
   uint8_t slotInd,
   uint8_t mcs,
   uint32_t size,
+  uint8_t numSym,
+  uint16_t rnti,
   std::vector<int> rbBitmap)
 {
   NS_LOG_FUNCTION (this);
@@ -443,6 +445,8 @@ MmWaveSidelinkSpectrumPhy::StartTxDataFrames (Ptr<PacketBurst> pb,
         txParams->slotInd = slotInd;
         txParams->txAntenna = m_antenna;
         txParams->mcs = mcs;
+        txParams->numSym = numSym;
+        txParams->rnti = rnti;
         txParams->size = size;
         txParams->rbBitmap = rbBitmap;
 

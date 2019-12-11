@@ -262,9 +262,7 @@ MmWaveSidelinkPhy::SlData (Ptr<PacketBurst> pb, SlotAllocInfo info)
   Simulator::Schedule (startTime + NanoSeconds (1.0), &MmWaveSidelinkPhy::SendDataChannels, this,
                        pb,
                        duration,
-                       info.m_slotIdx,
-                       info.m_dci.m_mcs,
-                       info.m_dci.m_tbSize,
+                       info,
                        subChannelsForTx);
 
   return info.m_dci.m_numSym;
@@ -273,12 +271,10 @@ MmWaveSidelinkPhy::SlData (Ptr<PacketBurst> pb, SlotAllocInfo info)
 void
 MmWaveSidelinkPhy::SendDataChannels (Ptr<PacketBurst> pb,
   Time duration,
-  uint8_t slotInd,
-  uint8_t mcs,
-  uint32_t size,
+  SlotAllocInfo info,
   std::vector<int> rbBitmap)
 {
-  m_sidelinkSpectrumPhy->StartTxDataFrames (pb, duration, slotInd, mcs, size, rbBitmap);
+  m_sidelinkSpectrumPhy->StartTxDataFrames (pb, duration, info.m_slotIdx, info.m_dci.m_mcs, info.m_dci.m_tbSize, info.m_dci.m_numSym, info.m_rnti, rbBitmap);
 }
 
 std::vector<int>

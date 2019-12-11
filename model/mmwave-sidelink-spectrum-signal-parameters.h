@@ -55,6 +55,10 @@ struct MmWaveSidelinkSpectrumSignalParameters : public SpectrumSignalParameters
 
   uint8_t mcs; ///< the modulation and coding scheme index to be used to transmit the transport block
 
+  uint8_t numSym; ///< the number of symbols associated to a specific transport block
+
+  uint16_t rnti; ///< the RNTI which identifies the device which is sending the packet
+
   uint32_t size; ///< the size of the corresponding transport block
 
   std::vector<int> rbBitmap; ///< the resource blocks bitmap associated to the transport block
