@@ -1,6 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 
 #include "ns3/mmwave-sidelink-spectrum-phy.h"
+#include "ns3/mmwave-vehicular-net-device.h"
 #include "ns3/constant-position-mobility-model.h"
 #include "ns3/isotropic-antenna-model.h"
 #include "ns3/spectrum-helper.h"
@@ -64,7 +65,7 @@ MmWaveVehicularSidelinkSpectrumPhyTestCase1::~MmWaveVehicularSidelinkSpectrumPhy
 void
 MmWaveVehicularSidelinkSpectrumPhyTestCase1::Rx (Ptr<Packet> p)
 {
-  NS_LOG_UNCOND ("Rx event");
+  NS_LOG_DEBUG ("Rx event");
 }
 
 void
@@ -143,23 +144,38 @@ MmWaveVehicularSidelinkSpectrumPhyTestCase1::DoRun (void)
   Ptr<SpectrumValue> noisePsd = MmWaveSpectrumValueHelper::CreateNoisePowerSpectralDensity (pmc, noiseFigure);
   rx_ssp->SetNoisePowerSpectralDensity (noisePsd);
 
+  // set the device for the receiving side, as the MmWaveSidelinkSpectrumPhy checks the RNTI of the receiver
+  // to drop or not the packet
+  uint16_t rxRnti = 1;
+  Ptr<MmWaveSidelinkPhy> phy = CreateObject<MmWaveSidelinkPhy> (rx_ssp, pmc);
+  Ptr<MmWaveSidelinkMac> mac = CreateObject<MmWaveSidelinkMac> (pmc);
+  phy->SetPhySapUser (mac->GetPhySapUser ());
+  mac->SetPhySapProvider (phy->GetPhySapProvider ());
+  mac->SetRnti (rxRnti);
+  Ptr<MmWaveVehicularNetDevice> device = CreateObject<MmWaveVehicularNetDevice> (phy, mac);
+  NodeContainer nc;
+  nc.Create(1);
+  rx_ssp->SetDevice (device);
+  device->SetNode(nc.Get(0));
+  nc.Get(0)->AddDevice(device);
+
   // send an empty packet burst
   Ptr<Packet> p = Create<Packet> (20);
   Ptr<PacketBurst> pb = CreateObject<PacketBurst> ();
   pb->AddPacket (p);
   Time duration = MilliSeconds (1); // packet duration
   uint8_t slotInd = 0; // slot index
-  uint8_t mcs = 28; // MCS
+  uint8_t mcs = 0; // MCS
   uint8_t numSym = 14; // number of symbols dedicated to the transport block 
   uint8_t size = 20; // size of the transport block
-  uint16_t rnti = 0; // RNTI that identifies the device in the cell (officially, it is set by the MAC)
 
   // send the transport block through the spectrum channel
-  tx_ssp->StartTxDataFrames (pb, duration, slotInd, mcs, size, numSym, rnti, subChannelsForTx);
+  tx_ssp->StartTxDataFrames (pb, duration, slotInd, mcs, size, numSym, rxRnti, subChannelsForTx);
 
   // compute the expected SINR
   m_expectedSinr = txp + 20 * log10 (3e8 / (4 * M_PI * distance * pmc->GetCenterFrequency ())) + 114 - noiseFigure - 10 * log10 (pmc->GetSystemBandwidth () / 1e6);
 
+  Simulator::Stop (MilliSeconds(2));
   Simulator::Run ();
   Simulator::Destroy ();
 

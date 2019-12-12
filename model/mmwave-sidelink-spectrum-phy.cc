@@ -29,6 +29,7 @@
 #include <stdio.h>
 #include <ns3/double.h>
 #include <ns3/mmwave-mi-error-model.h>
+#include <ns3/mmwave-vehicular-net-device.h>
 
 namespace ns3 {
 
@@ -125,10 +126,11 @@ MmWaveSidelinkSpectrumPhy::ResetSpectrumModel ()
   m_rxSpectrumModel = 0;
 }
 
-// TODO these are never used
 void
 MmWaveSidelinkSpectrumPhy::SetDevice (Ptr<NetDevice> d)
 {
+  NS_ABORT_MSG_IF(DynamicCast<MmWaveVehicularNetDevice>(d) == 0, 
+    "The MmWaveSidelinkSpectrumPhy only works with MmWaveVehicularNetDevices");
   m_device = d;
 }
 
@@ -261,35 +263,48 @@ MmWaveSidelinkSpectrumPhy::StartRxData (Ptr<MmWaveSidelinkSpectrumSignalParamete
     case RX_DATA:
     case IDLE:
       {
-        // this is a useful signal
-        m_interferenceData->StartRx (params->psd);
+        // check if the packet is for this device, otherwise
+        // consider it only for the interference
+        uint16_t thisDeviceRnti = 
+          DynamicCast<MmWaveVehicularNetDevice>(m_device)->GetMac()->GetRnti();
+        if(thisDeviceRnti == params->rnti)
+        {
+          // this is a useful signal
+          m_interferenceData->StartRx (params->psd);
 
-        if (m_rxTransportBlock.empty ())
-          {
-            NS_ASSERT (m_state == IDLE);
-            // first transmission, i.e., we're IDLE and we start RX
-            m_firstRxStart = Simulator::Now ();
-            m_firstRxDuration = params->duration;
-            NS_LOG_LOGIC (this << " scheduling EndRx with delay " << params->duration.GetSeconds () << "s");
+          if (m_rxTransportBlock.empty ())
+            {
+              NS_ASSERT (m_state == IDLE);
+              // first transmission, i.e., we're IDLE and we start RX
+              m_firstRxStart = Simulator::Now ();
+              m_firstRxDuration = params->duration;
+              NS_LOG_LOGIC (this << " scheduling EndRx with delay " << params->duration.GetSeconds () << "s");
 
-            m_endRxDataEvent = Simulator::Schedule (params->duration, &MmWaveSidelinkSpectrumPhy::EndRxData, this);
-          }
+              m_endRxDataEvent = Simulator::Schedule (params->duration, &MmWaveSidelinkSpectrumPhy::EndRxData, this);
+            }
+          else
+            {
+              NS_ASSERT (m_state == RX_DATA);
+              // sanity check: if there are multiple RX events, they
+              // should occur at the same time and have the same
+              // duration, otherwise the interference calculation
+              // won't be correct
+              NS_ASSERT ((m_firstRxStart == Simulator::Now ()) && (m_firstRxDuration == params->duration));
+            }
+
+          ChangeState (RX_DATA);
+          if (params->packetBurst && !params->packetBurst->GetPackets ().empty ())
+            {
+              TbInfo_t tbInfo = {params->packetBurst, params->size, params->mcs, params->numSym, params->rnti, params->rbBitmap};
+              m_rxTransportBlock.push_back (tbInfo);
+            }
+        }
         else
-          {
-            NS_ASSERT (m_state == RX_DATA);
-            // sanity check: if there are multiple RX events, they
-            // should occur at the same time and have the same
-            // duration, otherwise the interference calculation
-            // won't be correct
-            NS_ASSERT ((m_firstRxStart == Simulator::Now ()) && (m_firstRxDuration == params->duration));
-          }
-
-        ChangeState (RX_DATA);
-        if (params->packetBurst && !params->packetBurst->GetPackets ().empty ())
-          {
-            TbInfo_t tbInfo = {params->packetBurst, params->size, params->mcs, params->numSym, params->rnti, params->rbBitmap};
-            m_rxTransportBlock.push_back (tbInfo);
-          }
+        {
+          NS_LOG_LOGIC (this << " not in sync with this signal (rnti="
+              << params->rnti  << ", rnti of the device=" 
+              << thisDeviceRnti << ")");
+        }
         //m_rxControlMessageList.insert (m_rxControlMessageList.end (), params->ctrlMsgList.begin (), params->ctrlMsgList.end ());
       }
       break;

@@ -247,7 +247,7 @@ private:
 
   Ptr<mmWaveInterference> m_interferenceData; ///< the data interference
   Ptr<MobilityModel> m_mobility; ///< the modility model
-  Ptr<NetDevice> m_device; ///< the device // TODO this is never used
+  Ptr<NetDevice> m_device; ///< the device
   Ptr<SpectrumChannel> m_channel; ///< the channel
   Ptr<const SpectrumModel> m_rxSpectrumModel; ///< the spectrum model
   Ptr<SpectrumValue> m_txPsd; ///< the transmit PSD
