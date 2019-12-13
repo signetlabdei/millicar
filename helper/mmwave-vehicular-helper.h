@@ -35,6 +35,7 @@ class MmWaveVehicularNetDevice;
  * This class is used for the creation of MmWaveVehicularNetDevices and
  * their configuration
  */
+
 class MmWaveVehicularHelper : public Object
 {
 public:
@@ -82,6 +83,12 @@ public:
    */
   void SetPropagationDelayModelType (std::string pdm);
 
+  /**
+   * Configure the frame structure to be consistent with the NR V2X numerology
+   * \param index numerology index, used to define the frame structure
+   */
+  void SetNumerology (uint8_t index);
+
 protected:
   // inherited from Object
   virtual void DoInitialize (void) override;
@@ -104,9 +111,13 @@ private:
   Ptr<SpectrumChannel> m_channel; //!< the SpectrumChannel
   Ptr<MmWavePhyMacCommon> m_phyMacConfig; //!< the configuration parameters
   uint16_t m_rntiCounter; //!< a counter to set the RNTIs
+  uint8_t m_numerologyIndex; //!< numerology index
+  double m_bandwidth; //!< system bandwidth
   std::string m_propagationLossModelType; //!< the type id of the propagation loss model to be used
   std::string m_spectrumPropagationLossModelType; //!< the type id of the spectrum propagation loss model to be used
   std::string m_propagationDelayModelType; //!< the type id of the delay model to be used
+
+
 };
 
 } // namespace mmwave

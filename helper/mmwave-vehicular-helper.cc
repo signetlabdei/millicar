@@ -18,6 +18,7 @@
 
 #include "mmwave-vehicular-helper.h"
 #include "ns3/log.h"
+#include "ns3/double.h"
 #include "ns3/mmwave-vehicular-net-device.h"
 #include "ns3/single-model-spectrum-channel.h"
 #include "ns3/antenna-array-model.h"
@@ -70,6 +71,18 @@ MmWaveVehicularHelper::GetTypeId ()
                  StringValue (""),
                  MakeStringAccessor (&MmWaveVehicularHelper::SetPropagationDelayModelType),
                  MakeStringChecker ())
+  .AddAttribute ("Numerology",
+                "Numerology to use for the definition of the frame structure."
+                "2 : subcarrier spacing will be set to 60 KHz"
+                "3 : subcarrier spacing will be set to 120 KHz",
+                UintegerValue (2),
+                MakeUintegerAccessor (&MmWaveVehicularHelper::SetNumerology),
+                MakeUintegerChecker<uint8_t> ())
+  .AddAttribute ("Bandwidth",
+                 "Bandwidth in Hz",
+                 DoubleValue (1e8),
+                 MakeDoubleAccessor (&MmWaveVehicularHelper::m_bandwidth),
+                 MakeDoubleChecker<double> ())
   ;
 
   return tid;
@@ -116,6 +129,36 @@ MmWaveVehicularHelper::SetConfigurationParameters (Ptr<MmWavePhyMacCommon> conf)
 {
   NS_LOG_FUNCTION (this);
   m_phyMacConfig = conf;
+}
+
+void
+MmWaveVehicularHelper::SetNumerology (uint8_t index)
+{
+
+  NS_LOG_FUNCTION (this);
+
+  NS_ASSERT_MSG ( (index == 2) || (index == 3), "Numerology index is not valid.");
+
+  m_numerologyIndex = index;
+
+  m_phyMacConfig = CreateObject<MmWavePhyMacCommon> ();
+
+  double subcarrierSpacing = 15 * std::pow (2, m_numerologyIndex) * 1000; // subcarrier spacing based on the numerology. Only 60KHz and 120KHz is supported in NR V2X.
+
+  m_phyMacConfig->SetSymbPerSlot(14); // TR 38.802 Section 5.3: each slot must have 14 symbols < Symbol duration is dependant on the numerology
+  m_phyMacConfig->SetSlotPerSubframe(std::pow (2, m_numerologyIndex)); // flexible number of slots per subframe - depends on numerology
+  m_phyMacConfig->SetSubframePeriod (1000); // TR 38.802 Section 5.3: the subframe duration is 1ms, i.e., 1000us, and the frame length is 10ms.
+  m_phyMacConfig->SetSlotPeriod ( m_phyMacConfig->GetSubframePeriod() / m_phyMacConfig->GetSlotsPerSubframe()); // 1 ms is dedicated to each subframe, the slot period is evaluated accordingly
+
+  m_phyMacConfig->SetSymbolPeriod ( (1 / subcarrierSpacing) * 1e6 ); // symbol period is required in microseconds
+
+  double subCarriersPerRB = 12;
+
+  m_phyMacConfig->SetNumChunkPerRB(subCarriersPerRB); // each resource block contains subCarriersPerRB chunks
+  m_phyMacConfig->SetNumRb ( uint32_t( m_bandwidth / (subcarrierSpacing * subCarriersPerRB) ) );
+
+  m_phyMacConfig->SetChunkWidth (subcarrierSpacing);
+
 }
 
 NetDeviceContainer
