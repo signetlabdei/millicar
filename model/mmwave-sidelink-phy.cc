@@ -252,11 +252,12 @@ MmWaveSidelinkPhy::SlData (Ptr<PacketBurst> pb, SlotAllocInfo info)
 
   // compute the tx start time (IndexOfTheFirstSymbol * SymbolDuration)
   Time startTime = NanoSeconds (info.m_dci.m_symStart * m_phyMacConfig->GetSymbolPeriod () * 1e3);
-  NS_ASSERT_MSG (startTime.GetNanoSeconds () == info.m_dci.m_symStart * m_phyMacConfig->GetSymbolPeriod () * 1e3, "startTime was not been correctly set");
+  NS_ASSERT_MSG (startTime.GetNanoSeconds () == int64_t(info.m_dci.m_symStart * m_phyMacConfig->GetSymbolPeriod () * 1e3), "startTime was not been correctly set");
 
   // compute the duration of the transmission (NumberOfSymbols * SymbolDuration)
   Time duration = NanoSeconds (info.m_dci.m_numSym * m_phyMacConfig->GetSymbolPeriod () * 1e3);
-  NS_ASSERT_MSG (duration.GetNanoSeconds () == info.m_dci.m_numSym * m_phyMacConfig->GetSymbolPeriod () * 1e3, "duration was not been correctly set");
+
+  NS_ASSERT_MSG (duration.GetNanoSeconds () == int64_t(info.m_dci.m_numSym * m_phyMacConfig->GetSymbolPeriod () * 1e3), "duration was not been correctly set");
 
   // send the transport block
   Simulator::Schedule (startTime + NanoSeconds (1.0), &MmWaveSidelinkPhy::SendDataChannels, this,

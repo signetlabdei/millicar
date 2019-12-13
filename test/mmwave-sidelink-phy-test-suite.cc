@@ -227,11 +227,21 @@ MmWaveVehicularSpectrumPhyTestCase1::StartTest (TestVector testVector)
   rx_ssp->SetAntenna (rx_am);
   rx_ssp->SetChannel (sc);
 
+  // creating mac instance in order to be able to call the method DoSlotIndication from MmWaveSidelinkPhy::StartSlot()
+  Ptr<MmWaveSidelinkMac> tx_mac = CreateObject<MmWaveSidelinkMac> (pmc);
+  tx_mac->SetRnti(1);
+  tx_phy->SetPhySapUser(tx_mac->GetPhySapUser());
+
   // add the rx spectrum phy instance to the spectrum channel
   sc->AddRx (rx_ssp);
 
   // create the rx phy
   Ptr<MmWaveSidelinkPhy> rx_phy = CreateObject<MmWaveSidelinkPhy> (rx_ssp, pmc);
+
+  // creating mac instance in order to be able to call the method DoSlotIndication from MmWaveSidelinkPhy::StartSlot() 
+  Ptr<MmWaveSidelinkMac> rx_mac = CreateObject<MmWaveSidelinkMac> (pmc);
+  rx_mac->SetRnti(2);
+  rx_phy->SetPhySapUser(rx_mac->GetPhySapUser());
 
   // connect the rx callback to the sink
   rx_ssp->SetPhyRxDataEndOkCallback (MakeCallback (&MmWaveVehicularSpectrumPhyTestCase1::Rx, this));
