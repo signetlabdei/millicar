@@ -225,13 +225,12 @@ MmWaveSidelinkPhy::StartSlot (SfnSf timingInfo)
     m_phyBuffer.pop_front ();
   }
 
-  // convert the slot period from seconds to milliseconds
+  // convert the slot period from seconds to nanoseconds
   // TODO change GetSlotPeriod to return a TimeValue
   double slotPeriod = m_phyMacConfig->GetSlotPeriod () * 1e9;
 
   // update the timing information
   timingInfo = UpdateTimingInfo (timingInfo);
-
   Simulator::Schedule (NanoSeconds (slotPeriod), &MmWaveSidelinkPhy::StartSlot, this, timingInfo);
 }
 

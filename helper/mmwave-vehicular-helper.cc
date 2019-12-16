@@ -20,6 +20,7 @@
 #include "ns3/log.h"
 #include "ns3/double.h"
 #include "ns3/mmwave-vehicular-net-device.h"
+#include "ns3/internet-stack-helper.h"
 #include "ns3/single-model-spectrum-channel.h"
 #include "ns3/antenna-array-model.h"
 #include "ns3/mmwave-vehicular-spectrum-propagation-loss-model.h"
@@ -148,16 +149,16 @@ MmWaveVehicularHelper::SetNumerology (uint8_t index)
   m_phyMacConfig->SetSymbPerSlot(14); // TR 38.802 Section 5.3: each slot must have 14 symbols < Symbol duration is dependant on the numerology
   m_phyMacConfig->SetSlotPerSubframe(std::pow (2, m_numerologyIndex)); // flexible number of slots per subframe - depends on numerology
   m_phyMacConfig->SetSubframePeriod (1000); // TR 38.802 Section 5.3: the subframe duration is 1ms, i.e., 1000us, and the frame length is 10ms.
-  m_phyMacConfig->SetSlotPeriod ( m_phyMacConfig->GetSubframePeriod() / m_phyMacConfig->GetSlotsPerSubframe()); // 1 ms is dedicated to each subframe, the slot period is evaluated accordingly
+  m_phyMacConfig->SetSlotPeriod ( (m_phyMacConfig->GetSubframePeriod() / m_phyMacConfig->GetSlotsPerSubframe()) / 1e6); // 1 ms is dedicated to each subframe, the slot period is evaluated accordingly
 
   m_phyMacConfig->SetSymbolPeriod ( (1 / subcarrierSpacing) * 1e6 ); // symbol period is required in microseconds
 
   double subCarriersPerRB = 12;
 
-  m_phyMacConfig->SetNumChunkPerRB(subCarriersPerRB); // each resource block contains subCarriersPerRB chunks
+  m_phyMacConfig->SetNumChunkPerRB(1); // each resource block contains 1 chunk
   m_phyMacConfig->SetNumRb ( uint32_t( m_bandwidth / (subcarrierSpacing * subCarriersPerRB) ) );
 
-  m_phyMacConfig->SetChunkWidth (subcarrierSpacing);
+  m_phyMacConfig->SetChunkWidth (subCarriersPerRB*subcarrierSpacing);
 
 }
 
@@ -181,9 +182,6 @@ MmWaveVehicularHelper::InstallMmWaveVehicularNetDevices (NodeContainer nodes)
 
       devices.Add (device);
     }
-
-  // configure the devices to enable communication between them
-  PairDevices (devices);
 
   return devices;
 }
@@ -267,17 +265,23 @@ MmWaveVehicularHelper::PairDevices (NetDeviceContainer devices)
 
   for (NetDeviceContainer::Iterator i = devices.Begin (); i != devices.End (); ++i)
     {
+
       Ptr<MmWaveVehicularNetDevice> di = DynamicCast<MmWaveVehicularNetDevice> (*i);
+
       di->GetMac ()->SetSfAllocationInfo (pattern);
 
       for (NetDeviceContainer::Iterator j = devices.Begin (); j != devices.End (); ++j)
       {
         Ptr<MmWaveVehicularNetDevice> dj = DynamicCast<MmWaveVehicularNetDevice> (*j);
+        Ptr<Node> jNode = dj->GetNode ();
+        Ptr<Ipv4> jNodeIpv4 = jNode->GetObject<Ipv4> ();
+        NS_ASSERT_MSG (jNodeIpv4 != 0, "Nodes need to have IPv4 installed before pairing can be activated");
 
         if (*i != *j)
         {
-          // initialize the <MAC address, RNTI> map of the devices
-          di->RegisterDevice (dj->GetAddress (), dj->GetMac ()->GetRnti ());
+          // initialize the <IP address, RNTI> map of the devices
+          int32_t interface =  jNodeIpv4->GetInterfaceForDevice (dj);
+          di->RegisterDevice (jNodeIpv4->GetAddress (interface, 0).GetLocal (), dj->GetMac ()->GetRnti ());
 
           // register the associated devices in the PHY
           di->GetPhy ()->AddDevice (dj->GetMac ()->GetRnti (), dj);

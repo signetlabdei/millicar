@@ -398,7 +398,7 @@ MmWaveVehicularSpectrumPropagationLossModel::CalBeamformingGain (Ptr<const Spect
   //NS_ASSERT_MSG (params->m_angle.at(1).size()==params->m_channel.at(0).at(0).size(), "the cluster number of channel and ZOA should be the same");
 
   //channel[rx][tx][cluster]
-  uint8_t numCluster = params->m_delay.size ();
+  uint8_t numCluster = params->m_numCluster;
   //uint8_t txAntenna = params->m_txW.size();
   //uint8_t rxAntenna = params->m_rxW.size();
   //the update of Doppler is simplified by only taking the center angle of each cluster in to consideration.
@@ -526,7 +526,7 @@ MmWaveVehicularSpectrumPropagationLossModel::CalLongTerm (Ptr<Params3gpp> params
   //store the long term part to reduce computation load
   //only the small scale fading is need to be updated if the large scale parameters and antenna weights remain unchanged.
   complexVector_t longTerm;
-  uint8_t numCluster = params->m_delay.size ();
+  uint8_t numCluster = params->m_numCluster;
 
   for (uint8_t cIndex = 0; cIndex < numCluster; cIndex++)
     {

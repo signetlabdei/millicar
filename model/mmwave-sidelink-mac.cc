@@ -108,6 +108,7 @@ MmWaveSidelinkMac::DoSlotIndication (SfnSf timingInfo)
   {
     // compute the available bytes
     uint32_t availableBytes = m_amc->GetTbSizeFromMcsSymbols(m_mcs, m_phyMacConfig->GetSymbPerSlot ()) / 8; // this method returns the size in number of bits, that are then converted in number of bytes
+    uint8_t symStart = 0; // indicates the next available symbol in the slot
 
     while (availableBytes > 0 && m_txBuffer.size () > 0)
     {
@@ -133,6 +134,7 @@ MmWaveSidelinkMac::DoSlotIndication (SfnSf timingInfo)
         info.m_rnti = rntiDest; // the RNTI of the destination node
         info.m_dci.m_rnti = m_rnti; // my RNTI
         info.m_dci.m_numSym = requiredSymbols; // the number of symbols required to tx the packet
+        info.m_dci.m_symStart = symStart;
         info.m_dci.m_mcs = m_mcs;
         info.m_dci.m_tbSize = requiredBytes;
         info.m_slotType = SlotAllocInfo::DATA; // the TB carries data
@@ -145,6 +147,16 @@ MmWaveSidelinkMac::DoSlotIndication (SfnSf timingInfo)
 
         // update the number of available bytes
         availableBytes-=requiredBytes;
+
+        // update index to the next available symbol
+        symStart=symStart+requiredSymbols+1;
+      }
+      else
+      {
+        // the remaining available bytes are not enough to transmit the next
+        // packet in the buffer
+        NS_LOG_INFO ("Available bytes " << availableBytes << " next packet size " << pduInfo.pdu->GetSize ());
+        break;
       }
     }
   }

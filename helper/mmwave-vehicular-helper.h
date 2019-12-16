@@ -84,6 +84,12 @@ public:
   void SetPropagationDelayModelType (std::string pdm);
 
   /**
+   * Associate the devices in the container
+   * \param devices the NetDeviceContainer with the devices
+   */
+  void PairDevices (NetDeviceContainer devices);
+
+  /**
    * Configure the frame structure to be consistent with the NR V2X numerology
    * \param index numerology index, used to define the frame structure
    */
@@ -101,12 +107,6 @@ private:
    * \return pointer to the installed NetDevice
    */
   Ptr<MmWaveVehicularNetDevice> InstallSingleMmWaveVehicularNetDevice (Ptr<Node> n, uint16_t rnti);
-
-  /**
-   * Associate the devices in the container
-   * \param devices the NetDeviceContainer with the devices
-   */
-  void PairDevices (NetDeviceContainer devices);
 
   Ptr<SpectrumChannel> m_channel; //!< the SpectrumChannel
   Ptr<MmWavePhyMacCommon> m_phyMacConfig; //!< the configuration parameters

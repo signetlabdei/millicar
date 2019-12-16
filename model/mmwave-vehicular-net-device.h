@@ -103,7 +103,7 @@ public:
 
   /**
    * \brief Associate to the device a univocal (with respect to the transmitting device) RNTI
-   * \param address MAC address
+   * \param address IP address
    * \param rnti univocal RNTI
    */
   virtual void RegisterDevice (const Address& address, uint16_t rnti);
@@ -161,7 +161,7 @@ private:
   Ptr<MmWaveSidelinkPhy> m_phy; //!< pointer to the PHY instance to be associated to the NetDevice
   Mac64Address m_macAddr; //!< MAC address associated to the NetDevice
   mutable uint16_t m_mtu; //!< MTU associated to the NetDevice
-  std::map<Address, uint16_t> m_macRnti; //!< map that associates each MAC address to a specific univocal (with respect to the transmitting device) RNTI
+  std::map<Address, uint16_t> m_ipRnti; //!< map that associates each IP address to a specific univocal (with respect to the transmitting device) RNTI
   uint32_t m_ifIndex;
   bool m_linkUp; //!< boolean that indicates if the link is UP (true) or DOWN (false)
   Ptr<Node> m_node; //!< pointer to the node associated to the NetDevice

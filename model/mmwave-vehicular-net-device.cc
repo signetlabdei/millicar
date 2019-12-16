@@ -104,7 +104,7 @@ MmWaveVehicularNetDevice::AddLinkChangeCallback (Callback<void> callback)
 bool
 MmWaveVehicularNetDevice::IsBroadcast (void) const
 {
-  return false;
+  return true;
 }
 
 Address
@@ -233,24 +233,32 @@ void
 MmWaveVehicularNetDevice::RegisterDevice (const Address& dest, uint16_t rnti)
 {
   NS_LOG_FUNCTION (this);
-
-  NS_ASSERT_MSG(m_macRnti.find (dest) == m_macRnti.end (), "This device had already been registered ");
-  m_macRnti.insert (std::make_pair (dest, rnti));
+  NS_ASSERT_MSG(m_ipRnti.find (dest) == m_ipRnti.end (), "This device had already been registered ");
+  m_ipRnti.insert (std::make_pair (dest, rnti));
 }
 
 void
 MmWaveVehicularNetDevice::Receive (Ptr<Packet> p)
 {
   NS_LOG_FUNCTION (this << p);
+  NS_LOG_UNCOND ("Received packet at: " << Simulator::Now().GetSeconds() << "s");
 }
 
 bool
 MmWaveVehicularNetDevice::Send (Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber)
 {
-  NS_ASSERT_MSG(m_macRnti.find (dest) != m_macRnti.end (), "No registered device corresponding to the destination MAC address.");
   LteMacSapProvider::TransmitPduParameters params;
+
+  Ptr<Packet> copy = packet->Copy ();
+  Ipv4Header iph;
+  copy->RemoveHeader (iph);
+
+  Ipv4Address ipDest = iph.GetDestination();
+
+  NS_ASSERT_MSG(m_ipRnti.find (ipDest) != m_ipRnti.end (), "No registered device corresponding to the destination IP address.");
+
   params.pdu = packet;
-  params.rnti = (m_macRnti.find(dest))->second; // association between destination address and destination RNTI
+  params.rnti = (m_ipRnti.find(ipDest))->second; // association between destination address and destination RNTI
 
   m_mac->DoTransmitPdu(params);
 
