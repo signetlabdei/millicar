@@ -99,13 +99,14 @@ MmWaveVehicularSpectrumPhyTestCase1::Tx (Ptr<MmWaveSidelinkPhy> tx_phy, Time ipi
   dci.m_tbSize = p->GetSize (); // dummy value
   dci.m_symStart = 0; // dummy value
   dci.m_numSym = 30; // dummy value
+  dci.m_rnti = 1; // RNTI of the TX node
 
   // create the SlotAllocInfo containing the transmission information
   SlotAllocInfo info;
   info.m_slotType = SlotAllocInfo::DATA;
   info.m_slotIdx = 0;
   info.m_dci = dci;
-  info.m_rnti = 1;
+  info.m_rnti = 2; // the RNTI of the destination node
 
   tx_phy->DoAddTransportBlock (pb1, info);
 
@@ -183,14 +184,6 @@ MmWaveVehicularSpectrumPhyTestCase1::StartTest (TestVector testVector)
   NodeContainer n;
   n.Create (2); // node 0 is tx, node 1 is rx
 
-  // create the tx and rx devices
-  Ptr<NetDevice> txDev = CreateObject<MmWaveVehicularNetDevice> ();
-  Ptr<NetDevice> rxDev = CreateObject<MmWaveVehicularNetDevice> ();
-  n.Get (0)->AddDevice (txDev);
-  n.Get (1)->AddDevice (rxDev);
-  txDev->SetNode (n.Get (0));
-  rxDev->SetNode (n.Get (1));
-
   // create the tx mobility model and aggregate it with the tx node
   Ptr<MobilityModel> tx_mm = CreateObject<ConstantPositionMobilityModel> ();
   tx_mm->SetPosition (Vector (0.0, 0.0, 0.0));
@@ -252,9 +245,19 @@ MmWaveVehicularSpectrumPhyTestCase1::StartTest (TestVector testVector)
   pData->AddCallback (MakeCallback (&MmWaveVehicularSpectrumPhyTestCase1::UpdateSinrPerceived, this));
   rx_ssp->AddDataSinrChunkProcessor (pData);
 
+  // create the tx and rx devices
+  Ptr<NetDevice> txDev = CreateObject<MmWaveVehicularNetDevice> (tx_phy, tx_mac);
+  Ptr<NetDevice> rxDev = CreateObject<MmWaveVehicularNetDevice> (rx_phy, rx_mac);
+  n.Get (0)->AddDevice (txDev);
+  n.Get (1)->AddDevice (rxDev);
+  txDev->SetNode (n.Get (0));
+  rxDev->SetNode (n.Get (1));
+  tx_ssp->SetDevice (txDev);
+  rx_ssp->SetDevice (rxDev);
+
   // intialize the tx and rx phy
-  tx_phy->AddDevice (1, rxDev);
-  rx_phy->AddDevice (0, txDev);
+  tx_phy->AddDevice (2, rxDev);
+  rx_phy->AddDevice (1, txDev);
 
   Simulator::Schedule (MicroSeconds (800), &MmWaveVehicularSpectrumPhyTestCase1::Tx, this, tx_phy, ipi);
 
