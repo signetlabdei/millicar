@@ -241,7 +241,25 @@ void
 MmWaveVehicularNetDevice::Receive (Ptr<Packet> p)
 {
   NS_LOG_FUNCTION (this << p);
-  NS_LOG_UNCOND ("Received packet at: " << Simulator::Now().GetSeconds() << "s");
+  NS_LOG_DEBUG ("Received packet at: " << Simulator::Now().GetSeconds() << "s");
+
+  uint8_t ipType;
+
+  p->CopyData (&ipType, 1);
+  ipType = (ipType>>4) & 0x0f;
+
+  if (ipType == 0x04)
+  {
+    m_rxCallback (this, p, Ipv4L3Protocol::PROT_NUMBER, Address ());
+  }
+  else if (ipType == 0x06)
+  {
+    m_rxCallback (this, p, Ipv6L3Protocol::PROT_NUMBER, Address ());
+  }
+  else
+  {
+    NS_ABORT_MSG ("MmWaveVehicularNetDevice::Receive - Unknown IP type...");
+  }
 }
 
 bool
