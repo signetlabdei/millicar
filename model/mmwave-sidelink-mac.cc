@@ -106,11 +106,11 @@ MmWaveSidelinkMac::DoSlotIndication (SfnSf timingInfo)
   NS_ASSERT_MSG (!m_sfAllocInfo.empty (), "First set the scheduling patter");
   if(m_sfAllocInfo[timingInfo.m_slotNum] == m_rnti) // check if this slot is associated to the user who required it
   {
-    // compute the available bytes
-    uint32_t availableBytes = m_amc->GetTbSizeFromMcsSymbols(m_mcs, m_phyMacConfig->GetSymbPerSlot ()) / 8; // this method returns the size in number of bits, that are then converted in number of bytes
+    // compute the available bits
+    uint32_t availableBits = m_amc->GetTbSizeFromMcsSymbols(m_mcs, m_phyMacConfig->GetSymbPerSlot ()); // this method returns the size in number of bits, that are then converted in number of bytes
     uint8_t symStart = 0; // indicates the next available symbol in the slot
 
-    while (availableBytes > 0 && m_txBuffer.size () > 0)
+    while (availableBits > 0 && m_txBuffer.size () > 0)
     {
       // retrieve the first element of the buffer
       LteMacSapProvider::TransmitPduParameters pduInfo = m_txBuffer.front ();
@@ -118,12 +118,12 @@ MmWaveSidelinkMac::DoSlotIndication (SfnSf timingInfo)
       uint16_t rntiDest = pduInfo.rnti; // the RNTI of the destination node
 
       // compute the number of symbols needed to transmit the packet
-      uint32_t requiredSymbols = m_amc->GetNumSymbolsFromTbsMcs (pdu->GetSize (), m_mcs);
+      uint32_t requiredSymbols = m_amc->GetNumSymbolsFromTbsMcs (pdu->GetSize ()*8, m_mcs);
 
-      // compute the corresponding number of bytes
-      uint32_t requiredBytes = m_amc->GetTbSizeFromMcsSymbols(m_mcs, requiredSymbols) / 8;
+      // compute the corresponding number of bits
+      uint32_t requiredBits = m_amc->GetTbSizeFromMcsSymbols(m_mcs, requiredSymbols);
 
-      if (requiredBytes < availableBytes)
+      if (requiredBits <= availableBits)
       {
         // create a new transport block
         Ptr<PacketBurst> pb = CreateObject <PacketBurst> ();
@@ -134,9 +134,9 @@ MmWaveSidelinkMac::DoSlotIndication (SfnSf timingInfo)
         info.m_rnti = rntiDest; // the RNTI of the destination node
         info.m_dci.m_rnti = m_rnti; // my RNTI
         info.m_dci.m_numSym = requiredSymbols; // the number of symbols required to tx the packet
-        info.m_dci.m_symStart = symStart;
+        info.m_dci.m_symStart = symStart; // index of the first available symbol
         info.m_dci.m_mcs = m_mcs;
-        info.m_dci.m_tbSize = requiredBytes;
+        info.m_dci.m_tbSize = requiredBits / 8; // the TB size in bytes
         info.m_slotType = SlotAllocInfo::DATA; // the TB carries data
 
         // forward the transport block to the PHY
@@ -145,17 +145,17 @@ MmWaveSidelinkMac::DoSlotIndication (SfnSf timingInfo)
         // remove the packet from the buffer
         m_txBuffer.pop_front ();
 
-        // update the number of available bytes
-        availableBytes-=requiredBytes;
+        // update the number of available bits
+        availableBits-=requiredBits;
 
         // update index to the next available symbol
         symStart=symStart+requiredSymbols+1;
       }
       else
       {
-        // the remaining available bytes are not enough to transmit the next
+        // the remaining available bits are not enough to transmit the next
         // packet in the buffer
-        NS_LOG_INFO ("Available bytes " << availableBytes << " next packet size " << pduInfo.pdu->GetSize ());
+        NS_LOG_INFO ("Available bytes " << availableBits / 8 << " next packet size " << pduInfo.pdu->GetSize ());
         break;
       }
     }
