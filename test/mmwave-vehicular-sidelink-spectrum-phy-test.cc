@@ -11,7 +11,7 @@
 NS_LOG_COMPONENT_DEFINE ("MmWaveVehicularSidelinkSpectrumPhyTestSuite");
 
 using namespace ns3;
-using namespace mmwave;
+using namespace mmwave_vehicular;
 
 /**
  * This is a test to check if the class MmWaveSidelinkSpectrumPhy correctly
@@ -122,13 +122,13 @@ MmWaveVehicularSidelinkSpectrumPhyTestCase1::DoRun (void)
   rx_ssp->SetPhyRxDataEndOkCallback (MakeCallback (&MmWaveVehicularSidelinkSpectrumPhyTestCase1::Rx, this));
 
   // create and configure the chunk processor
-  Ptr<mmWaveChunkProcessor> pData = Create<mmWaveChunkProcessor> ();
+  Ptr<mmwave::mmWaveChunkProcessor> pData = Create<mmwave::mmWaveChunkProcessor> ();
   pData->AddCallback (MakeCallback (&MmWaveSidelinkSpectrumPhy::UpdateSinrPerceived, rx_ssp));
   pData->AddCallback (MakeCallback (&MmWaveVehicularSidelinkSpectrumPhyTestCase1::UpdateSinrPerceived, this));
   rx_ssp->AddDataSinrChunkProcessor (pData);
 
   // create the tx psd
-  Ptr<MmWavePhyMacCommon> pmc = CreateObject<MmWavePhyMacCommon> ();
+  Ptr<mmwave::MmWavePhyMacCommon> pmc = CreateObject<mmwave::MmWavePhyMacCommon> ();
   double txp = 30.0; // transmission power in dBm
   std::vector<int> subChannelsForTx (72);
   // create the transmission mask, use all the available subchannels
@@ -136,12 +136,12 @@ MmWaveVehicularSidelinkSpectrumPhyTestCase1::DoRun (void)
   {
     subChannelsForTx [i] = i;
   }
-  Ptr<SpectrumValue> txPsd = MmWaveSpectrumValueHelper::CreateTxPowerSpectralDensity (pmc, txp, subChannelsForTx);
+  Ptr<SpectrumValue> txPsd = mmwave::MmWaveSpectrumValueHelper::CreateTxPowerSpectralDensity (pmc, txp, subChannelsForTx);
   tx_ssp->SetTxPowerSpectralDensity (txPsd);
 
   // set the rx noise psd
   double noiseFigure = 5.0; // noise figure in dB
-  Ptr<SpectrumValue> noisePsd = MmWaveSpectrumValueHelper::CreateNoisePowerSpectralDensity (pmc, noiseFigure);
+  Ptr<SpectrumValue> noisePsd = mmwave::MmWaveSpectrumValueHelper::CreateNoisePowerSpectralDensity (pmc, noiseFigure);
   rx_ssp->SetNoisePowerSpectralDensity (noisePsd);
 
   // set the device for the receiving side, as the MmWaveSidelinkSpectrumPhy checks the RNTI of the receiver

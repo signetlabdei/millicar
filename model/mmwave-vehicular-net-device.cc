@@ -27,7 +27,7 @@
 
 namespace ns3 {
 
-namespace mmwave {
+namespace mmwave_vehicular {
 
 NS_LOG_COMPONENT_DEFINE ("MmWaveVehicularNetDevice");
 

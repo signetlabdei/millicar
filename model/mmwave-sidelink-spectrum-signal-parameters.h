@@ -27,7 +27,7 @@ namespace ns3 {
 
 class PacketBurst;
 
-namespace mmwave {
+namespace mmwave_vehicular {
 
 class MmWaveSidelinkControlMessage;
 
@@ -67,7 +67,7 @@ struct MmWaveSidelinkSpectrumSignalParameters : public SpectrumSignalParameters
 
 };
 
-} // namespace mmwave
+} // namespace mmwave_vehicular
 
 }  // namespace ns3
 

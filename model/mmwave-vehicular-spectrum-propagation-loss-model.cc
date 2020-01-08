@@ -39,7 +39,7 @@
 
 namespace ns3 {
 
-namespace mmwave {
+namespace mmwave_vehicular {
 
 NS_LOG_COMPONENT_DEFINE ("MmWaveVehicularSpectrumPropagationLossModel");
 
@@ -173,10 +173,10 @@ MmWaveVehicularSpectrumPropagationLossModel::DoDispose ()
 }
 
 void
-MmWaveVehicularSpectrumPropagationLossModel::AddDevice (Ptr<NetDevice> dev, Ptr<AntennaArrayModel> antenna)
+MmWaveVehicularSpectrumPropagationLossModel::AddDevice (Ptr<NetDevice> dev, Ptr<mmwave::AntennaArrayModel> antenna)
 {
   NS_ASSERT_MSG (m_deviceAntennaMap.find (dev) == m_deviceAntennaMap.end (), "Device is already present in the map");
-  m_deviceAntennaMap.insert (std::pair <Ptr<NetDevice>, Ptr<AntennaArrayModel>> (dev, antenna));
+  m_deviceAntennaMap.insert (std::pair <Ptr<NetDevice>, Ptr<mmwave::AntennaArrayModel>> (dev, antenna));
 }
 
 Ptr<SpectrumValue>
@@ -198,12 +198,12 @@ MmWaveVehicularSpectrumPropagationLossModel::DoCalcRxPowerSpectralDensity (Ptr<c
 
   // retrieve the antenna of the tx device
   NS_ASSERT_MSG (m_deviceAntennaMap.find (txDevice) != m_deviceAntennaMap.end (), "Antenna not found for device " << txDevice);
-  Ptr<AntennaArrayModel> txAntennaArray = m_deviceAntennaMap.at (txDevice);
+  Ptr<mmwave::AntennaArrayModel> txAntennaArray = m_deviceAntennaMap.at (txDevice);
   NS_LOG_DEBUG ("tx dev " << txDevice << " antenna " << txAntennaArray);
 
   // retrieve the antenna of the rx device
   NS_ASSERT_MSG (m_deviceAntennaMap.find (txDevice) != m_deviceAntennaMap.end (), "Antenna not found for device " << rxDevice);
-  Ptr<AntennaArrayModel> rxAntennaArray = m_deviceAntennaMap.at (rxDevice);
+  Ptr<mmwave::AntennaArrayModel> rxAntennaArray = m_deviceAntennaMap.at (rxDevice);
   NS_LOG_DEBUG ("rx dev " << rxDevice << " antenna " << rxAntennaArray);
 
   /* txAntennaNum[0]-number of vertical antenna elements
@@ -792,7 +792,7 @@ MmWaveVehicularSpectrumPropagationLossModel::DeleteChannel (Ptr<const MobilityMo
 
 Ptr<Params3gpp>
 MmWaveVehicularSpectrumPropagationLossModel::GetNewChannel (Ptr<ParamsTable>  table3gpp, Vector locUT, char condition, bool o2i,
-                                  Ptr<AntennaArrayModel> txAntenna, Ptr<AntennaArrayModel> rxAntenna,
+                                  Ptr<mmwave::AntennaArrayModel> txAntenna, Ptr<mmwave::AntennaArrayModel> rxAntenna,
                                   uint16_t *txAntennaNum, uint16_t *rxAntennaNum,  Angles &rxAngle, Angles &txAngle,
                                   Vector speed, double dis2D, double dis3D) const
 {
@@ -1633,7 +1633,7 @@ MmWaveVehicularSpectrumPropagationLossModel::GetNewChannel (Ptr<ParamsTable>  ta
 
 Ptr<Params3gpp>
 MmWaveVehicularSpectrumPropagationLossModel::UpdateChannel (Ptr<Params3gpp> params3gpp, Ptr<ParamsTable>  table3gpp,
-                                  Ptr<AntennaArrayModel> txAntenna, Ptr<AntennaArrayModel> rxAntenna,
+                                  Ptr<mmwave::AntennaArrayModel> txAntenna, Ptr<mmwave::AntennaArrayModel> rxAntenna,
                                   uint16_t *txAntennaNum, uint16_t *rxAntennaNum, Angles &rxAngle, Angles &txAngle) const
 {
   Ptr<Params3gpp> params = params3gpp;
@@ -2486,6 +2486,6 @@ MmWaveVehicularSpectrumPropagationLossModel::CalAttenuationOfBlockage (Ptr<Param
 }
 
 
-} // namespace mmwave
+} // namespace mmwave_vehicular
 
 } // namespace ns3

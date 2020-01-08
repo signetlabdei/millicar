@@ -40,7 +40,7 @@
 
 namespace ns3 {
 
-namespace mmwave {
+namespace mmwave_vehicular {
 
 struct TbInfo_t
 {
@@ -210,14 +210,14 @@ public:
   *
   * \param p the new ChunkProcessor to be added to the Data Channel power processing chain
   */
-  void AddDataPowerChunkProcessor (Ptr<mmWaveChunkProcessor> p);
+  void AddDataPowerChunkProcessor (Ptr<mmwave::mmWaveChunkProcessor> p);
 
   /**
   *
   *
   * \param p the new ChunkProcessor to be added to the data processing chain
   */
-  void AddDataSinrChunkProcessor (Ptr<mmWaveChunkProcessor> p);
+  void AddDataSinrChunkProcessor (Ptr<mmwave::mmWaveChunkProcessor> p);
 
   /**
   *
@@ -245,7 +245,7 @@ private:
   void EndRxData ();
   //void EndRxCtrl ();
 
-  Ptr<mmWaveInterference> m_interferenceData; ///< the data interference
+  Ptr<mmwave::mmWaveInterference> m_interferenceData; ///< the data interference
   Ptr<MobilityModel> m_mobility; ///< the modility model
   Ptr<NetDevice> m_device; ///< the device
   Ptr<SpectrumChannel> m_channel; ///< the channel

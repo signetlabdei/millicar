@@ -31,7 +31,7 @@
 
 namespace ns3 {
 
-namespace mmwave {
+namespace mmwave_vehicular {
 
 // ------------------------------------------------------------------------- //
 NS_LOG_COMPONENT_DEFINE ("MmWaveVehicularPropagationLossModel");
@@ -558,6 +558,6 @@ MmWaveVehicularPropagationLossModel::GetScenario ()
   return m_scenario;
 }
 
-} // namespace mmwave
+} // namespace mmwave_vehicular
 
 } // namespace ns3

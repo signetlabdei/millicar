@@ -35,7 +35,7 @@ namespace ns3 {
 
 NS_LOG_COMPONENT_DEFINE ("MmWaveSidelinkSpectrumPhy");
 
-namespace mmwave {
+namespace mmwave_vehicular {
 
 NS_OBJECT_ENSURE_REGISTERED (MmWaveSidelinkSpectrumPhy);
 
@@ -75,7 +75,7 @@ MmWaveSidelinkSpectrumPhy::MmWaveSidelinkSpectrumPhy ()
   : m_state (IDLE),
     m_componentCarrierId (0)
 {
-  m_interferenceData = CreateObject<mmWaveInterference> ();
+  m_interferenceData = CreateObject<mmwave::mmWaveInterference> ();
   m_random = CreateObject<UniformRandomVariable> ();
   m_random->SetAttribute ("Min", DoubleValue (0.0));
   m_random->SetAttribute ("Max", DoubleValue (1.0));
@@ -367,8 +367,8 @@ MmWaveSidelinkSpectrumPhy::EndRxData ()
      {
        // Here we need to initialize an empty harqInfoList since it is mandatory input
        // for the method. Since the vector is empty, no harq procedures are triggeres (as we want)
-       std::vector <MmWaveHarqProcessInfoElement_t> harqInfoList;
-       MmWaveTbStats_t tbStats = MmWaveMiErrorModel::GetTbDecodificationStats (m_sinrPerceived, (*i).rbBitmap, (*i).size, (*i).mcs, harqInfoList);
+       std::vector <mmwave::MmWaveHarqProcessInfoElement_t> harqInfoList;
+       mmwave::MmWaveTbStats_t tbStats = mmwave::MmWaveMiErrorModel::GetTbDecodificationStats (m_sinrPerceived, (*i).rbBitmap, (*i).size, (*i).mcs, harqInfoList);
        bool corrupt = m_random->GetValue () > tbStats.tbler ? false : true;
        if(!corrupt)
        {
@@ -534,13 +534,13 @@ MmWaveSidelinkSpectrumPhy::GetSpectrumChannel ()
 // }
 
 void
-MmWaveSidelinkSpectrumPhy::AddDataPowerChunkProcessor (Ptr<mmWaveChunkProcessor> p)
+MmWaveSidelinkSpectrumPhy::AddDataPowerChunkProcessor (Ptr<mmwave::mmWaveChunkProcessor> p)
 {
   m_interferenceData->AddPowerChunkProcessor (p);
 }
 
 void
-MmWaveSidelinkSpectrumPhy::AddDataSinrChunkProcessor (Ptr<mmWaveChunkProcessor> p)
+MmWaveSidelinkSpectrumPhy::AddDataSinrChunkProcessor (Ptr<mmwave::mmWaveChunkProcessor> p)
 {
   m_interferenceData->AddSinrChunkProcessor (p);
 }
@@ -557,7 +557,7 @@ MmWaveSidelinkSpectrumPhy::ConfigureBeamforming (Ptr<NetDevice> dev)
 {
   NS_LOG_FUNCTION (this);
 
-  Ptr<AntennaArrayModel> antennaArray = DynamicCast<AntennaArrayModel> (m_antenna);
+  Ptr<mmwave::AntennaArrayModel> antennaArray = DynamicCast<mmwave::AntennaArrayModel> (m_antenna);
   if (antennaArray)
   {
     //TODO consider to update this in order to not recompute the beamforming

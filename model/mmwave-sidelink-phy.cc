@@ -27,7 +27,7 @@
 
 namespace ns3 {
 
-namespace mmwave {
+namespace mmwave_vehicular {
 
 MacSidelinkMemberPhySapProvider::MacSidelinkMemberPhySapProvider (Ptr<MmWaveSidelinkPhy> phy)
   : m_phy (phy)
@@ -36,7 +36,7 @@ MacSidelinkMemberPhySapProvider::MacSidelinkMemberPhySapProvider (Ptr<MmWaveSide
 }
 
 void
-MacSidelinkMemberPhySapProvider::AddTransportBlock (Ptr<PacketBurst> pb, SlotAllocInfo info)
+MacSidelinkMemberPhySapProvider::AddTransportBlock (Ptr<PacketBurst> pb, mmwave::SlotAllocInfo info)
 {
   m_phy->DoAddTransportBlock (pb, info);
 }
@@ -59,7 +59,7 @@ MmWaveSidelinkPhy::MmWaveSidelinkPhy ()
   NS_FATAL_ERROR ("This constructor should not be called");
 }
 
-MmWaveSidelinkPhy::MmWaveSidelinkPhy (Ptr<MmWaveSidelinkSpectrumPhy> spectrumPhy, Ptr<MmWavePhyMacCommon> confParams)
+MmWaveSidelinkPhy::MmWaveSidelinkPhy (Ptr<MmWaveSidelinkSpectrumPhy> spectrumPhy, Ptr<mmwave::MmWavePhyMacCommon> confParams)
 {
   NS_LOG_FUNCTION (this);
   m_sidelinkSpectrumPhy = spectrumPhy;
@@ -69,11 +69,11 @@ MmWaveSidelinkPhy::MmWaveSidelinkPhy (Ptr<MmWaveSidelinkSpectrumPhy> spectrumPhy
   m_phySapProvider = new MacSidelinkMemberPhySapProvider (this);
 
   // create the noise PSD
-  Ptr<SpectrumValue> noisePsd = MmWaveSpectrumValueHelper::CreateNoisePowerSpectralDensity (m_phyMacConfig, m_noiseFigure);
+  Ptr<SpectrumValue> noisePsd = mmwave::MmWaveSpectrumValueHelper::CreateNoisePowerSpectralDensity (m_phyMacConfig, m_noiseFigure);
   m_sidelinkSpectrumPhy->SetNoisePowerSpectralDensity (noisePsd);
 
   // schedule the first slot
-  Simulator::ScheduleNow (&MmWaveSidelinkPhy::StartSlot, this, SfnSf (0, 0, 0));
+  Simulator::ScheduleNow (&MmWaveSidelinkPhy::StartSlot, this, mmwave::SfnSf (0, 0, 0));
 }
 
 MmWaveSidelinkPhy::~MmWaveSidelinkPhy ()
@@ -138,7 +138,7 @@ MmWaveSidelinkPhy::SetNoiseFigure (double nf)
   m_noiseFigure = nf;
 
   // update the noise PSD
-  Ptr<SpectrumValue> noisePsd = MmWaveSpectrumValueHelper::CreateNoisePowerSpectralDensity (m_phyMacConfig, m_noiseFigure);
+  Ptr<SpectrumValue> noisePsd = mmwave::MmWaveSpectrumValueHelper::CreateNoisePowerSpectralDensity (m_phyMacConfig, m_noiseFigure);
   m_sidelinkSpectrumPhy->SetNoisePowerSpectralDensity (noisePsd);
 }
 
@@ -154,7 +154,7 @@ MmWaveSidelinkPhy::GetSpectrumPhy () const
   return m_sidelinkSpectrumPhy;
 }
 
-Ptr<MmWavePhyMacCommon>
+Ptr<mmwave::MmWavePhyMacCommon>
 MmWaveSidelinkPhy::GetConfigurationParameters (void) const
 {
   return m_phyMacConfig;
@@ -175,7 +175,7 @@ MmWaveSidelinkPhy::SetPhySapUser (MmWaveSidelinkPhySapUser* sap)
 }
 
 void
-MmWaveSidelinkPhy::DoAddTransportBlock (Ptr<PacketBurst> pb, SlotAllocInfo info)
+MmWaveSidelinkPhy::DoAddTransportBlock (Ptr<PacketBurst> pb, mmwave::SlotAllocInfo info)
 {
   // create a new entry for the PHY buffer
   PhyBufferEntry e = std::make_pair (pb, info);
@@ -185,7 +185,7 @@ MmWaveSidelinkPhy::DoAddTransportBlock (Ptr<PacketBurst> pb, SlotAllocInfo info)
 }
 
 void
-MmWaveSidelinkPhy::StartSlot (SfnSf timingInfo)
+MmWaveSidelinkPhy::StartSlot (mmwave::SfnSf timingInfo)
 {
    NS_LOG_FUNCTION (this << " frame " << timingInfo.m_frameNum << " subframe " << timingInfo.m_sfNum << " slot " << timingInfo.m_slotNum);
 
@@ -198,18 +198,18 @@ MmWaveSidelinkPhy::StartSlot (SfnSf timingInfo)
 
     // retrieve the first element in the list
     Ptr<PacketBurst> pktBurst;
-    SlotAllocInfo info;
+    mmwave::SlotAllocInfo info;
     std::tie (pktBurst, info) = m_phyBuffer.front ();
 
     // check if this TB has to be sent in this slot, otherwise raise an error
     NS_ASSERT_MSG (info.m_slotIdx == timingInfo.m_slotNum, "This TB is not intended for this slot");
 
     // send the transport block
-    if (info.m_slotType == SlotAllocInfo::DATA)
+    if (info.m_slotType == mmwave::SlotAllocInfo::DATA)
     {
       usedSymbols += SlData (pktBurst, info);
     }
-    else if (info.m_slotType == SlotAllocInfo::CTRL)
+    else if (info.m_slotType == mmwave::SlotAllocInfo::CTRL)
     {
       NS_FATAL_ERROR ("Control messages are not currently supported");
     }
@@ -235,13 +235,13 @@ MmWaveSidelinkPhy::StartSlot (SfnSf timingInfo)
 }
 
 uint8_t
-MmWaveSidelinkPhy::SlData (Ptr<PacketBurst> pb, SlotAllocInfo info)
+MmWaveSidelinkPhy::SlData (Ptr<PacketBurst> pb, mmwave::SlotAllocInfo info)
 {
   NS_LOG_FUNCTION (this);
 
   // retrieve the RNTI of the device we want to communicate with and properly
   // configure the beamforming
-  // NOTE: this information is contained in SlotAllocInfo.m_rnti parameter
+  // NOTE: this information is contained in mmwave::SlotAllocInfo.m_rnti parameter
   NS_ASSERT_MSG (m_deviceMap.find (info.m_rnti) != m_deviceMap.end (), "Device not found");
   m_sidelinkSpectrumPhy->ConfigureBeamforming (m_deviceMap.at (info.m_rnti));
 
@@ -271,7 +271,7 @@ MmWaveSidelinkPhy::SlData (Ptr<PacketBurst> pb, SlotAllocInfo info)
 void
 MmWaveSidelinkPhy::SendDataChannels (Ptr<PacketBurst> pb,
   Time duration,
-  SlotAllocInfo info,
+  mmwave::SlotAllocInfo info,
   std::vector<int> rbBitmap)
 {
   m_sidelinkSpectrumPhy->StartTxDataFrames (pb, duration, info.m_slotIdx, info.m_dci.m_mcs, info.m_dci.m_tbSize, info.m_dci.m_numSym, info.m_rnti, rbBitmap);
@@ -288,7 +288,7 @@ MmWaveSidelinkPhy::SetSubChannelsForTransmission ()
     }
 
     // create the tx PSD
-    Ptr<SpectrumValue> txPsd = MmWaveSpectrumValueHelper::CreateTxPowerSpectralDensity (m_phyMacConfig, m_txPower, subChannelsForTx);
+    Ptr<SpectrumValue> txPsd = mmwave::MmWaveSpectrumValueHelper::CreateTxPowerSpectralDensity (m_phyMacConfig, m_txPower, subChannelsForTx);
 
     // set the tx PSD in the spectrum phy
     m_sidelinkSpectrumPhy->SetTxPowerSpectralDensity (txPsd);
@@ -296,8 +296,8 @@ MmWaveSidelinkPhy::SetSubChannelsForTransmission ()
     return subChannelsForTx;
   }
 
-SfnSf
-MmWaveSidelinkPhy::UpdateTimingInfo (SfnSf info) const
+mmwave::SfnSf
+MmWaveSidelinkPhy::UpdateTimingInfo (mmwave::SfnSf info) const
 {
   NS_LOG_INFO (this);
 
@@ -317,7 +317,7 @@ MmWaveSidelinkPhy::UpdateTimingInfo (SfnSf info) const
     }
   }
 
-  // update the SfnSf structure
+  // update the mmwave::SfnSf structure
   info.m_slotNum = nextSlot;
   info.m_sfNum = nextSf;
   info.m_frameNum = nextFrame;
@@ -357,5 +357,5 @@ MmWaveSidelinkPhy::Receive (Ptr<Packet> p)
   m_phySapUser->ReceivePhyPdu(p);
 }
 
-} // namespace mmwave
+} // namespace mmwave_vehicular
 } // namespace ns3

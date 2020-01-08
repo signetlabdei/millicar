@@ -12,7 +12,7 @@
 NS_LOG_COMPONENT_DEFINE ("MmWaveVehicularSpectrumPhyTestSuite");
 
 using namespace ns3;
-using namespace mmwave;
+using namespace mmwave_vehicular;
 
 /**
  * In this test, two packets are sent from the tx node the rx node.
@@ -94,16 +94,16 @@ MmWaveVehicularSpectrumPhyTestCase1::Tx (Ptr<MmWaveSidelinkPhy> tx_phy, Time ipi
   pb1->AddPacket (p);
 
   // create the associated DCI
-  DciInfoElementTdma dci;
+  mmwave::DciInfoElementTdma dci;
   dci.m_mcs = 0; // dummy value
   dci.m_tbSize = p->GetSize (); // dummy value
   dci.m_symStart = 0; // dummy value
   dci.m_numSym = 30; // dummy value
   dci.m_rnti = 1; // RNTI of the TX node
 
-  // create the SlotAllocInfo containing the transmission information
-  SlotAllocInfo info;
-  info.m_slotType = SlotAllocInfo::DATA;
+  // create the mmwave::SlotAllocInfo containing the transmission information
+  mmwave::SlotAllocInfo info;
+  info.m_slotType = mmwave::SlotAllocInfo::DATA;
   info.m_slotIdx = 0;
   info.m_dci = dci;
   info.m_rnti = 2; // the RNTI of the destination node
@@ -203,7 +203,7 @@ MmWaveVehicularSpectrumPhyTestCase1::StartTest (TestVector testVector)
   Ptr<SpectrumChannel> sc = sh.Create ();
 
   // create the configuration
-  Ptr<MmWavePhyMacCommon> pmc = CreateObject<MmWavePhyMacCommon> ();
+  Ptr<mmwave::MmWavePhyMacCommon> pmc = CreateObject<mmwave::MmWavePhyMacCommon> ();
 
   // create and configure the tx spectrum phy
   Ptr<MmWaveSidelinkSpectrumPhy> tx_ssp = CreateObject<MmWaveSidelinkSpectrumPhy> ();
@@ -240,7 +240,7 @@ MmWaveVehicularSpectrumPhyTestCase1::StartTest (TestVector testVector)
   rx_ssp->SetPhyRxDataEndOkCallback (MakeCallback (&MmWaveVehicularSpectrumPhyTestCase1::Rx, this));
 
   // create and configure the chunk processor
-  Ptr<mmWaveChunkProcessor> pData = Create<mmWaveChunkProcessor> ();
+  Ptr<mmwave::mmWaveChunkProcessor> pData = Create<mmwave::mmWaveChunkProcessor> ();
   pData->AddCallback (MakeCallback (&MmWaveSidelinkSpectrumPhy::UpdateSinrPerceived, rx_ssp));
   pData->AddCallback (MakeCallback (&MmWaveVehicularSpectrumPhyTestCase1::UpdateSinrPerceived, this));
   rx_ssp->AddDataSinrChunkProcessor (pData);

@@ -26,7 +26,7 @@
 
 namespace ns3 {
 
-namespace mmwave {
+namespace mmwave_vehicular {
 
 class MmWaveVehicularNetDevice : public NetDevice
 {

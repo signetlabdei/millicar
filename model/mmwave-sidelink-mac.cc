@@ -26,7 +26,7 @@ namespace ns3 {
 
 NS_LOG_COMPONENT_DEFINE ("MmWaveSidelinkMac");
 
-namespace mmwave {
+namespace mmwave_vehicular {
 
 MacSidelinkMemberPhySapUser::MacSidelinkMemberPhySapUser (Ptr<MmWaveSidelinkMac> mac)
   : m_mac (mac)
@@ -41,7 +41,7 @@ MacSidelinkMemberPhySapUser::ReceivePhyPdu (Ptr<Packet> p)
 }
 
 void
-MacSidelinkMemberPhySapUser::SlotIndication (SfnSf timingInfo)
+MacSidelinkMemberPhySapUser::SlotIndication (mmwave::SfnSf timingInfo)
 {
   m_mac->DoSlotIndication (timingInfo);
 }
@@ -64,7 +64,7 @@ MmWaveSidelinkMac::GetTypeId (void)
   return tid;
 }
 
-MmWaveSidelinkMac::MmWaveSidelinkMac (Ptr<MmWavePhyMacCommon> pmc)
+MmWaveSidelinkMac::MmWaveSidelinkMac (Ptr<mmwave::MmWavePhyMacCommon> pmc)
 {
   NS_LOG_FUNCTION (this);
 
@@ -76,8 +76,8 @@ MmWaveSidelinkMac::MmWaveSidelinkMac (Ptr<MmWavePhyMacCommon> pmc)
   // create the PHY SAP USER
   m_phySapUser = new MacSidelinkMemberPhySapUser (this);
 
-  // create the MmWaveAmc instance
-  m_amc = CreateObject <MmWaveAmc> (m_phyMacConfig);
+  // create the mmwave::MmWaveAmc instance
+  m_amc = CreateObject <mmwave::MmWaveAmc> (m_phyMacConfig);
 
   // initialize the scheduling patter
   std::vector<uint16_t> pattern (m_phyMacConfig->GetSlotsPerSubframe (), 0);
@@ -98,7 +98,7 @@ MmWaveSidelinkMac::DoDispose ()
 }
 
 void
-MmWaveSidelinkMac::DoSlotIndication (SfnSf timingInfo)
+MmWaveSidelinkMac::DoSlotIndication (mmwave::SfnSf timingInfo)
 {
   NS_LOG_FUNCTION (this);
 
@@ -129,7 +129,7 @@ MmWaveSidelinkMac::DoSlotIndication (SfnSf timingInfo)
         Ptr<PacketBurst> pb = CreateObject <PacketBurst> ();
         pb->AddPacket(pdu);
 
-        SlotAllocInfo info;
+        mmwave::SlotAllocInfo info;
         info.m_slotIdx = timingInfo.m_slotNum; // the TB will be sent in this slot
         info.m_rnti = rntiDest; // the RNTI of the destination node
         info.m_dci.m_rnti = m_rnti; // my RNTI
@@ -137,7 +137,7 @@ MmWaveSidelinkMac::DoSlotIndication (SfnSf timingInfo)
         info.m_dci.m_symStart = symStart; // index of the first available symbol
         info.m_dci.m_mcs = m_mcs;
         info.m_dci.m_tbSize = requiredBits / 8; // the TB size in bytes
-        info.m_slotType = SlotAllocInfo::DATA; // the TB carries data
+        info.m_slotType = mmwave::SlotAllocInfo::DATA; // the TB carries data
 
         // forward the transport block to the PHY
         m_phySapProvider->AddTransportBlock(pb, info);

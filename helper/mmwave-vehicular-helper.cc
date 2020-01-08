@@ -30,7 +30,7 @@ namespace ns3 {
 
 NS_LOG_COMPONENT_DEFINE ("MmWaveVehicularHelper"); // TODO check if this has to be defined here
 
-namespace mmwave {
+namespace mmwave_vehicular {
 
 NS_OBJECT_ENSURE_REGISTERED (MmWaveVehicularHelper); // TODO check if this has to be defined here
 
@@ -126,13 +126,13 @@ MmWaveVehicularHelper::DoInitialize ()
 }
 
 void
-MmWaveVehicularHelper::SetConfigurationParameters (Ptr<MmWavePhyMacCommon> conf)
+MmWaveVehicularHelper::SetConfigurationParameters (Ptr<mmwave::MmWavePhyMacCommon> conf)
 {
   NS_LOG_FUNCTION (this);
   m_phyMacConfig = conf;
 }
 
-Ptr<MmWavePhyMacCommon>
+Ptr<mmwave::MmWavePhyMacCommon>
 MmWaveVehicularHelper::GetConfigurationParameters () const
 {
   NS_LOG_FUNCTION (this);
@@ -150,7 +150,7 @@ MmWaveVehicularHelper::SetNumerology (uint8_t index)
 
   m_numerologyIndex = index;
 
-  m_phyMacConfig = CreateObject<MmWavePhyMacCommon> ();
+  m_phyMacConfig = CreateObject<mmwave::MmWavePhyMacCommon> ();
 
   double subcarrierSpacing = 15 * std::pow (2, m_numerologyIndex) * 1000; // subcarrier spacing based on the numerology. Only 60KHz and 120KHz is supported in NR V2X.
 
@@ -200,7 +200,7 @@ MmWaveVehicularHelper::InstallSingleMmWaveVehicularNetDevice (Ptr<Node> node, ui
   NS_LOG_FUNCTION (this);
 
   // create the antenna
-  Ptr<AntennaArrayModel> aam = CreateObject<AntennaArrayModel> ();
+  Ptr<mmwave::AntennaArrayModel> aam = CreateObject<mmwave::AntennaArrayModel> ();
 
   // create and configure the tx spectrum phy
   Ptr<MmWaveSidelinkSpectrumPhy> ssp = CreateObject<MmWaveSidelinkSpectrumPhy> ();
@@ -214,7 +214,7 @@ MmWaveVehicularHelper::InstallSingleMmWaveVehicularNetDevice (Ptr<Node> node, ui
   m_channel->AddRx (ssp);
 
   // create and configure the chunk processor
-  Ptr<mmWaveChunkProcessor> pData = Create<mmWaveChunkProcessor> ();
+  Ptr<mmwave::mmWaveChunkProcessor> pData = Create<mmwave::mmWaveChunkProcessor> ();
   pData->AddCallback (MakeCallback (&MmWaveSidelinkSpectrumPhy::UpdateSinrPerceived, ssp));
   ssp->AddDataSinrChunkProcessor (pData);
 
@@ -320,5 +320,5 @@ MmWaveVehicularHelper::SetPropagationDelayModelType (std::string pdm)
   m_propagationDelayModelType = pdm;
 }
 
-} // namespace mmwave
+} // namespace mmwave_vehicular
 } // namespace ns3

@@ -27,7 +27,7 @@ namespace ns3 {
 
 NS_LOG_COMPONENT_DEFINE ("MmWaveSidelinkSpectrumSignalParameters");
 
-namespace mmwave {
+namespace mmwave_vehicular {
 
 MmWaveSidelinkSpectrumSignalParameters::MmWaveSidelinkSpectrumSignalParameters ()
 {

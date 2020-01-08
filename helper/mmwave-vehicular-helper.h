@@ -27,7 +27,7 @@
 
 namespace ns3 {
 
-namespace mmwave {
+namespace mmwave_vehicular {
 
 class MmWaveVehicularNetDevice;
 
@@ -61,15 +61,15 @@ public:
 
   /**
    * Set the configuration parameters
-   * \param conf pointer to MmWavePhyMacCommon
+   * \param conf pointer to mmwave::MmWavePhyMacCommon
    */
-  void SetConfigurationParameters (Ptr<MmWavePhyMacCommon> conf);
+  void SetConfigurationParameters (Ptr<mmwave::MmWavePhyMacCommon> conf);
 
   /**
    * Retrieve pointer to the object that lists all the configuration parameters
    * \return a pointer to a MmWavePhyMacCommon object 
    */
-  Ptr<MmWavePhyMacCommon> GetConfigurationParameters () const;
+  Ptr<mmwave::MmWavePhyMacCommon> GetConfigurationParameters () const;
 
   /**
    * Set the propagation loss model type
@@ -115,7 +115,7 @@ private:
   Ptr<MmWaveVehicularNetDevice> InstallSingleMmWaveVehicularNetDevice (Ptr<Node> n, uint16_t rnti);
 
   Ptr<SpectrumChannel> m_channel; //!< the SpectrumChannel
-  Ptr<MmWavePhyMacCommon> m_phyMacConfig; //!< the configuration parameters
+  Ptr<mmwave::MmWavePhyMacCommon> m_phyMacConfig; //!< the configuration parameters
   uint16_t m_rntiCounter; //!< a counter to set the RNTIs
   uint8_t m_numerologyIndex; //!< numerology index
   double m_bandwidth; //!< system bandwidth
@@ -126,7 +126,7 @@ private:
 
 };
 
-} // namespace mmwave
+} // namespace mmwave_vehicular
 } // namespace ns3
 
 #endif /* MMWAVE_VEHICULAR_HELPER_H */

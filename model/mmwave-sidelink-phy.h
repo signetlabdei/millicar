@@ -26,7 +26,7 @@
 
 namespace ns3 {
 
-namespace mmwave {
+namespace mmwave_vehicular {
 
 class MmWaveSidelinkPhy : public Object
 {
@@ -41,12 +41,12 @@ public:
   /**
    * MmWaveSidelinkPhy real constructor
    * \param channelPhy spectrum phy
-   * \param confParams instance of MmWavePhyMacCommon containing the
+   * \param confParams instance of mmwave::MmWavePhyMacCommon containing the
    *        configuration parameters
    *
    * Usually called by the helper. It starts the event loop for the device.
    */
-  MmWaveSidelinkPhy (Ptr<MmWaveSidelinkSpectrumPhy> spectrumPhy, Ptr<MmWavePhyMacCommon> confParams);
+  MmWaveSidelinkPhy (Ptr<MmWaveSidelinkSpectrumPhy> spectrumPhy, Ptr<mmwave::MmWavePhyMacCommon> confParams);
 
   /**
    * Desctructor
@@ -83,11 +83,11 @@ public:
   double GetNoiseFigure () const;
 
   /**
-   * Returns the MmWavePhyMacCommon instance associated with this phy containing
+   * Returns the mmwave::MmWavePhyMacCommon instance associated with this phy containing
    * the configuration parameters
-   * \return the MmWavePhyMacCommon instance
+   * \return the mmwave::MmWavePhyMacCommon instance
    */
-  Ptr<MmWavePhyMacCommon> GetConfigurationParameters (void) const;
+  Ptr<mmwave::MmWavePhyMacCommon> GetConfigurationParameters (void) const;
 
   /**
    * Returns the SpectrumPhy instance associated with this phy
@@ -120,9 +120,9 @@ public:
    * Add a transport block to the transmission buffer, which will be sent in the
    * current slot.
    * \param pb the packet burst containing the packets to be sent
-   * \param info the SlotAllocInfo instance containg the transmission information
+   * \param info the mmwave::SlotAllocInfo instance containg the transmission information
    */
-  void DoAddTransportBlock (Ptr<PacketBurst> pb, SlotAllocInfo info);
+  void DoAddTransportBlock (Ptr<PacketBurst> pb, mmwave::SlotAllocInfo info);
 
   /**
    * Prepare for the reception from another device by properly configuring
@@ -143,15 +143,15 @@ private:
    * Start a slot. Send all the transport blocks in the buffer.
    * \param timingInfo the structure containing the timing information
    */
-  void StartSlot (SfnSf timingInfo);
+  void StartSlot (mmwave::SfnSf timingInfo);
 
   /**
    * Transmit a transport block
    * \param pb the packet burst containing the packets to be sent
-   * \param info the SlotAllocInfo instance containg the transmission information
+   * \param info the mmwave::SlotAllocInfo instance containg the transmission information
    * \return the number of symbols used to send this TB
    */
-  uint8_t SlData (Ptr<PacketBurst> pb, SlotAllocInfo info);
+  uint8_t SlData (Ptr<PacketBurst> pb, mmwave::SlotAllocInfo info);
 
   /**
    * Set the transmission mask and creates the power spectral density for the
@@ -164,31 +164,31 @@ private:
    * Send the packet burts
    * \param pb the packet burst
    * \param duration the duration of the transmissin
-   * \param info the SlotAllocInfo instance containg the transmission information
+   * \param info the mmwave::SlotAllocInfo instance containg the transmission information
    * \param rbBitmap the mask indicating the suchannels to be used for the
             transmission
    */
-  void SendDataChannels (Ptr<PacketBurst> pb, Time duration, SlotAllocInfo info, std::vector<int> rbBitmap);
+  void SendDataChannels (Ptr<PacketBurst> pb, Time duration, mmwave::SlotAllocInfo info, std::vector<int> rbBitmap);
 
   /**
-   * TODO: this can be done by overloading the operator ++ of the SfnSf struct
-   * Update the SfnSf structure to point to the next slot. If the current slot
+   * TODO: this can be done by overloading the operator ++ of the mmwave::SfnSf struct
+   * Update the mmwave::SfnSf structure to point to the next slot. If the current slot
    * the last slot of the subframe, the next slot index will be 0 and the
    * subframe index will be incremented. If the current subframe is the last
    * subframe of the frame, the next subframe index will be 0 and the frame
    * frame index will be incremented.
-   * \param info the SfnSf structure containg frame, subframe and slot indeces
+   * \param info the mmwave::SfnSf structure containg frame, subframe and slot indeces
    * \return the updated SnfSn structure pointing to the next slot
    */
-  SfnSf UpdateTimingInfo (SfnSf info) const;
+  mmwave::SfnSf UpdateTimingInfo (mmwave::SfnSf info) const;
 
   MmWaveSidelinkPhySapUser* m_phySapUser; //!< Sidelink PHY SAP user
   MmWaveSidelinkPhySapProvider* m_phySapProvider; //!< Sidelink PHY SAP provider
   double m_txPower; //!< the transmission power in dBm
   double m_noiseFigure; //!< the noise figure in dB
   Ptr<MmWaveSidelinkSpectrumPhy> m_sidelinkSpectrumPhy; //!< the SpectrumPhy instance associated with this PHY
-  Ptr<MmWavePhyMacCommon> m_phyMacConfig; //!< the configuration parameters
-  typedef std::pair<Ptr<PacketBurst>, SlotAllocInfo> PhyBufferEntry; //!< type of the phy buffer entries
+  Ptr<mmwave::MmWavePhyMacCommon> m_phyMacConfig; //!< the configuration parameters
+  typedef std::pair<Ptr<PacketBurst>, mmwave::SlotAllocInfo> PhyBufferEntry; //!< type of the phy buffer entries
   std::list<PhyBufferEntry> m_phyBuffer; //!< buffer of transport blocks to send in the current slot
   std::map<uint64_t, Ptr<NetDevice>> m_deviceMap; //!< map containing the <rnti, device> pairs of the nodes we want to communicate with
 };
@@ -199,7 +199,7 @@ class MacSidelinkMemberPhySapProvider : public MmWaveSidelinkPhySapProvider
 public:
   MacSidelinkMemberPhySapProvider (Ptr<MmWaveSidelinkPhy> phy);
 
-  void AddTransportBlock (Ptr<PacketBurst> pb, SlotAllocInfo info) override;
+  void AddTransportBlock (Ptr<PacketBurst> pb, mmwave::SlotAllocInfo info) override;
 
   void PrepareForReception (uint16_t rnti) override;
 
@@ -208,7 +208,7 @@ private:
 
 };
 
-} // namespace mmwave
+} // namespace mmwave_vehicular
 } // namespace ns3
 
 #endif /* SRC_MMWAVE_SIDELINK_PHY_H_ */

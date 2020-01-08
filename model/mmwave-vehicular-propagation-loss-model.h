@@ -39,7 +39,7 @@
 
 namespace ns3 {
 
-namespace mmwave {
+namespace mmwave_vehicular {
 
 struct channelCondition
 {
@@ -121,7 +121,7 @@ class MmWaveVehicularPropagationLossModel : public PropagationLossModel
     double m_percType3Vehicles;
 };
 
-} // namespace mmwave
+} // namespace mmwave_vehicular
 
 } // namespace ns3
 

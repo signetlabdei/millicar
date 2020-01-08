@@ -17,6 +17,7 @@ NS_LOG_COMPONENT_DEFINE ("MmWaveVehicularRateTestSuite");
 
 using namespace ns3;
 using namespace mmwave;
+using namespace mmwave_vehicular;
 
 /**
  * This is a test to check if the designed vehicular stack (MAC and PHY) is able

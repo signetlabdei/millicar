@@ -26,7 +26,7 @@
 
 namespace ns3 {
 
-namespace mmwave {
+namespace mmwave_vehicular {
 
 class MmWaveSidelinkMac : public Object
 {
@@ -47,10 +47,10 @@ public:
 
   /**
    * \brief Class constructor
-   * \param pmc pointer to the MmWavePhyMacCommon instance which specifies the
+   * \param pmc pointer to the mmwave::MmWavePhyMacCommon instance which specifies the
    *        PHY/MAC parameters
    */
-  MmWaveSidelinkMac (Ptr<MmWavePhyMacCommon> pmc);
+  MmWaveSidelinkMac (Ptr<mmwave::MmWavePhyMacCommon> pmc);
 
   /**
    * \brief Class destructor
@@ -66,7 +66,7 @@ public:
   * \brief trigger the start of a new slot with all the necessary information
   * \param timingInfo the structure containing the timing information
   */
-  void DoSlotIndication (SfnSf timingInfo);
+  void DoSlotIndication (mmwave::SfnSf timingInfo);
 
   /**
   * \brief Get the PHY SAP user
@@ -121,8 +121,8 @@ private:
 
   MmWaveSidelinkPhySapUser* m_phySapUser; //!< Sidelink PHY SAP user
   MmWaveSidelinkPhySapProvider* m_phySapProvider; //!< Sidelink PHY SAP provider
-  Ptr<MmWavePhyMacCommon> m_phyMacConfig; //!< PHY and MAC configuration pointer
-  Ptr<MmWaveAmc> m_amc; //!< pointer to AMC instance
+  Ptr<mmwave::MmWavePhyMacCommon> m_phyMacConfig; //!< PHY and MAC configuration pointer
+  Ptr<mmwave::MmWaveAmc> m_amc; //!< pointer to AMC instance
   uint8_t m_mcs; //!< the MCS used to transmit the packets
   uint16_t m_rnti; //!< radio network temporary identifier
   std::vector<uint16_t> m_sfAllocInfo; //!< defines the subframe allocation, m_sfAllocInfo[i] = RNTI of the device scheduled for slot i
@@ -138,7 +138,7 @@ public:
 
   void ReceivePhyPdu (Ptr<Packet> p) override;
 
-  void SlotIndication (SfnSf timingInfo) override;
+  void SlotIndication (mmwave::SfnSf timingInfo) override;
 
 private:
   Ptr<MmWaveSidelinkMac> m_mac;
