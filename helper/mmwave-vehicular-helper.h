@@ -66,6 +66,12 @@ public:
   void SetConfigurationParameters (Ptr<MmWavePhyMacCommon> conf);
 
   /**
+   * Retrieve pointer to the object that lists all the configuration parameters
+   * \return a pointer to a MmWavePhyMacCommon object 
+   */
+  Ptr<MmWavePhyMacCommon> GetConfigurationParameters () const;
+
+  /**
    * Set the propagation loss model type
    * \param plm the type id of the propagation loss model to use
    */

@@ -132,6 +132,14 @@ MmWaveVehicularHelper::SetConfigurationParameters (Ptr<MmWavePhyMacCommon> conf)
   m_phyMacConfig = conf;
 }
 
+Ptr<MmWavePhyMacCommon>
+MmWaveVehicularHelper::GetConfigurationParameters () const
+{
+  NS_LOG_FUNCTION (this);
+  return m_phyMacConfig;
+}
+
+
 void
 MmWaveVehicularHelper::SetNumerology (uint8_t index)
 {

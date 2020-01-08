@@ -272,7 +272,7 @@ MmWaveVehicularPropagationLossModel::GetLoss (Ptr<MobilityModel> deviceA, Ptr<Mo
               NS_FATAL_ERROR ("Unknown scenario");
             }
 
-          NS_LOG_UNCOND (m_scenario << " scenario, 2D distance = " << distance2D << "m, Prob_LOS = " << probLos
+          NS_LOG_DEBUG (m_scenario << " scenario, 2D distance = " << distance2D << "m, Prob_LOS = " << probLos
                                     << ", Prob_REF = " << PRef << ", the channel condition is " << condition.m_channelCondition << ", h_A=" << hA << ",h_B=" << hB);
         }
       else

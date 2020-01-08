@@ -24,7 +24,8 @@ def build(bld):
     module_test.source = [
         'test/mmwave-vehicular-test-suite.cc',
         'test/mmwave-vehicular-sidelink-spectrum-phy-test.cc',
-        'test/mmwave-sidelink-phy-test-suite.cc'
+        'test/mmwave-sidelink-phy-test-suite.cc',
+        'test/mmwave-vehicular-rate-test.cc'
         ]
 
     headers = bld(features='ns3header')
