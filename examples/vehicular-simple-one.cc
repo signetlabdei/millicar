@@ -150,8 +150,7 @@ int main (int argc, char *argv[])
   std::cout << "Packets size:\t\t" << packetSize << " Bytes" << std::endl;
   std::cout << "Packets transmitted:\t" << g_txPackets << std::endl;
   std::cout << "Packets received:\t" << g_rxPackets << std::endl;
-  std::cout << "Average Throughput:\t" << (double(g_rxPackets*(packetSize+28)*8)/double( g_lastReceived.GetSeconds() - g_firstReceived.GetSeconds()))/1e6 << " Mbps" << std::endl;
-
+  std::cout << "Average Throughput:\t" << (double(g_rxPackets)*double(packetSize+28)*8/double( g_lastReceived.GetSeconds() - g_firstReceived.GetSeconds()))/1e6 << " Mbps" << std::endl;
 
   return 0;
 }

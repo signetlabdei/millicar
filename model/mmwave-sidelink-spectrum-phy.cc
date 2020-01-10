@@ -129,7 +129,7 @@ MmWaveSidelinkSpectrumPhy::ResetSpectrumModel ()
 void
 MmWaveSidelinkSpectrumPhy::SetDevice (Ptr<NetDevice> d)
 {
-  NS_ABORT_MSG_IF(DynamicCast<MmWaveVehicularNetDevice>(d) == 0, 
+  NS_ABORT_MSG_IF(DynamicCast<MmWaveVehicularNetDevice>(d) == 0,
     "The MmWaveSidelinkSpectrumPhy only works with MmWaveVehicularNetDevices");
   m_device = d;
 }
@@ -234,11 +234,8 @@ MmWaveSidelinkSpectrumPhy::StartRx (Ptr<SpectrumSignalParameters> params)
       //     isAllocated = false;
       //   }
 
-      //if (isAllocated)
-      //  {
-      m_interferenceData->AddSignal (mmwaveSidelinkParams->psd, mmwaveSidelinkParams->duration);
       StartRxData (mmwaveSidelinkParams);
-      //  }
+
     }
     else
     {
@@ -255,7 +252,9 @@ MmWaveSidelinkSpectrumPhy::StartRxData (Ptr<MmWaveSidelinkSpectrumSignalParamete
   switch (m_state)
     {
     case TX:
-      NS_FATAL_ERROR ("Cannot receive while transmitting");
+      // If there are other intereferent devices that transmit in the same slot, the current
+      // device simply does not consider the signal and goes on with the transmission. The code does not raise any errors since
+      // otherwise we are not able to study scenarios where interference could be an issue.
       break;
     case RX_CTRL:
       NS_FATAL_ERROR ("Cannot receive control in data period");
@@ -265,7 +264,8 @@ MmWaveSidelinkSpectrumPhy::StartRxData (Ptr<MmWaveSidelinkSpectrumSignalParamete
       {
         // check if the packet is for this device, otherwise
         // consider it only for the interference
-        uint16_t thisDeviceRnti = 
+        m_interferenceData->AddSignal (params->psd, params->duration);
+        uint16_t thisDeviceRnti =
           DynamicCast<MmWaveVehicularNetDevice>(m_device)->GetMac()->GetRnti();
         if(thisDeviceRnti == params->rnti)
         {
@@ -302,7 +302,7 @@ MmWaveSidelinkSpectrumPhy::StartRxData (Ptr<MmWaveSidelinkSpectrumSignalParamete
         else
         {
           NS_LOG_LOGIC (this << " not in sync with this signal (rnti="
-              << params->rnti  << ", rnti of the device=" 
+              << params->rnti  << ", rnti of the device="
               << thisDeviceRnti << ")");
         }
         //m_rxControlMessageList.insert (m_rxControlMessageList.end (), params->ctrlMsgList.begin (), params->ctrlMsgList.end ());
@@ -550,6 +550,9 @@ MmWaveSidelinkSpectrumPhy::UpdateSinrPerceived (const SpectrumValue& sinr)
 {
   NS_LOG_FUNCTION (this << sinr);
   m_sinrPerceived = sinr;
+
+  // TODO create trace callback to fire everytime the SINR is updated
+  NS_LOG_DEBUG(this << " " << Sum(m_sinrPerceived)/m_sinrPerceived.GetSpectrumModel()->GetNumBands());
 }
 
 void

@@ -25,7 +25,8 @@ def build(bld):
         'test/mmwave-vehicular-test-suite.cc',
         'test/mmwave-vehicular-sidelink-spectrum-phy-test.cc',
         'test/mmwave-sidelink-phy-test-suite.cc',
-        'test/mmwave-vehicular-rate-test.cc'
+        'test/mmwave-vehicular-rate-test.cc',
+        'test/mmwave-vehicular-interference-test.cc'
         ]
 
     headers = bld(features='ns3header')
