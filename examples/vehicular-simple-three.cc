@@ -12,10 +12,10 @@
 #include "ns3/internet-module.h"
 #include "ns3/core-module.h"
 
-NS_LOG_COMPONENT_DEFINE ("VehicularSimpleTwo");
+NS_LOG_COMPONENT_DEFINE ("VehicularSimpleThree");
 
 using namespace ns3;
-using namespace mmwave;
+using namespace mmwave_vehicular;
 
 /**
   This script creates two pairs of vehicles moving at 20 m/s. The two groups are virtually positioned in the same lane, one in front of the other at 20 m distance.
@@ -102,7 +102,7 @@ int main (int argc, char *argv[])
   NS_LOG_DEBUG("IPv4 Address node 0 group 2: " << group2.Get (0)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal ());
   NS_LOG_DEBUG("IPv4 Address node 1 group 2: " << group2.Get (1)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal ());
 
-  Ptr<MmWaveAmc> m_amc = CreateObject <MmWaveAmc> (helper->GetConfigurationParameters());
+  Ptr<mmwave::MmWaveAmc> m_amc = CreateObject <mmwave::MmWaveAmc> (helper->GetConfigurationParameters());
   double availableRate = m_amc->GetTbSizeFromMcsSymbols(mcs, 14) / 0.001; // bps
   uint16_t port = 4000;  // well-known echo port number
   uint32_t maxPacketCount = 500000;

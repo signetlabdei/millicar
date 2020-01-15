@@ -17,6 +17,7 @@ NS_LOG_COMPONENT_DEFINE ("MmWaveVehicularInterferenceTestSuite");
 
 using namespace ns3;
 using namespace mmwave;
+using namespace mmwave_vehicular;
 
 /**
   The aim of this test is to check whether the interference was evaluated correctly when different groups

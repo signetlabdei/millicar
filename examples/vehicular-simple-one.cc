@@ -15,7 +15,7 @@
 NS_LOG_COMPONENT_DEFINE ("VehicularSimpleOne");
 
 using namespace ns3;
-using namespace mmwave;
+using namespace mmwave_vehicular;
 
 uint32_t g_rxPackets; // total number of received packets
 uint32_t g_txPackets; // total number of transmitted packets
@@ -125,7 +125,7 @@ int main (int argc, char *argv[])
   // node one.
   //
 
-  Ptr<MmWaveAmc> m_amc = CreateObject <MmWaveAmc> (helper->GetConfigurationParameters());
+  Ptr<mmwave::MmWaveAmc> m_amc = CreateObject <mmwave::MmWaveAmc> (helper->GetConfigurationParameters());
   double availableRate = m_amc->GetTbSizeFromMcsSymbols(mcs, 14) / 0.001; // bps
 
   uint32_t maxPacketCount = 500000;
