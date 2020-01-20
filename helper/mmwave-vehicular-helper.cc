@@ -73,12 +73,12 @@ MmWaveVehicularHelper::GetTypeId ()
                  MakeStringAccessor (&MmWaveVehicularHelper::SetPropagationDelayModelType),
                  MakeStringChecker ())
   .AddAttribute ("Numerology",
-                "Numerology to use for the definition of the frame structure."
-                "2 : subcarrier spacing will be set to 60 KHz"
-                "3 : subcarrier spacing will be set to 120 KHz",
-                UintegerValue (2),
-                MakeUintegerAccessor (&MmWaveVehicularHelper::SetNumerology),
-                MakeUintegerChecker<uint8_t> ())
+                 "Numerology to use for the definition of the frame structure."
+                 "2 : subcarrier spacing will be set to 60 KHz"
+                 "3 : subcarrier spacing will be set to 120 KHz",
+                 UintegerValue (2),
+                 MakeUintegerAccessor (&MmWaveVehicularHelper::SetNumerology),
+                 MakeUintegerChecker<uint8_t> ())
   .AddAttribute ("Bandwidth",
                  "Bandwidth in Hz",
                  DoubleValue (1e8),
@@ -225,6 +225,9 @@ MmWaveVehicularHelper::InstallSingleMmWaveVehicularNetDevice (Ptr<Node> node, ui
   // connect the rx callback of the spectrum object to the sink
   ssp->SetPhyRxDataEndOkCallback (MakeCallback (&MmWaveSidelinkPhy::Receive, phy));
 
+  // connect the callback to report the SINR
+  ssp->SetSidelinkSinrReportCallback (MakeCallback (&MmWaveSidelinkPhy::GenerateSinrReport, phy));
+  
   // create the mac
   Ptr<MmWaveSidelinkMac> mac = CreateObject<MmWaveSidelinkMac> (m_phyMacConfig);
   mac->SetRnti (rnti);

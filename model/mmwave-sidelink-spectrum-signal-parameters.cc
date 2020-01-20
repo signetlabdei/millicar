@@ -49,7 +49,8 @@ MmWaveSidelinkSpectrumSignalParameters::MmWaveSidelinkSpectrumSignalParameters (
   rbBitmap = p.rbBitmap;
   pss = p.pss;
   numSym = p.numSym;
-  rnti = p.rnti;
+  senderRnti = p.senderRnti;
+  destinationRnti = p.destinationRnti;
 }
 
 Ptr<SpectrumSignalParameters>

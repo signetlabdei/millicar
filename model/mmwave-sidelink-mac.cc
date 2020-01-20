@@ -21,6 +21,7 @@
 #include "mmwave-sidelink-mac.h"
 #include "ns3/log.h"
 #include "ns3/uinteger.h"
+#include "ns3/boolean.h"
 
 namespace ns3 {
 
@@ -46,6 +47,12 @@ MacSidelinkMemberPhySapUser::SlotIndication (mmwave::SfnSf timingInfo)
   m_mac->DoSlotIndication (timingInfo);
 }
 
+void
+MacSidelinkMemberPhySapUser::SlSinrReport (const SpectrumValue& sinr, uint16_t rnti, uint8_t numSym, uint32_t tbSize)
+{
+  m_mac->DoSlSinrReport (sinr, rnti, numSym, tbSize);
+}
+
 //-----------------------------------------------------------------------
 
 NS_OBJECT_ENSURE_REGISTERED (MmWaveSidelinkMac);
@@ -56,10 +63,19 @@ MmWaveSidelinkMac::GetTypeId (void)
   static TypeId tid = TypeId ("ns3::MmWaveSidelinkMac")
     .SetParent<Object> ()
     .AddAttribute ("Mcs",
-                   "Modulation and Coding Scheme.",
+                   "If AMC is not used, specify a fixed MCS value.",
                    UintegerValue (0),
                    MakeUintegerAccessor (&MmWaveSidelinkMac::m_mcs),
                    MakeUintegerChecker<uint8_t> (0, 28))
+    .AddAttribute ("UseAmc",
+                   "Set to true to use adaptive modulation and coding.",
+                   BooleanValue (true),
+                   MakeBooleanAccessor (&MmWaveSidelinkMac::m_useAmc),
+                   MakeBooleanChecker ())
+    .AddTraceSource ("SchedulingInfo",
+                     "Information regarding the scheduling.",
+                     MakeTraceSourceAccessor (&MmWaveSidelinkMac::m_schedulingTrace),
+                     "ns3::mmwave_vehicular::MmWaveSidelinkMac::SlSchedulingTracedCallback")
   ;
   return tid;
 }
@@ -106,24 +122,26 @@ MmWaveSidelinkMac::DoSlotIndication (mmwave::SfnSf timingInfo)
   NS_ASSERT_MSG (!m_sfAllocInfo.empty (), "First set the scheduling patter");
   if(m_sfAllocInfo[timingInfo.m_slotNum] == m_rnti) // check if this slot is associated to the user who required it
   {
-    // compute the available bits
-    uint32_t availableBits = m_amc->GetTbSizeFromMcsSymbols(m_mcs, m_phyMacConfig->GetSymbPerSlot ()); // this method returns the size in number of bits, that are then converted in number of bytes
+    // compute the number of available symbols
+    uint32_t availableSymbols = m_phyMacConfig->GetSymbPerSlot ();
     uint8_t symStart = 0; // indicates the next available symbol in the slot
 
-    while (availableBits > 0 && m_txBuffer.size () > 0)
+    while (availableSymbols > 0 && m_txBuffer.size () > 0)
     {
       // retrieve the first element of the buffer
       LteMacSapProvider::TransmitPduParameters pduInfo = m_txBuffer.front ();
       Ptr<Packet> pdu = pduInfo.pdu; // the packet to transmit
       uint16_t rntiDest = pduInfo.rnti; // the RNTI of the destination node
 
+      uint8_t mcs = GetMcs (rntiDest); // select the MCS
+
       // compute the number of symbols needed to transmit the packet
-      uint32_t requiredSymbols = m_amc->GetNumSymbolsFromTbsMcs (pdu->GetSize ()*8, m_mcs);
+      uint32_t requiredSymbols = m_amc->GetNumSymbolsFromTbsMcs (pdu->GetSize ()*8, mcs);
 
       // compute the corresponding number of bits
-      uint32_t requiredBits = m_amc->GetTbSizeFromMcsSymbols(m_mcs, requiredSymbols);
+      uint32_t requiredBits = m_amc->GetTbSizeFromMcsSymbols(mcs, requiredSymbols);
 
-      if (requiredBits <= availableBits)
+      if (requiredSymbols <= availableSymbols)
       {
         // create a new transport block
         Ptr<PacketBurst> pb = CreateObject <PacketBurst> ();
@@ -135,7 +153,7 @@ MmWaveSidelinkMac::DoSlotIndication (mmwave::SfnSf timingInfo)
         info.m_dci.m_rnti = m_rnti; // my RNTI
         info.m_dci.m_numSym = requiredSymbols; // the number of symbols required to tx the packet
         info.m_dci.m_symStart = symStart; // index of the first available symbol
-        info.m_dci.m_mcs = m_mcs;
+        info.m_dci.m_mcs = mcs;
         info.m_dci.m_tbSize = requiredBits / 8; // the TB size in bytes
         info.m_slotType = mmwave::SlotAllocInfo::DATA; // the TB carries data
 
@@ -146,16 +164,29 @@ MmWaveSidelinkMac::DoSlotIndication (mmwave::SfnSf timingInfo)
         m_txBuffer.pop_front ();
 
         // update the number of available bits
-        availableBits-=requiredBits;
+        availableSymbols -= requiredSymbols;
 
         // update index to the next available symbol
-        symStart=symStart+requiredSymbols+1;
+        symStart = symStart + requiredSymbols + 1;
+
+        // fire the scheduling trace
+        SlSchedulingCallback traceInfo;
+        traceInfo.frame = timingInfo.m_frameNum;
+        traceInfo.subframe = timingInfo.m_sfNum;
+        traceInfo.slotNum = timingInfo.m_slotNum;
+        traceInfo.symStart = symStart;
+        traceInfo.numSym = requiredSymbols;
+        traceInfo.mcs = mcs;
+        traceInfo.tbSize = requiredBits / 8;
+        traceInfo.txRnti = m_rnti;
+        traceInfo.rxRnti = rntiDest;
+        m_schedulingTrace (traceInfo);
       }
       else
       {
         // the remaining available bits are not enough to transmit the next
         // packet in the buffer
-        NS_LOG_INFO ("Available bytes " << availableBits / 8 << " next packet size " << pduInfo.pdu->GetSize ());
+        NS_LOG_INFO ("Available bits " << m_amc->GetTbSizeFromMcsSymbols(mcs, availableSymbols) << " next pdu size " << pduInfo.pdu->GetSize () * 8);
         break;
       }
     }
@@ -227,6 +258,56 @@ MmWaveSidelinkMac::SetForwardUpCallback (Callback <void, Ptr<Packet> > cb)
 {
   m_forwardUpCallback = cb;
 }
+
+void
+MmWaveSidelinkMac::DoSlSinrReport (const SpectrumValue& sinr, uint16_t rnti, uint8_t numSym, uint32_t tbSize)
+{
+  NS_LOG_FUNCTION (this);
+
+  // check if the m_slCqiReported already contains the CQI history for the device
+  // with RNTI = rnti. If so, add the new CQI report, otherwise create a new
+  // entry.
+  int mcs; // the selected MCS will be stored in this variable
+  if (m_slCqiReported.find (rnti) != m_slCqiReported.end () )
+  {
+    m_slCqiReported.at (rnti).push_back (m_amc->CreateCqiFeedbackWbTdma (sinr, numSym, tbSize, mcs));
+  }
+  else
+  {
+    std::vector<int> cqiTemp;
+    cqiTemp.push_back (m_amc->CreateCqiFeedbackWbTdma (sinr, numSym, tbSize, mcs));
+    m_slCqiReported.insert (std::make_pair(rnti, cqiTemp));
+  }
+}
+
+uint8_t
+MmWaveSidelinkMac::GetMcs (uint16_t rnti)
+{
+  NS_LOG_FUNCTION (this);
+
+  uint8_t mcs; // the selected MCS
+  if (m_useAmc)
+  {
+    // if AMC is used, select the MCS based on the CQI history
+    if (m_slCqiReported.find (rnti) != m_slCqiReported.end ())
+    {
+      std::vector <int> cqi = m_slCqiReported.find (rnti)->second;
+      mcs = m_amc->GetMcsFromCqi(*std::min_element (cqi.begin(), cqi.end()));
+    }
+    else
+    {
+      mcs = 0; // if the CQI history not found for this device, use the minimum MCS value
+    }
+  }
+  else
+  {
+    // if AMC is not used, use a fixed MCS value
+    mcs = m_mcs;
+  }
+  // TODO: update the method to refresh CQI reports and delete older reports
+  return mcs;
+}
+
 
 } // mmwave namespace
 

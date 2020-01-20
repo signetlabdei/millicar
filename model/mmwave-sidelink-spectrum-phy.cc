@@ -211,6 +211,13 @@ MmWaveSidelinkSpectrumPhy::SetPhyRxDataEndOkCallback (MmWavePhyRxDataEndOkCallba
 // }
 
 void
+MmWaveSidelinkSpectrumPhy::SetSidelinkSinrReportCallback (MmWaveSidelinkSinrReportCallback c)
+{
+  NS_LOG_FUNCTION (this);
+  m_slSinrReportCallback = c;
+}
+
+void
 MmWaveSidelinkSpectrumPhy::StartRx (Ptr<SpectrumSignalParameters> params)
 {
 
@@ -267,7 +274,7 @@ MmWaveSidelinkSpectrumPhy::StartRxData (Ptr<MmWaveSidelinkSpectrumSignalParamete
         m_interferenceData->AddSignal (params->psd, params->duration);
         uint16_t thisDeviceRnti =
           DynamicCast<MmWaveVehicularNetDevice>(m_device)->GetMac()->GetRnti();
-        if(thisDeviceRnti == params->rnti)
+        if(thisDeviceRnti == params->destinationRnti)
         {
           // this is a useful signal
           m_interferenceData->StartRx (params->psd);
@@ -295,14 +302,14 @@ MmWaveSidelinkSpectrumPhy::StartRxData (Ptr<MmWaveSidelinkSpectrumSignalParamete
           ChangeState (RX_DATA);
           if (params->packetBurst && !params->packetBurst->GetPackets ().empty ())
             {
-              TbInfo_t tbInfo = {params->packetBurst, params->size, params->mcs, params->numSym, params->rnti, params->rbBitmap};
+              TbInfo_t tbInfo = {params->packetBurst, params->size, params->mcs, params->numSym, params->senderRnti, params->rbBitmap};
               m_rxTransportBlock.push_back (tbInfo);
             }
         }
         else
         {
           NS_LOG_LOGIC (this << " not in sync with this signal (rnti="
-              << params->rnti  << ", rnti of the device="
+              << params->destinationRnti  << ", rnti of the device="
               << thisDeviceRnti << ")");
         }
         //m_rxControlMessageList.insert (m_rxControlMessageList.end (), params->ctrlMsgList.begin (), params->ctrlMsgList.end ());
@@ -356,7 +363,7 @@ MmWaveSidelinkSpectrumPhy::EndRxData ()
   NS_LOG_FUNCTION (this);
   m_interferenceData->EndRx ();
 
-  //double sinrAvg = Sum (m_sinrPerceived) / (m_sinrPerceived.GetSpectrumModel ()->GetNumBands ());
+  double sinrAvg = Sum (m_sinrPerceived) / (m_sinrPerceived.GetSpectrumModel ()->GetNumBands ());
 
   NS_ASSERT (m_state = RX_DATA);
 
@@ -368,7 +375,13 @@ MmWaveSidelinkSpectrumPhy::EndRxData ()
        // Here we need to initialize an empty harqInfoList since it is mandatory input
        // for the method. Since the vector is empty, no harq procedures are triggeres (as we want)
        std::vector <mmwave::MmWaveHarqProcessInfoElement_t> harqInfoList;
+
+       NS_LOG_DEBUG ("average sinr " << 10*log10 (sinrAvg) << " MCS " <<  (uint16_t)(*i).mcs);
        mmwave::MmWaveTbStats_t tbStats = mmwave::MmWaveMiErrorModel::GetTbDecodificationStats (m_sinrPerceived, (*i).rbBitmap, (*i).size, (*i).mcs, harqInfoList);
+
+       // trigger measure reporting
+       m_slSinrReportCallback(m_sinrPerceived, (*i).rnti, (*i).numSym, (*i).size);
+
        bool corrupt = m_random->GetValue () > tbStats.tbler ? false : true;
        if(!corrupt)
        {
@@ -430,7 +443,8 @@ MmWaveSidelinkSpectrumPhy::StartTxDataFrames (Ptr<PacketBurst> pb,
   uint8_t mcs,
   uint32_t size,
   uint8_t numSym,
-  uint16_t rnti,
+  uint16_t senderRnti,
+  uint16_t destinationRnti,
   std::vector<int> rbBitmap)
 {
   NS_LOG_FUNCTION (this);
@@ -461,7 +475,8 @@ MmWaveSidelinkSpectrumPhy::StartTxDataFrames (Ptr<PacketBurst> pb,
         txParams->txAntenna = m_antenna;
         txParams->mcs = mcs;
         txParams->numSym = numSym;
-        txParams->rnti = rnti;
+        txParams->destinationRnti = destinationRnti;
+        txParams->senderRnti = senderRnti;
         txParams->size = size;
         txParams->rbBitmap = rbBitmap;
 

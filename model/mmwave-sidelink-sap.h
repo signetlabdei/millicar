@@ -68,6 +68,17 @@ public:
    */
   virtual void SlotIndication (mmwave::SfnSf timingInfo) = 0;
 
+  /**
+   * \brief Reports the SINR meausured with a certain device
+   * \param sinr the SINR
+   * \param rnti RNTI of the transmitting device
+   * \param numSym size of the transport block that generated the report in
+            number of OFDM symbols
+   * \param tbSize size of the transport block that generated the report in
+            number of bytes
+   */
+  virtual void SlSinrReport (const SpectrumValue& sinr, uint16_t rnti, uint8_t numSym, uint32_t tbSize) = 0;
+
 };
 
 } // mmwave namespace

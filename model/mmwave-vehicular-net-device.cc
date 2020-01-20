@@ -265,6 +265,8 @@ MmWaveVehicularNetDevice::Receive (Ptr<Packet> p)
 bool
 MmWaveVehicularNetDevice::Send (Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber)
 {
+  NS_LOG_FUNCTION (this);
+  
   LteMacSapProvider::TransmitPduParameters params;
 
   Ptr<Packet> copy = packet->Copy ();

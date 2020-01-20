@@ -274,7 +274,7 @@ MmWaveSidelinkPhy::SendDataChannels (Ptr<PacketBurst> pb,
   mmwave::SlotAllocInfo info,
   std::vector<int> rbBitmap)
 {
-  m_sidelinkSpectrumPhy->StartTxDataFrames (pb, duration, info.m_slotIdx, info.m_dci.m_mcs, info.m_dci.m_tbSize, info.m_dci.m_numSym, info.m_rnti, rbBitmap);
+  m_sidelinkSpectrumPhy->StartTxDataFrames (pb, duration, info.m_slotIdx, info.m_dci.m_mcs, info.m_dci.m_tbSize, info.m_dci.m_numSym, info.m_dci.m_rnti, info.m_rnti, rbBitmap);
 }
 
 std::vector<int>
@@ -355,6 +355,18 @@ MmWaveSidelinkPhy::Receive (Ptr<Packet> p)
 
   // Forward the received packet to the MAC layer using the PHY SAP USER
   m_phySapUser->ReceivePhyPdu(p);
+}
+
+void
+MmWaveSidelinkPhy::GenerateSinrReport (const SpectrumValue& sinr, uint16_t rnti, uint8_t numSym, uint32_t tbSize)
+{
+  NS_LOG_FUNCTION (this);
+
+  double sinrAvg = Sum (sinr) / (sinr.GetSpectrumModel ()->GetNumBands ());
+  NS_LOG_INFO ("Average SINR with dev " << rnti << " = " << 10 * std::log10 (sinrAvg));
+
+  // forward the report to the MAC layer
+  m_phySapUser->SlSinrReport (sinr, rnti, numSym, tbSize);
 }
 
 } // namespace mmwave_vehicular

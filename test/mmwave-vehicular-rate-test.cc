@@ -127,6 +127,7 @@ MmWaveVehicularRateTestCase::StartTest (uint8_t mcs)
   Time endTime = Seconds (60.0);
 
   Config::SetDefault ("ns3::MmWaveSidelinkMac::Mcs", UintegerValue (mcs));
+  Config::SetDefault ("ns3::MmWaveSidelinkMac::UseAmc", BooleanValue (false));
   Config::SetDefault ("ns3::MmWavePhyMacCommon::CenterFreq", DoubleValue (60.0e9));
   Config::SetDefault ("ns3::MmWaveVehicularPropagationLossModel::Frequency", DoubleValue (60.0e9));
   Config::SetDefault ("ns3::MmWaveVehicularSpectrumPropagationLossModel::Frequency", DoubleValue (60.0e9));

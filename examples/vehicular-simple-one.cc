@@ -55,6 +55,7 @@ int main (int argc, char *argv[])
   Time endTime = Seconds (30.0);
   uint8_t mcs = 12;
 
+  Config::SetDefault ("ns3::MmWaveSidelinkMac::UseAmc", BooleanValue (false));
   Config::SetDefault ("ns3::MmWaveSidelinkMac::Mcs", UintegerValue (mcs));
   Config::SetDefault ("ns3::MmWavePhyMacCommon::CenterFreq", DoubleValue (60.0e9));
   Config::SetDefault ("ns3::MmWaveVehicularPropagationLossModel::Frequency", DoubleValue (60.0e9));

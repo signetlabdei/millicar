@@ -38,6 +38,7 @@ int main (int argc, char *argv[])
   cmd.AddValue ("vehicleSpeed", "The speed of the vehicle", speed);
   cmd.Parse (argc, argv);
 
+  Config::SetDefault ("ns3::MmWaveSidelinkMac::UseAmc", BooleanValue (false));
   Config::SetDefault ("ns3::MmWaveSidelinkMac::Mcs", UintegerValue (mcs));
   Config::SetDefault ("ns3::MmWavePhyMacCommon::CenterFreq", DoubleValue (60.0e9));
   Config::SetDefault ("ns3::MmWaveVehicularPropagationLossModel::Frequency", DoubleValue (60.0e9));

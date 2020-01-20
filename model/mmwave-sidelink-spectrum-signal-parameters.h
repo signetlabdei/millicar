@@ -57,7 +57,9 @@ struct MmWaveSidelinkSpectrumSignalParameters : public SpectrumSignalParameters
 
   uint8_t numSym; ///< the number of symbols associated to a specific transport block
 
-  uint16_t rnti; ///< the RNTI which identifies the device which is sending the packet
+  uint16_t senderRnti; ///< the RNTI which identifies the sender device
+
+  uint16_t destinationRnti; ///< the RNTI which identifies the destination device
 
   uint32_t size; ///< the size of the corresponding transport block
 

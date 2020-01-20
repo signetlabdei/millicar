@@ -60,6 +60,17 @@ struct TbInfo_t
 */
 typedef Callback< void, Ptr<Packet> > MmWavePhyRxDataEndOkCallback;
 
+/**
+* This method is used by the MmWaveSidelinkSpectrumPhy to notify the PHY about
+* the SINR of the channel
+*
+* @param sinr estimated SINR value
+* @param rnti RNTI of the transmitting device
+* @param numSym number of symbols associated to the transport block
+* @param size size of the transport block
+*/
+typedef Callback< void, const SpectrumValue&, uint16_t, uint8_t, uint32_t> MmWaveSidelinkSinrReportCallback;
+
 //typedef Callback< void, std::list<Ptr<MmWaveControlMessage> > > MmWavePhyRxCtrlEndOkCallback;
 
 /**
@@ -191,7 +202,7 @@ public:
   * @return true if an error occurred and the transmission was not
   * started, false otherwise.
   */
-  bool StartTxDataFrames (Ptr<PacketBurst> pb, Time duration, uint8_t slotInd, uint8_t mcs, uint32_t size, uint8_t numSym, uint16_t rnti, std::vector<int> rbBitmap);
+  bool StartTxDataFrames (Ptr<PacketBurst> pb, Time duration, uint8_t slotInd, uint8_t mcs, uint32_t size, uint8_t numSym, uint16_t senderRnti, uint16_t destinationRnti, std::vector<int> rbBitmap);
 
   //bool StartTxControlFrames (std::list<Ptr<MmWaveControlMessage> > ctrlMsgList, Time duration);       // control frames from enb to ue
 
@@ -204,6 +215,13 @@ public:
   void SetPhyRxDataEndOkCallback (MmWavePhyRxDataEndOkCallback c);
 
   //void SetPhyRxCtrlEndOkCallback (MmWavePhyRxCtrlEndOkCallback c);
+
+  /**
+  * Set the callback for SINR reporting
+  *
+  * @param c the callback
+  */
+  void SetSidelinkSinrReportCallback (MmWaveSidelinkSinrReportCallback c);
 
   /**
   *
@@ -269,6 +287,7 @@ private:
 
   //MmWavePhyRxCtrlEndOkCallback m_phyRxCtrlEndOkCallback;
   MmWavePhyRxDataEndOkCallback m_phyRxDataEndOkCallback;  ///< the mmwave sidelink phy receive data end ok callback
+  MmWaveSidelinkSinrReportCallback m_slSinrReportCallback; ///< the mmwave sidelink SINR report callback
 
   SpectrumValue m_sinrPerceived; ///< the perceived SINR
 

@@ -23,10 +23,25 @@
 #include "ns3/mmwave-amc.h"
 #include "ns3/mmwave-phy-mac-common.h"
 #include "ns3/lte-mac-sap.h"
+#include "ns3/traced-callback.h"
 
 namespace ns3 {
 
 namespace mmwave_vehicular {
+
+/// structure used for the scheduling info callback
+struct SlSchedulingCallback
+{
+  uint16_t frame; //!< frame number
+  uint8_t subframe; //!< subframe number
+  uint8_t slotNum; //!< slot number
+  uint8_t symStart; //!< index of the starting symbol
+  uint8_t numSym; //!< nummber of allocated symbols
+  uint8_t mcs; //!< the MCS for transport block
+  uint16_t tbSize; //!< the TB size in bytes
+  uint16_t txRnti; //!< the RNTI which identifies the sender
+  uint16_t rxRnti; //!< the RNTI which identifies the destination
+};
 
 class MmWaveSidelinkMac : public Object
 {
@@ -111,6 +126,13 @@ public:
    */
   void SetForwardUpCallback (Callback <void, Ptr<Packet> > cb);
 
+  /**
+   * TracedCallback signature for SL scheduling
+   *
+   * \param params the struct SlSchedulingCallback containing the scheduling info
+   */
+  typedef void (* SlSchedulingTracedCallback) (SlSchedulingCallback params);
+
 private:
   // forwarded from PHY SAP
  /**
@@ -119,15 +141,40 @@ private:
   */
   void DoReceivePhyPdu (Ptr<Packet> p);
 
+  /**
+  * \brief Based on the SINR reported, the CQI is evaluated and pushed to the
+           CQIs history with the latest SINR information
+  * \params sinr SpectrumValue instance representing the SINR measured on all
+            the spectrum chunks
+  * \params rnti RNTI of the transmitting device
+  * \params numSym size of the transport block that generated the report in
+            number of OFDM symbols
+  * \params tbSize size of the transport block that generated the report in bytes
+  */
+  void DoSlSinrReport (const SpectrumValue& sinr, uint16_t rnti, uint8_t numSym, uint32_t tbSize);
+
+  /////////////////////////////////////////////////////////////////////////////
+
+  /**
+  * \brief Evaluate the MCS of the link towards a specific device
+  * \params rnti the RNTI that identifies the device we want to communicate with
+  */
+  uint8_t GetMcs (uint16_t rnti);
+
   MmWaveSidelinkPhySapUser* m_phySapUser; //!< Sidelink PHY SAP user
   MmWaveSidelinkPhySapProvider* m_phySapProvider; //!< Sidelink PHY SAP provider
   Ptr<mmwave::MmWavePhyMacCommon> m_phyMacConfig; //!< PHY and MAC configuration pointer
   Ptr<mmwave::MmWaveAmc> m_amc; //!< pointer to AMC instance
-  uint8_t m_mcs; //!< the MCS used to transmit the packets
+  bool m_useAmc; //!< set to true to use adaptive modulation and coding
+  uint8_t m_mcs; //!< the MCS used to transmit the packets if AMC is not used
   uint16_t m_rnti; //!< radio network temporary identifier
   std::vector<uint16_t> m_sfAllocInfo; //!< defines the subframe allocation, m_sfAllocInfo[i] = RNTI of the device scheduled for slot i
   std::list< LteMacSapProvider::TransmitPduParameters > m_txBuffer; //!< buffer containing the packets to be sent
+  std::map<uint16_t, std::vector<int>> m_slCqiReported; //!< map containing the <RNTI, CQI> pairs
   Callback <void, Ptr<Packet> > m_forwardUpCallback; ///< upward callback to the NetDevice
+
+  // trace sources
+  TracedCallback<SlSchedulingCallback> m_schedulingTrace; //!< trace source returning information regarding the scheduling
 };
 
 class MacSidelinkMemberPhySapUser : public MmWaveSidelinkPhySapUser
@@ -139,6 +186,8 @@ public:
   void ReceivePhyPdu (Ptr<Packet> p) override;
 
   void SlotIndication (mmwave::SfnSf timingInfo) override;
+
+  void SlSinrReport (const SpectrumValue& sinr, uint16_t rnti, uint8_t numSym, uint32_t tbSize) override;
 
 private:
   Ptr<MmWaveSidelinkMac> m_mac;
