@@ -71,7 +71,7 @@ RlcSidelinkMemberMacSapProvider::TransmitPdu (TransmitPduParameters params)
 void
 RlcSidelinkMemberMacSapProvider::ReportBufferStatus (ReportBufferStatusParameters params)
 {
-  // TODO update this method
+  m_mac->DoReportBufferStatus (params);
 }
 
 //-----------------------------------------------------------------------
@@ -144,75 +144,23 @@ MmWaveSidelinkMac::DoSlotIndication (mmwave::SfnSf timingInfo)
 
   NS_ASSERT_MSG (m_rnti != 0, "First set the RNTI");
   NS_ASSERT_MSG (!m_sfAllocInfo.empty (), "First set the scheduling patter");
-  if(m_sfAllocInfo[timingInfo.m_slotNum] == m_rnti) // check if this slot is associated to the user who required it
+  if(m_sfAllocInfo [timingInfo.m_slotNum] == m_rnti) // check if this slot is associated to the user who required it
   {
-    // compute the number of available symbols
-    uint32_t availableSymbols = m_phyMacConfig->GetSymbPerSlot ();
-    uint8_t symStart = 0; // indicates the next available symbol in the slot
+    std::list<mmwave::SlotAllocInfo> allocationInfo = ScheduleResources (timingInfo);
 
-    while (availableSymbols > 0 && m_txBuffer.size () > 0)
+    // TODO inform phy about the allocatio ?
+
+    // TODO associate slot alloc info and pdu
+    NS_LOG_UNCOND (allocationInfo.size () << " " <<  m_txBuffer.size ());
+    NS_ASSERT_MSG (allocationInfo.size () == m_txBuffer.size (), "A LC has not used the tx opportunity");
+    for (auto it = m_txBuffer.begin (); it != m_txBuffer.end (); it++)
     {
-      // retrieve the first element of the buffer
-      LteMacSapProvider::TransmitPduParameters pduInfo = m_txBuffer.front ();
-      Ptr<Packet> pdu = pduInfo.pdu; // the packet to transmit
-      uint16_t rntiDest = pduInfo.rnti; // the RNTI of the destination node
-
-      uint8_t mcs = GetMcs (rntiDest); // select the MCS
-
-      // compute the number of symbols needed to transmit the packet
-      uint32_t requiredSymbols = m_amc->GetNumSymbolsFromTbsMcs (pdu->GetSize ()*8, mcs);
-
-      // compute the corresponding number of bits
-      uint32_t requiredBits = m_amc->GetTbSizeFromMcsSymbols(mcs, requiredSymbols);
-
-      if (requiredSymbols <= availableSymbols)
-      {
-        // create a new transport block
-        Ptr<PacketBurst> pb = CreateObject <PacketBurst> ();
-        pb->AddPacket(pdu);
-
-        mmwave::SlotAllocInfo info;
-        info.m_slotIdx = timingInfo.m_slotNum; // the TB will be sent in this slot
-        info.m_rnti = rntiDest; // the RNTI of the destination node
-        info.m_dci.m_rnti = m_rnti; // my RNTI
-        info.m_dci.m_numSym = requiredSymbols; // the number of symbols required to tx the packet
-        info.m_dci.m_symStart = symStart; // index of the first available symbol
-        info.m_dci.m_mcs = mcs;
-        info.m_dci.m_tbSize = requiredBits / 8; // the TB size in bytes
-        info.m_slotType = mmwave::SlotAllocInfo::DATA; // the TB carries data
-
-        // forward the transport block to the PHY
-        m_phySapProvider->AddTransportBlock(pb, info);
-
-        // remove the packet from the buffer
-        m_txBuffer.pop_front ();
-
-        // update the number of available bits
-        availableSymbols -= requiredSymbols;
-
-        // update index to the next available symbol
-        symStart = symStart + requiredSymbols + 1;
-
-        // fire the scheduling trace
-        SlSchedulingCallback traceInfo;
-        traceInfo.frame = timingInfo.m_frameNum;
-        traceInfo.subframe = timingInfo.m_sfNum;
-        traceInfo.slotNum = timingInfo.m_slotNum;
-        traceInfo.symStart = symStart;
-        traceInfo.numSym = requiredSymbols;
-        traceInfo.mcs = mcs;
-        traceInfo.tbSize = requiredBits / 8;
-        traceInfo.txRnti = m_rnti;
-        traceInfo.rxRnti = rntiDest;
-        m_schedulingTrace (traceInfo);
-      }
-      else
-      {
-        // the remaining available bits are not enough to transmit the next
-        // packet in the buffer
-        NS_LOG_INFO ("Available bits " << m_amc->GetTbSizeFromMcsSymbols(mcs, availableSymbols) << " next pdu size " << pduInfo.pdu->GetSize () * 8);
-        break;
-      }
+      Ptr<PacketBurst> pb = CreateObject<PacketBurst> ();
+      pb->AddPacket (it->pdu);
+      m_phySapProvider->AddTransportBlock (pb, allocationInfo.front ());
+      allocationInfo.pop_front ();
+      m_txBuffer.pop_front ();
+      // TODO add assert if sizes are different
     }
   }
   else if (m_sfAllocInfo[timingInfo.m_slotNum] != 0) // if the slot is assigned to another device, prepare for reception
@@ -225,6 +173,201 @@ MmWaveSidelinkMac::DoSlotIndication (mmwave::SfnSf timingInfo)
     NS_LOG_INFO ("Empty slot");
   }
 
+}
+
+std::list<mmwave::SlotAllocInfo>
+MmWaveSidelinkMac::ScheduleResources (mmwave::SfnSf timingInfo)
+{
+  std::list<mmwave::SlotAllocInfo> allocationInfo; // stores all the allocation decisions
+
+  // if there are no active channels return an empty vector
+  if (m_bufferStatusReportMap.size () == 0)
+  {
+    return allocationInfo;
+  }
+
+  // compute the total number of available symbols
+  uint32_t availableSymbols = m_phyMacConfig->GetSymbPerSlot ();
+
+  // compute the number of available symbols per logical channel
+  // NOTE the number of available symbols per LC is rounded down due to the cast
+  // to int
+  uint32_t availableSymbolsPerLc = availableSymbols / m_bufferStatusReportMap.size ();
+
+  // TODO start from the last served lc + 1
+  auto bsrIt = m_bufferStatusReportMap.begin ();
+
+  uint8_t symStart = 0; // indicates the next available symbol in the slot
+
+  // serve the active logical channels with a Round Robin approach
+  while (availableSymbols > 0 && m_bufferStatusReportMap.size () > 0)
+  {
+    uint16_t rntiDest = bsrIt->second.rnti; // the RNTI of the destination node
+
+    uint8_t mcs = GetMcs (rntiDest); // select the MCS
+
+    // compute the number of bits for this LC
+    uint32_t availableBitsPerLc = m_amc->GetTbSizeFromMcsSymbols(mcs, availableSymbolsPerLc);
+
+    // compute the number of bits required by this LC
+    uint32_t requiredBits = (bsrIt->second.txQueueSize + bsrIt->second.retxQueueSize + bsrIt->second.statusPduSize) * 8;
+
+    // assign a number of bits which is less or equal to the available bits
+    uint32_t assignedBits = 0;
+    if (requiredBits <= availableBitsPerLc)
+    {
+      assignedBits = requiredBits;
+    }
+    else
+    {
+      assignedBits = availableBitsPerLc;
+    }
+
+    // compute the number of symbols assigned to this LC
+    uint32_t assignedSymbols = m_amc->GetNumSymbolsFromTbsMcs (assignedBits, mcs);
+
+    //if (assignedSymbols <= availableSymbols) // TODO check if needed
+    //{
+    // create the SlotAllocInfo object
+    mmwave::SlotAllocInfo info;
+    info.m_slotIdx = timingInfo.m_slotNum; // the TB will be sent in this slot
+    info.m_rnti = rntiDest; // the RNTI of the destination node
+    info.m_dci.m_rnti = m_rnti; // my RNTI
+    info.m_dci.m_numSym = assignedSymbols; // the number of symbols required to tx the packet
+    info.m_dci.m_symStart = symStart; // index of the first available symbol
+    info.m_dci.m_mcs = mcs;
+    info.m_dci.m_tbSize = assignedBits / 8; // the TB size in bytes
+    info.m_slotType = mmwave::SlotAllocInfo::DATA; // the TB carries data
+
+    allocationInfo.push_back (info);
+
+    // fire the scheduling trace
+    SlSchedulingCallback traceInfo;
+    traceInfo.frame = timingInfo.m_frameNum;
+    traceInfo.subframe = timingInfo.m_sfNum;
+    traceInfo.slotNum = timingInfo.m_slotNum;
+    traceInfo.symStart = symStart;
+    traceInfo.numSym = assignedSymbols;
+    traceInfo.mcs = mcs;
+    traceInfo.tbSize = assignedBits / 8;
+    traceInfo.txRnti = m_rnti;
+    traceInfo.rxRnti = rntiDest;
+    m_schedulingTrace (traceInfo);
+
+    // update the entry in the m_bufferStatusReportMap (delete it if no
+    // further resources are needed)
+    UpdateBufferStatusReport (bsrIt->second.lcid, assignedBits / 8);
+
+    // update the number of available bits
+    availableSymbols -= assignedSymbols;
+
+    // update the availableSymbolsPerLc (if needed)
+    if (availableSymbols < availableSymbolsPerLc)
+    {
+      availableSymbolsPerLc = availableSymbols;
+    }
+
+    // update index to the next available symbol
+    symStart = symStart + assignedSymbols + 1;
+
+    // update the iterator
+    bsrIt++;
+    // if the iterator reached the end of the map, start again
+    if (bsrIt == m_bufferStatusReportMap.end ())
+    {
+      bsrIt = m_bufferStatusReportMap.begin ();
+    }
+    //}
+    // else
+    // {
+    //   // the remaining available bits are not enough to transmit the next
+    //   // packet in the buffer
+    //   NS_LOG_INFO ("Available bits " << m_amc->GetTbSizeFromMcsSymbols(mcs, availableSymbols) << " next pdu size " << pduInfo.pdu->GetSize () * 8);
+    //   break;
+    // }
+
+    // notify the RLC
+    LteMacSapUser* macSapUser = m_lcidToMacSap.find (bsrIt->second.lcid)->second;
+    LteMacSapUser::TxOpportunityParameters params;
+    params.bytes = assignedBits / 8;  // the number of bytes to transmit
+    params.layer = 0;  // the layer of transmission (MIMO) (NOT USED)
+    params.harqId = 0; // the HARQ ID (NOT USED)
+    params.componentCarrierId = 0; // the component carrier id (NOT USED)
+    params.rnti = rntiDest; // the C-RNTI identifying the destination
+    params.lcid = bsrIt->second.lcid; // the logical channel id
+    macSapUser->NotifyTxOpportunity (params);
+  }
+  return allocationInfo;
+}
+
+void
+MmWaveSidelinkMac::UpdateBufferStatusReport (uint8_t lcid, uint32_t assignedBytes)
+{
+  // find the corresponding entry in the map
+  auto bsrIt = m_bufferStatusReportMap.find (lcid);
+
+  NS_ASSERT_MSG (bsrIt != m_bufferStatusReportMap.end (), "m_bufferStatusReportMap does not contain the required entry");
+
+  // NOTE RLC transmits PDUs in the following priority order:
+  // 1) STATUS PDUs
+  // 2) retransmissions
+  // 3) regular PDUs
+  if (bsrIt->second.statusPduSize > assignedBytes)
+  {
+    bsrIt->second.statusPduSize -= assignedBytes;
+    assignedBytes = 0;
+  }
+  else
+  {
+    assignedBytes -= bsrIt->second.statusPduSize;
+    bsrIt->second.statusPduSize = 0;
+  }
+
+  if (bsrIt->second.retxQueueSize > assignedBytes)
+  {
+    bsrIt->second.retxQueueSize -= assignedBytes;
+    assignedBytes = 0;
+  }
+  else
+  {
+    assignedBytes -= bsrIt->second.retxQueueSize;
+    bsrIt->second.retxQueueSize = 0;
+  }
+
+  if (bsrIt->second.txQueueSize > assignedBytes)
+  {
+    bsrIt->second.txQueueSize -= assignedBytes;
+    assignedBytes = 0;
+  }
+  else
+  {
+    assignedBytes -= bsrIt->second.txQueueSize;
+    bsrIt->second.txQueueSize = 0;
+  }
+
+  // delete the entry in the map if no further resources are needed
+  if (bsrIt->second.statusPduSize == 0 && bsrIt->second.retxQueueSize == 0  && bsrIt->second.txQueueSize == 0)
+  {
+    m_bufferStatusReportMap.erase (bsrIt);
+  }
+
+  return;
+}
+
+void
+MmWaveSidelinkMac::DoReportBufferStatus (LteMacSapProvider::ReportBufferStatusParameters params)
+{
+  NS_LOG_FUNCTION (this);
+
+  auto bsrIt = m_bufferStatusReportMap.find (params.lcid);
+  if (bsrIt != m_bufferStatusReportMap.end ())
+  {
+    bsrIt->second = params;
+  }
+  else
+  {
+    m_bufferStatusReportMap.insert (std::make_pair (params.lcid, params));
+  }
 }
 
 void

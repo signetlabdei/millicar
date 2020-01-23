@@ -45,7 +45,8 @@ struct SlSchedulingCallback
 class MmWaveSidelinkMac : public Object
 {
 
-friend class MacSidelinkMemberPhySapUser;
+  friend class MacSidelinkMemberPhySapUser;
+  friend class RlcSidelinkMemberMacSapProvider;
 
 public:
   /**
@@ -165,6 +166,13 @@ private:
   */
   void DoSlSinrReport (const SpectrumValue& sinr, uint16_t rnti, uint8_t numSym, uint32_t tbSize);
 
+  /**
+  * \brief Implements RlcSidelinkMemberMacSapProvider::ReportBufferStatus,
+  *        reports the RLC buffer status to the MAC
+  * \param params the buffer status report
+  */
+  void DoReportBufferStatus (LteMacSapProvider::ReportBufferStatusParameters params);
+
   /////////////////////////////////////////////////////////////////////////////
 
   /**
@@ -172,6 +180,23 @@ private:
   * \params rnti the RNTI that identifies the device we want to communicate with
   */
   uint8_t GetMcs (uint16_t rnti);
+
+  /**
+  * \brief Decides how to allocate the available resources to the active
+  *        logical channels
+  * \params timingInfo the SfnSf object containing the frame, subframe and slot
+  *         index
+  * \returns vector of SlotAllocInfo objects containing the scheduling information
+  */
+  std::list<mmwave::SlotAllocInfo> ScheduleResources (mmwave::SfnSf timingInfo);
+
+  /**
+  * \brief Updates the BSR corresponding to the specified LC by subtracting the
+  *        assigned grant
+  * \params lcid the logical channel ID
+  * \params assignedBytes the assigned grant in bytes
+  */
+  void UpdateBufferStatusReport (uint8_t lcid, uint32_t assignedBytes);
 
   MmWaveSidelinkPhySapUser* m_phySapUser; //!< Sidelink PHY SAP user
   MmWaveSidelinkPhySapProvider* m_phySapProvider; //!< Sidelink PHY SAP provider
@@ -183,9 +208,11 @@ private:
   uint8_t m_mcs; //!< the MCS used to transmit the packets if AMC is not used
   uint16_t m_rnti; //!< radio network temporary identifier
   std::vector<uint16_t> m_sfAllocInfo; //!< defines the subframe allocation, m_sfAllocInfo[i] = RNTI of the device scheduled for slot i
+  // TODO to be removed
   std::list< LteMacSapProvider::TransmitPduParameters > m_txBuffer; //!< buffer containing the packets to be sent
   std::map<uint16_t, std::vector<int>> m_slCqiReported; //!< map containing the <RNTI, CQI> pairs
-  Callback <void, Ptr<Packet> > m_forwardUpCallback; ///< upward callback to the NetDevice
+  Callback<void, Ptr<Packet> > m_forwardUpCallback; //!< upward callback to the NetDevice
+  std::map<uint8_t, LteMacSapProvider::ReportBufferStatusParameters> m_bufferStatusReportMap; //!< map containing the <LCID, buffer status in bits> pairs
 
   // trace sources
   TracedCallback<SlSchedulingCallback> m_schedulingTrace; //!< trace source returning information regarding the scheduling
