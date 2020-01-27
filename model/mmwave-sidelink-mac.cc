@@ -151,15 +151,17 @@ MmWaveSidelinkMac::DoSlotIndication (mmwave::SfnSf timingInfo)
     // TODO inform phy about the allocatio ?
 
     // TODO associate slot alloc info and pdu
-    NS_LOG_UNCOND (allocationInfo.size () << " " <<  m_txBuffer.size ());
     NS_ASSERT_MSG (allocationInfo.size () == m_txBuffer.size (), "A LC has not used the tx opportunity");
-    for (auto it = m_txBuffer.begin (); it != m_txBuffer.end (); it++)
+    auto it = m_txBuffer.begin();
+    while (it != m_txBuffer.end ())
     {
       Ptr<PacketBurst> pb = CreateObject<PacketBurst> ();
       pb->AddPacket (it->pdu);
+      NS_LOG_DEBUG("allocationInfo.size () = " << allocationInfo.size () << " - m_txBuffer.size () =  " << m_txBuffer.size ());
       m_phySapProvider->AddTransportBlock (pb, allocationInfo.front ());
       allocationInfo.pop_front ();
       m_txBuffer.pop_front ();
+      it = m_txBuffer.begin();
       // TODO add assert if sizes are different
     }
   }
@@ -258,7 +260,7 @@ MmWaveSidelinkMac::ScheduleResources (mmwave::SfnSf timingInfo)
     // further resources are needed)
     UpdateBufferStatusReport (bsrIt->second.lcid, assignedBits / 8);
 
-    // update the number of available bits
+    // update the number of available symbols
     availableSymbols -= assignedSymbols;
 
     // update the availableSymbolsPerLc (if needed)
@@ -269,6 +271,17 @@ MmWaveSidelinkMac::ScheduleResources (mmwave::SfnSf timingInfo)
 
     // update index to the next available symbol
     symStart = symStart + assignedSymbols + 1;
+
+    // notify the RLC
+    LteMacSapUser* macSapUser = m_lcidToMacSap.find (bsrIt->second.lcid)->second;
+    LteMacSapUser::TxOpportunityParameters params;
+    params.bytes = assignedBits / 8;  // the number of bytes to transmit
+    params.layer = 0;  // the layer of transmission (MIMO) (NOT USED)
+    params.harqId = 0; // the HARQ ID (NOT USED)
+    params.componentCarrierId = 0; // the component carrier id (NOT USED)
+    params.rnti = rntiDest; // the C-RNTI identifying the destination
+    params.lcid = bsrIt->second.lcid; // the logical channel id
+    macSapUser->NotifyTxOpportunity (params);
 
     // update the iterator
     bsrIt++;
@@ -286,16 +299,6 @@ MmWaveSidelinkMac::ScheduleResources (mmwave::SfnSf timingInfo)
     //   break;
     // }
 
-    // notify the RLC
-    LteMacSapUser* macSapUser = m_lcidToMacSap.find (bsrIt->second.lcid)->second;
-    LteMacSapUser::TxOpportunityParameters params;
-    params.bytes = assignedBits / 8;  // the number of bytes to transmit
-    params.layer = 0;  // the layer of transmission (MIMO) (NOT USED)
-    params.harqId = 0; // the HARQ ID (NOT USED)
-    params.componentCarrierId = 0; // the component carrier id (NOT USED)
-    params.rnti = rntiDest; // the C-RNTI identifying the destination
-    params.lcid = bsrIt->second.lcid; // the logical channel id
-    macSapUser->NotifyTxOpportunity (params);
   }
   return allocationInfo;
 }

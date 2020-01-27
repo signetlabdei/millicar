@@ -23,6 +23,7 @@
 #include <ns3/ipv6-header.h>
 #include <ns3/ipv6-l3-protocol.h>
 #include "ns3/epc-tft.h"
+#include "ns3/lte-rlc-um.h"
 #include "mmwave-sidelink-mac.h"
 #include "mmwave-vehicular-net-device.h"
 
@@ -265,7 +266,7 @@ MmWaveVehicularNetDevice::ActivateBearer(const uint8_t bearerId, const uint16_t 
   m_tftClassifier.Add(tft, bearerId);
 
   // Create RLC instance with specific RNTI and LCID
-  Ptr<LteRlc> rlc = CreateObject<LteRlcAm> ();
+  Ptr<LteRlc> rlc = CreateObject<LteRlcUm> ();
   rlc->SetLteMacSapProvider (m_mac->GetMacSapProvider());
   rlc->SetRnti (destRnti); // this is the rnti of the destination
   rlc->SetLcId (lcid);
