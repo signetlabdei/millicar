@@ -277,7 +277,7 @@ MmWaveVehicularNetDevice::ActivateBearer(const uint8_t bearerId, const uint16_t 
   m_bid2lcid.insert(std::make_pair(bearerId, lcid));
 
   NS_ASSERT_MSG(m_bearerToInfoMap.find (bearerId) == m_bearerToInfoMap.end (),
-    "There's another bearer associated to this bearerId: " << bearerId);
+    "There's another bearer associated to this bearerId: " << uint32_t(bearerId));
 
   EpcTft::PacketFilter slFilter;
   slFilter.remoteAddress= Ipv4Address::ConvertFrom(dest);
@@ -322,8 +322,7 @@ void
 MmWaveVehicularNetDevice::Receive (Ptr<Packet> p)
 {
   NS_LOG_FUNCTION (this << p);
-  NS_LOG_DEBUG ("Received packet at: " << Simulator::Now().GetSeconds() << "s");
-
+  NS_LOG_UNCOND ("Received packet at: " << Simulator::Now().GetSeconds() << "s");
   uint8_t ipType;
 
   p->CopyData (&ipType, 1);

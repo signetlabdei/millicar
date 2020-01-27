@@ -19,6 +19,7 @@
 #include "ns3/mmwave-phy-mac-common.h"
 #include "ns3/mmwave-amc.h"
 #include "ns3/lte-mac-sap.h"
+#include "ns3/lte-radio-bearer-tag.h"
 #include "mmwave-sidelink-mac.h"
 #include "ns3/log.h"
 #include "ns3/uinteger.h"
@@ -378,7 +379,9 @@ MmWaveSidelinkMac::DoTransmitPdu (LteMacSapProvider::TransmitPduParameters param
 {
   NS_LOG_FUNCTION (this);
 
-  // insert the packet at the end of the buffer
+  LteRadioBearerTag tag (params.rnti, params.lcid, params.layer);
+  params.pdu->AddPacketTag (tag);
+  //insert the packet at the end of the buffer
   m_txBuffer.push_back (params);
 }
 
@@ -386,13 +389,17 @@ void
 MmWaveSidelinkMac::DoReceivePhyPdu (Ptr<Packet> p)
 {
   NS_LOG_FUNCTION(this << p);
-
   LteMacSapUser::ReceivePduParameters rxPduParams;
+
+  LteRadioBearerTag tag;
+  p->PeekPacketTag (tag);
 
   // TODO pick the right lcid associated to this communication. As discussed, this can be done via a dedicated SidelinkBearerTag
   rxPduParams.p = p;
-  rxPduParams.rnti = m_rnti;
-  rxPduParams.lcid = 1;
+  rxPduParams.rnti = tag.GetRnti ();
+  rxPduParams.lcid = tag.GetLcid ();
+
+  NS_LOG_UNCOND(this << " " << m_rnti << " RNTI = " << (uint32_t)rxPduParams.rnti << "  LCID = " << (uint32_t)rxPduParams.lcid);
 
   LteMacSapUser* macSapUser = m_lcidToMacSap.find(rxPduParams.lcid)->second;
   macSapUser->ReceivePdu (rxPduParams);

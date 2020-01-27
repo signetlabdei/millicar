@@ -309,6 +309,7 @@ MmWaveVehicularHelper::PairDevices (NetDeviceContainer devices)
 
         di->ActivateBearer(bearerId, dj->GetMac ()->GetRnti (), djAddr);
         dj->ActivateBearer(bearerId, di->GetMac ()->GetRnti (), diAddr);
+        bearerId = bearerIdCounter++;
       }
 
     }
