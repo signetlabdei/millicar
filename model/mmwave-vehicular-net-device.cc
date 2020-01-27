@@ -24,6 +24,7 @@
 #include <ns3/ipv6-l3-protocol.h>
 #include "ns3/epc-tft.h"
 #include "ns3/lte-rlc-um.h"
+#include "ns3/lte-rlc-tm.h"
 #include "mmwave-sidelink-mac.h"
 #include "mmwave-vehicular-net-device.h"
 
@@ -60,6 +61,11 @@ TypeId MmWaveVehicularNetDevice::GetTypeId ()
                    MakeUintegerAccessor (&MmWaveVehicularNetDevice::SetMtu,
                                          &MmWaveVehicularNetDevice::GetMtu),
                    MakeUintegerChecker<uint16_t> ())
+     .AddAttribute ("RlcType",
+                  "Set the RLC mode to use (AM not supported for now)",
+                   StringValue ("LteRlcTm"),
+                   MakeStringAccessor (&MmWaveVehicularNetDevice::m_rlcType),
+                   MakeStringChecker ())
   ;
 
   return tid;
@@ -245,6 +251,22 @@ MmWaveVehicularNetDevice::GetMtu (void) const
   return m_mtu;
 }
 
+TypeId
+MmWaveVehicularNetDevice::GetRlcType (std::string rlcType)
+{
+  if (rlcType == "LteRlcSm")
+  {
+    return LteRlcSm::GetTypeId ();
+  }
+  else if (rlcType == "LteRlcUm")
+  {
+    return LteRlcUm::GetTypeId ();
+  }
+
+  return LteRlcTm::GetTypeId ();
+
+}
+
 void
 MmWaveVehicularNetDevice::ActivateBearer(const uint8_t bearerId, const uint16_t destRnti, const Address& dest)
 {
@@ -266,7 +288,10 @@ MmWaveVehicularNetDevice::ActivateBearer(const uint8_t bearerId, const uint16_t 
   m_tftClassifier.Add(tft, bearerId);
 
   // Create RLC instance with specific RNTI and LCID
-  Ptr<LteRlc> rlc = CreateObject<LteRlcUm> ();
+  ObjectFactory rlcObjectFactory;
+  rlcObjectFactory.SetTypeId (GetRlcType(m_rlcType));
+  Ptr<LteRlc> rlc = rlcObjectFactory.Create ()->GetObject<LteRlc> ();
+
   rlc->SetLteMacSapProvider (m_mac->GetMacSapProvider());
   rlc->SetRnti (destRnti); // this is the rnti of the destination
   rlc->SetLcId (lcid);

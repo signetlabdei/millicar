@@ -157,6 +157,11 @@ public:
   virtual uint16_t GetMtu (void) const;
 
   /**
+   * \brief Returns valid LteRlc TypeId based on the parameter passed
+   */
+  TypeId GetRlcType (std::string rlcType);
+
+  /**
    * \brief Packet forwarding to the MAC layer by calling DoTransmitPdu
    * \param p packet to be used to fire the callbacks
    */
@@ -186,6 +191,7 @@ private:
   bool m_linkUp; //!< boolean that indicates if the link is UP (true) or DOWN (false)
   Ptr<Node> m_node; //!< pointer to the node associated to the NetDevice
   EpcTftClassifier m_tftClassifier;
+  std::string m_rlcType;
 
   /**
    * Return the LCID associated to a certain bearer
