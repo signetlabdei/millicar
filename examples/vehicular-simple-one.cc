@@ -5,6 +5,7 @@
 #include "ns3/mmwave-vehicular-helper.h"
 #include "ns3/constant-position-mobility-model.h"
 #include "ns3/mobility-module.h"
+#include "ns3/config.h"
 #include "ns3/isotropic-antenna-model.h"
 #include "ns3/spectrum-helper.h"
 #include "ns3/mmwave-spectrum-value-helper.h"
@@ -25,13 +26,18 @@ Time g_lastReceived; // timestamp of the last received packet
 
 static void Tx (Ptr<const Packet> p)
 {
- NS_LOG_DEBUG ("TX event");
+ NS_LOG_UNCOND ("TX event");
  g_txPackets++;
 }
 
-static void Rx (Ptr<const Packet> p)
+static void Rx (Ptr<OutputStreamWrapper> stream, Ptr<const Packet> p)
 {
  g_rxPackets++;
+ SeqTsHeader header;
+
+ p->PeekHeader(header);
+
+ *stream->GetStream () << Simulator::Now ().GetSeconds () << "\t" << p->GetSize() << "\t" << header.GetSeq() << "\t" << header.GetTs().GetSeconds() << std::endl;
 
  if (g_rxPackets > 1)
  {
@@ -51,11 +57,28 @@ int main (int argc, char *argv[])
   // and they communicate using a wireless channel at 60 GHz.
 
   uint32_t packetSize = 1024; // bytes
-  Time startTime = Seconds (1.5);
-  Time endTime = Seconds (30.0);
-  uint8_t mcs = 12;
+  double startSim = 1.5;
+  double endSim = 30.0;
+  double xDistanceNode2 = 20;
+  double yDistanceNode2 = 0;
+  double xSpeedNode2 = 20; // in m/s
+  uint8_t mcs = 24;
+  bool useAmc = false;
 
-  Config::SetDefault ("ns3::MmWaveSidelinkMac::UseAmc", BooleanValue (false));
+  CommandLine cmd;
+
+  cmd.AddValue ("endSim", "duration of the application", endSim);
+  cmd.AddValue ("useAmc", "enable the use of AMC, false by default", useAmc);
+  cmd.AddValue ("mcs", "set different mcs", mcs);
+  cmd.AddValue ("xDistanceNode2", "distance from Node 1, x-coord", xDistanceNode2);
+  cmd.AddValue ("yDistanceNode2", "distance from Node 1, y-coord", yDistanceNode2);
+  cmd.AddValue ("xSpeedNode2", "speed at which Node 2 is moving in the x axis", xSpeedNode2);
+  cmd.Parse (argc, argv);
+
+  Time startTime = Seconds (startSim);
+  Time endTime = Seconds (endSim);
+
+  Config::SetDefault ("ns3::MmWaveSidelinkMac::UseAmc", BooleanValue (useAmc));
   Config::SetDefault ("ns3::MmWaveSidelinkMac::Mcs", UintegerValue (mcs));
   Config::SetDefault ("ns3::MmWavePhyMacCommon::CenterFreq", DoubleValue (60.0e9));
   Config::SetDefault ("ns3::MmWaveVehicularPropagationLossModel::Frequency", DoubleValue (60.0e9));
@@ -77,8 +100,8 @@ int main (int argc, char *argv[])
   n.Get (0)->GetObject<MobilityModel> ()->SetPosition (Vector (0,0,0));
   n.Get (0)->GetObject<ConstantVelocityMobilityModel> ()->SetVelocity (Vector (20, 0, 0));
 
-  n.Get (1)->GetObject<MobilityModel> ()->SetPosition (Vector (250,0,0));
-  n.Get (1)->GetObject<ConstantVelocityMobilityModel> ()->SetVelocity (Vector (20, 0, 0));
+  n.Get (1)->GetObject<MobilityModel> ()->SetPosition (Vector (xDistanceNode2, yDistanceNode2, 0));
+  n.Get (1)->GetObject<ConstantVelocityMobilityModel> ()->SetVelocity (Vector (xSpeedNode2, 0, 0));
 
   // create and configure the helper
   Ptr<MmWaveVehicularHelper> helper = CreateObject<MmWaveVehicularHelper> ();
@@ -117,9 +140,17 @@ int main (int argc, char *argv[])
   UdpServerHelper server (port);
   ApplicationContainer apps = server.Install (n.Get (1));
   apps.Start (Seconds (1.0));
-  apps.Stop (Seconds(34.0));
+  apps.Stop (Seconds(endSim-1));
 
-  apps.Get(0)->TraceConnectWithoutContext ("Rx", MakeCallback (&Rx));
+  AsciiTraceHelper asciiTraceHelper;
+  Ptr<OutputStreamWrapper> stream = asciiTraceHelper.CreateFileStream ("stats.txt");
+  apps.Get(0)->TraceConnectWithoutContext ("Rx", MakeBoundCallback (&Rx, stream));
+
+  // Config::Connect ("/NodeList/*/DeviceList/*/$ns3::MmWaveVehicularNetDevice/SidelinkRadioBearerMap/*/LtePdcp/RxPDU",
+  //                  MakeCallback (&RxPdu));
+
+  // ns3::Config::MatchContainer container = ns3::Config::LookupMatches("/NodeList/*/DeviceList/*/$ns3::MmWaveVehicularNetDevice/1/SidelinkRadioBearerMap/*");
+  // std::cout << container.GetN() << '\n';
 
   //
   // Create a UdpClient application to send UDP datagrams from node zero to
@@ -129,10 +160,10 @@ int main (int argc, char *argv[])
   Ptr<mmwave::MmWaveAmc> m_amc = CreateObject <mmwave::MmWaveAmc> (helper->GetConfigurationParameters());
   double availableRate = m_amc->GetTbSizeFromMcsSymbols(mcs, 14) / 0.001; // bps
 
-  uint32_t maxPacketCount = 500000;
+  uint32_t maxPacketCount = 600000;
   packetSize = m_amc->GetTbSizeFromMcsSymbols(mcs, 14) / 8 - 28 - 2;
   Time interPacketInterval =  Seconds(double((packetSize * 8) / availableRate));
-  UdpEchoClientHelper client (n.Get (1)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal (), port);
+  UdpClientHelper client (n.Get (1)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal (), port);
   client.SetAttribute ("MaxPackets", UintegerValue (maxPacketCount));
   client.SetAttribute ("Interval", TimeValue (interPacketInterval));
   client.SetAttribute ("PacketSize", UintegerValue (packetSize));
@@ -142,16 +173,24 @@ int main (int argc, char *argv[])
 
   apps.Get(0)->TraceConnectWithoutContext ("Tx", MakeCallback (&Tx));
 
-  Simulator::Stop (Seconds(34.0));
+  Simulator::Stop (endTime);
   Simulator::Run ();
   Simulator::Destroy ();
 
-  std::cout << "----------- MCS :\t\t" << uint32_t(mcs) << " -----------" << std::endl;
+  std::cout << "----------- Parameters ---------- " << std::endl;
+  std::cout << "endSim:\t" << endSim << std::endl;
+  std::cout << "useAmc:\t" << useAmc << std::endl;
+  std::cout << "xDistanceNode2:\t" << xDistanceNode2 << std::endl;
+  std::cout << "yDistanceNode2:\t" << yDistanceNode2 << std::endl;
+  std::cout << "xSpeedNode2:\t" << xSpeedNode2 << " m/s" << std::endl;
+  std::cout << "mcs:\t" << uint32_t(mcs) << std::endl;
+
+  std::cout << "----------- Statistics -----------" << std::endl;
   std::cout << "Available Rate:\t\t" << availableRate/1e6 << " Mbps" << std::endl;
   std::cout << "Packets size:\t\t" << packetSize << " Bytes" << std::endl;
-  std::cout << "Packets transmitted:\t" << g_txPackets << std::endl;
+  //std::cout << "Packets transmitted:\t" << g_txPackets << std::endl;
   std::cout << "Packets received:\t" << g_rxPackets << std::endl;
-  std::cout << "Average Throughput:\t" << (double(g_rxPackets)*double(packetSize+28)*8/double( g_lastReceived.GetSeconds() - g_firstReceived.GetSeconds()))/1e6 << " Mbps" << std::endl;
+  std::cout << "Average Throughput:\t" << (double(g_rxPackets)*(double(packetSize+28)*8-28-2)/double( g_lastReceived.GetSeconds() - g_firstReceived.GetSeconds()))/1e6 << " Mbps" << std::endl;
 
   return 0;
 }

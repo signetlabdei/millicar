@@ -12,7 +12,7 @@
 #include "ns3/internet-module.h"
 #include "ns3/core-module.h"
 
-NS_LOG_COMPONENT_DEFINE ("VehicularSimpleTwo");
+NS_LOG_COMPONENT_DEFINE ("VehicularSimpleFour");
 
 using namespace ns3;
 using namespace mmwave_vehicular;
@@ -37,6 +37,15 @@ int main (int argc, char *argv[])
   CommandLine cmd;
   cmd.AddValue ("vehicleSpeed", "The speed of the vehicle", speed);
   cmd.Parse (argc, argv);
+
+  LogComponentEnableAll (LOG_PREFIX_TIME);
+  LogComponentEnableAll (LOG_PREFIX_FUNC);
+  LogComponentEnableAll (LOG_PREFIX_NODE);
+  //LogComponentEnable ("MmWaveVehicularNetDevice", LOG_LEVEL_LOGIC);
+  //LogComponentEnable ("MmWaveVehicularHelper", LOG_LEVEL_LOGIC);
+  // LogComponentEnable ("EpcTft", LOG_LEVEL_LOGIC);
+  // LogComponentEnable ("EpcTftClassifier", LOG_LEVEL_LOGIC);
+
 
   Config::SetDefault ("ns3::MmWaveSidelinkMac::UseAmc", BooleanValue (false));
   Config::SetDefault ("ns3::MmWaveSidelinkMac::Mcs", UintegerValue (mcs));
@@ -78,13 +87,13 @@ int main (int argc, char *argv[])
 
   helper->PairDevices(devs);
 
-  Ipv4StaticRoutingHelper ipv4RoutingHelper;
-
-  Ptr<Ipv4StaticRouting> staticRouting = ipv4RoutingHelper.GetStaticRouting (group.Get (0)->GetObject<Ipv4> ());
-  staticRouting->SetDefaultRoute (group.Get (1)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal () , 2 );
-
-  staticRouting = ipv4RoutingHelper.GetStaticRouting (group.Get (2)->GetObject<Ipv4> ());
-  staticRouting->SetDefaultRoute (group.Get (1)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal () , 2 );
+  // Ipv4StaticRoutingHelper ipv4RoutingHelper;
+  //
+  // Ptr<Ipv4StaticRouting> staticRouting = ipv4RoutingHelper.GetStaticRouting (group.Get (0)->GetObject<Ipv4> ());
+  // staticRouting->SetDefaultRoute (group.Get (1)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal () , 2 );
+  //
+  // staticRouting = ipv4RoutingHelper.GetStaticRouting (group.Get (2)->GetObject<Ipv4> ());
+  // staticRouting->SetDefaultRoute (group.Get (1)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal () , 2 );
 
   NS_LOG_DEBUG("IPv4 Address node 0: " << group.Get (0)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal ());
   NS_LOG_DEBUG("IPv4 Address node 1: " << group.Get (1)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal ());
@@ -94,7 +103,7 @@ int main (int argc, char *argv[])
   double availableRate = m_amc->GetTbSizeFromMcsSymbols(mcs, 14) / 0.001; // bps
   uint16_t port_1 = 4000;  // well-known echo port number
   uint16_t port_2 = 4001;
-  uint32_t maxPacketCount = 1;
+  uint32_t maxPacketCount = 10;
   packetSize = m_amc->GetTbSizeFromMcsSymbols(mcs, 14) / 8 - 28 - 2;
   Time interPacketInterval =  Seconds(double((packetSize * 8) / availableRate));
 
@@ -125,6 +134,8 @@ int main (int argc, char *argv[])
   apps = client2.Install (group.Get (2));
   apps.Start (startTime);
   apps.Stop (endTime);
+
+  Ipv4GlobalRoutingHelper::PopulateRoutingTables ();
 
   Simulator::Stop (Seconds(14.0));
   Simulator::Run ();

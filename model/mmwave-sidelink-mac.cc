@@ -378,7 +378,7 @@ void
 MmWaveSidelinkMac::DoTransmitPdu (LteMacSapProvider::TransmitPduParameters params)
 {
   NS_LOG_FUNCTION (this);
-
+  //NS_LOG_UNCOND("RNTI dst: " << params.rnti << " LCID:" << (uint32_t)params.lcid);
   LteRadioBearerTag tag (params.rnti, params.lcid, params.layer);
   params.pdu->AddPacketTag (tag);
   //insert the packet at the end of the buffer
@@ -398,8 +398,6 @@ MmWaveSidelinkMac::DoReceivePhyPdu (Ptr<Packet> p)
   rxPduParams.p = p;
   rxPduParams.rnti = tag.GetRnti ();
   rxPduParams.lcid = tag.GetLcid ();
-
-  NS_LOG_UNCOND(this << " " << m_rnti << " RNTI = " << (uint32_t)rxPduParams.rnti << "  LCID = " << (uint32_t)rxPduParams.lcid);
 
   LteMacSapUser* macSapUser = m_lcidToMacSap.find(rxPduParams.lcid)->second;
   macSapUser->ReceivePdu (rxPduParams);

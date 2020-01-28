@@ -274,11 +274,10 @@ MmWaveVehicularHelper::PairDevices (NetDeviceContainer devices)
     NS_LOG_DEBUG ("slot " << i << " assigned to rnti " << pattern.at (i));
   }
 
-  uint8_t bearerIdCounter = 1;
+  uint8_t bearerId = 1;
 
   for (NetDeviceContainer::Iterator i = devices.Begin (); i != devices.End (); ++i)
     {
-      uint8_t bearerId = bearerIdCounter++;
 
       Ptr<MmWaveVehicularNetDevice> di = DynamicCast<MmWaveVehicularNetDevice> (*i);
       Ptr<Node> iNode = di->GetNode ();
@@ -309,8 +308,9 @@ MmWaveVehicularHelper::PairDevices (NetDeviceContainer devices)
 
         di->ActivateBearer(bearerId, dj->GetMac ()->GetRnti (), djAddr);
         dj->ActivateBearer(bearerId, di->GetMac ()->GetRnti (), diAddr);
-        bearerId = bearerIdCounter++;
+        bearerId++;
       }
+
 
     }
 }

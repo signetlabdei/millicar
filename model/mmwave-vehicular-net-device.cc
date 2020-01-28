@@ -18,6 +18,7 @@
 
 #include <ns3/uinteger.h>
 #include <ns3/log.h>
+#include <ns3/object-map.h>
 #include <ns3/ipv4-header.h>
 #include <ns3/ipv4-l3-protocol.h>
 #include <ns3/ipv6-header.h>
@@ -25,6 +26,7 @@
 #include "ns3/epc-tft.h"
 #include "ns3/lte-rlc-um.h"
 #include "ns3/lte-rlc-tm.h"
+#include "ns3/lte-radio-bearer-tag.h"
 #include "mmwave-sidelink-mac.h"
 #include "mmwave-vehicular-net-device.h"
 
@@ -56,6 +58,10 @@ TypeId MmWaveVehicularNetDevice::GetTypeId ()
     tid =
     TypeId ("ns3::MmWaveVehicularNetDevice")
     .SetParent<NetDevice> ()
+    .AddAttribute ("SidelinkRadioBearerMap", "List of SidelinkRadioBearerMap by BID",
+                   ObjectMapValue (),
+                   MakeObjectMapAccessor (&MmWaveVehicularNetDevice::m_bearerToInfoMap),
+                   MakeObjectMapChecker<SidelinkRadioBearerInfo> ())
     .AddAttribute ("Mtu", "The MAC-level Maximum Transmission Unit",
                    UintegerValue (30000),
                    MakeUintegerAccessor (&MmWaveVehicularNetDevice::SetMtu,
@@ -282,6 +288,17 @@ MmWaveVehicularNetDevice::ActivateBearer(const uint8_t bearerId, const uint16_t 
   EpcTft::PacketFilter slFilter;
   slFilter.remoteAddress= Ipv4Address::ConvertFrom(dest);
 
+  Ptr<Node> node = GetNode ();
+  Ptr<Ipv4> nodeIpv4 = node->GetObject<Ipv4> ();
+  int32_t interface =  nodeIpv4->GetInterfaceForDevice (this);
+  Ipv4Address src = nodeIpv4->GetAddress (interface, 0).GetLocal ();
+  slFilter.localAddress= Ipv4Address::ConvertFrom(src);
+  //slFilter.direction= EpcTft::DOWNLINK;
+  slFilter.remoteMask= Ipv4Mask("255.255.255.255");
+  slFilter.localMask= Ipv4Mask("255.255.255.255");
+
+  NS_LOG_DEBUG(this << " Add filter for " << Ipv4Address::ConvertFrom(dest));
+
   Ptr<EpcTft> tft = Create<EpcTft> (); // Create a new tft
   tft->Add (slFilter); // Add the packet filter
 
@@ -314,6 +331,8 @@ MmWaveVehicularNetDevice::ActivateBearer(const uint8_t bearerId, const uint16_t 
   rbInfo->m_pdcp = pdcp;
   rbInfo->m_rnti = destRnti;
 
+  NS_LOG_DEBUG(this << " MmWaveVehicularNetDevice::ActivateBearer() bid: " << (uint32_t)bearerId << " rnti: " << destRnti);
+
   // insert the tuple <lcid, pdcpSapProvider> in the map of this NetDevice, so that we are able to associate it to them later
   m_bearerToInfoMap.insert (std::make_pair (bearerId, rbInfo));
 }
@@ -322,7 +341,7 @@ void
 MmWaveVehicularNetDevice::Receive (Ptr<Packet> p)
 {
   NS_LOG_FUNCTION (this << p);
-  NS_LOG_UNCOND ("Received packet at: " << Simulator::Now().GetSeconds() << "s");
+  NS_LOG_DEBUG ("Received packet at: " << Simulator::Now().GetSeconds() << "s");
   uint8_t ipType;
 
   p->CopyData (&ipType, 1);
@@ -362,8 +381,11 @@ MmWaveVehicularNetDevice::Send (Ptr<Packet> packet, const Address& dest, uint16_
   params.rnti = bearerInfo->m_rnti;
   params.lcid = lcid;
 
-  NS_LOG_DEBUG("SRC RNTI: " << m_mac->GetRnti() << " - BID: " << uint32_t(bid) << " - LCID: " << uint32_t(lcid));
+  NS_LOG_DEBUG(this << " MmWaveVehicularNetDevice::Send() bid " << (uint32_t)bid << " lcid " << (uint32_t)lcid << " rnti " << bearerInfo->m_rnti);
 
+  packet->RemoveAllPacketTags (); // remove all tags in case there is any
+
+  params.pdcpSdu = packet;
   bearerInfo->m_pdcp->GetLtePdcpSapProvider()->TransmitPdcpSdu (params);
 
   return true;
