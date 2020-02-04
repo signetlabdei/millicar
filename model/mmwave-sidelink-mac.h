@@ -195,8 +195,9 @@ private:
   *        assigned grant
   * \params lcid the logical channel ID
   * \params assignedBytes the assigned grant in bytes
+  * \returns updated iterator to the Buffer Status Report map
   */
-  void UpdateBufferStatusReport (uint8_t lcid, uint32_t assignedBytes);
+  std::map<uint8_t, LteMacSapProvider::ReportBufferStatusParameters>::iterator UpdateBufferStatusReport (uint8_t lcid, uint32_t assignedBytes);
 
   MmWaveSidelinkPhySapUser* m_phySapUser; //!< Sidelink PHY SAP user
   MmWaveSidelinkPhySapProvider* m_phySapProvider; //!< Sidelink PHY SAP provider

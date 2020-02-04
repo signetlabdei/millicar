@@ -144,7 +144,7 @@ MmWaveSidelinkMac::DoSlotIndication (mmwave::SfnSf timingInfo)
   NS_LOG_FUNCTION (this);
 
   NS_ASSERT_MSG (m_rnti != 0, "First set the RNTI");
-  NS_ASSERT_MSG (!m_sfAllocInfo.empty (), "First set the scheduling patter");
+  NS_ASSERT_MSG (!m_sfAllocInfo.empty (), "First set the scheduling pattern");
   if(m_sfAllocInfo [timingInfo.m_slotNum] == m_rnti) // check if this slot is associated to the user who required it
   {
     std::list<mmwave::SlotAllocInfo> allocationInfo = ScheduleResources (timingInfo);
@@ -152,13 +152,14 @@ MmWaveSidelinkMac::DoSlotIndication (mmwave::SfnSf timingInfo)
     // TODO inform phy about the allocatio ?
 
     // TODO associate slot alloc info and pdu
+    NS_LOG_DEBUG(allocationInfo.size () << " " << m_txBuffer.size ());
     NS_ASSERT_MSG (allocationInfo.size () == m_txBuffer.size (), "A LC has not used the tx opportunity");
     auto it = m_txBuffer.begin();
     while (it != m_txBuffer.end ())
     {
       Ptr<PacketBurst> pb = CreateObject<PacketBurst> ();
       pb->AddPacket (it->pdu);
-      NS_LOG_DEBUG("allocationInfo.size () = " << allocationInfo.size () << " - m_txBuffer.size () =  " << m_txBuffer.size ());
+      NS_LOG_DEBUG("allocationInfo.size () = " << allocationInfo.size () << " | m_txBuffer.size () =  " << m_txBuffer.size ());
       m_phySapProvider->AddTransportBlock (pb, allocationInfo.front ());
       allocationInfo.pop_front ();
       m_txBuffer.pop_front ();
@@ -183,6 +184,7 @@ MmWaveSidelinkMac::ScheduleResources (mmwave::SfnSf timingInfo)
 {
   std::list<mmwave::SlotAllocInfo> allocationInfo; // stores all the allocation decisions
 
+  NS_LOG_DEBUG("m_bufferStatusReportMap.size () =\t" << m_bufferStatusReportMap.size ());
   // if there are no active channels return an empty vector
   if (m_bufferStatusReportMap.size () == 0)
   {
@@ -192,10 +194,14 @@ MmWaveSidelinkMac::ScheduleResources (mmwave::SfnSf timingInfo)
   // compute the total number of available symbols
   uint32_t availableSymbols = m_phyMacConfig->GetSymbPerSlot ();
 
+  NS_LOG_DEBUG("availableSymbols =\t" << availableSymbols);
+
   // compute the number of available symbols per logical channel
   // NOTE the number of available symbols per LC is rounded down due to the cast
   // to int
   uint32_t availableSymbolsPerLc = availableSymbols / m_bufferStatusReportMap.size ();
+
+  NS_LOG_DEBUG("availableSymbolsPerLc =\t" << availableSymbolsPerLc);
 
   // TODO start from the last served lc + 1
   auto bsrIt = m_bufferStatusReportMap.begin ();
@@ -209,6 +215,7 @@ MmWaveSidelinkMac::ScheduleResources (mmwave::SfnSf timingInfo)
 
     uint8_t mcs = GetMcs (rntiDest); // select the MCS
 
+    NS_LOG_DEBUG("mcs =\t" << uint32_t(mcs));
     // compute the number of bits for this LC
     uint32_t availableBitsPerLc = m_amc->GetTbSizeFromMcsSymbols(mcs, availableSymbolsPerLc);
 
@@ -257,9 +264,20 @@ MmWaveSidelinkMac::ScheduleResources (mmwave::SfnSf timingInfo)
     traceInfo.rxRnti = rntiDest;
     m_schedulingTrace (traceInfo);
 
+    // notify the RLC
+    LteMacSapUser* macSapUser = m_lcidToMacSap.find (bsrIt->second.lcid)->second;
+    LteMacSapUser::TxOpportunityParameters params;
+    params.bytes = assignedBits / 8;  // the number of bytes to transmit
+    params.layer = 0;  // the layer of transmission (MIMO) (NOT USED)
+    params.harqId = 0; // the HARQ ID (NOT USED)
+    params.componentCarrierId = 0; // the component carrier id (NOT USED)
+    params.rnti = rntiDest; // the C-RNTI identifying the destination
+    params.lcid = bsrIt->second.lcid; // the logical channel id
+    macSapUser->NotifyTxOpportunity (params);
+
     // update the entry in the m_bufferStatusReportMap (delete it if no
     // further resources are needed)
-    UpdateBufferStatusReport (bsrIt->second.lcid, assignedBits / 8);
+    bsrIt = UpdateBufferStatusReport (bsrIt->second.lcid, assignedBits / 8);
 
     // update the number of available symbols
     availableSymbols -= assignedSymbols;
@@ -273,19 +291,6 @@ MmWaveSidelinkMac::ScheduleResources (mmwave::SfnSf timingInfo)
     // update index to the next available symbol
     symStart = symStart + assignedSymbols + 1;
 
-    // notify the RLC
-    LteMacSapUser* macSapUser = m_lcidToMacSap.find (bsrIt->second.lcid)->second;
-    LteMacSapUser::TxOpportunityParameters params;
-    params.bytes = assignedBits / 8;  // the number of bytes to transmit
-    params.layer = 0;  // the layer of transmission (MIMO) (NOT USED)
-    params.harqId = 0; // the HARQ ID (NOT USED)
-    params.componentCarrierId = 0; // the component carrier id (NOT USED)
-    params.rnti = rntiDest; // the C-RNTI identifying the destination
-    params.lcid = bsrIt->second.lcid; // the logical channel id
-    macSapUser->NotifyTxOpportunity (params);
-
-    // update the iterator
-    bsrIt++;
     // if the iterator reached the end of the map, start again
     if (bsrIt == m_bufferStatusReportMap.end ())
     {
@@ -304,7 +309,7 @@ MmWaveSidelinkMac::ScheduleResources (mmwave::SfnSf timingInfo)
   return allocationInfo;
 }
 
-void
+std::map<uint8_t, LteMacSapProvider::ReportBufferStatusParameters>::iterator
 MmWaveSidelinkMac::UpdateBufferStatusReport (uint8_t lcid, uint32_t assignedBytes)
 {
   // find the corresponding entry in the map
@@ -352,10 +357,14 @@ MmWaveSidelinkMac::UpdateBufferStatusReport (uint8_t lcid, uint32_t assignedByte
   // delete the entry in the map if no further resources are needed
   if (bsrIt->second.statusPduSize == 0 && bsrIt->second.retxQueueSize == 0  && bsrIt->second.txQueueSize == 0)
   {
-    m_bufferStatusReportMap.erase (bsrIt);
+    bsrIt = m_bufferStatusReportMap.erase (bsrIt);
+  }
+  else
+  {
+    bsrIt++;
   }
 
-  return;
+  return bsrIt;
 }
 
 void
@@ -367,10 +376,12 @@ MmWaveSidelinkMac::DoReportBufferStatus (LteMacSapProvider::ReportBufferStatusPa
   if (bsrIt != m_bufferStatusReportMap.end ())
   {
     bsrIt->second = params;
+    NS_LOG_DEBUG("Update buffer status report for LCID " << uint32_t(params.lcid));
   }
   else
   {
     m_bufferStatusReportMap.insert (std::make_pair (params.lcid, params));
+    NS_LOG_DEBUG("Insert buffer status report for LCID " << uint32_t(params.lcid));
   }
 }
 
@@ -382,6 +393,7 @@ MmWaveSidelinkMac::DoTransmitPdu (LteMacSapProvider::TransmitPduParameters param
   LteRadioBearerTag tag (params.rnti, params.lcid, params.layer);
   params.pdu->AddPacketTag (tag);
   //insert the packet at the end of the buffer
+  NS_LOG_DEBUG("Add packet for RNTI " << params.rnti << " LCID " << uint32_t(params.lcid));
   m_txBuffer.push_back (params);
 }
 
