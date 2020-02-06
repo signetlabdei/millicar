@@ -380,7 +380,7 @@ MmWaveSidelinkSpectrumPhy::EndRxData ()
        mmwave::MmWaveTbStats_t tbStats = mmwave::MmWaveMiErrorModel::GetTbDecodificationStats (m_sinrPerceived, (*i).rbBitmap, (*i).size, (*i).mcs, harqInfoList);
 
        // trigger measure reporting
-       m_slSinrReportCallback(m_sinrPerceived, (*i).rnti, (*i).numSym, (*i).size);
+       m_slSinrReportCallback(m_sinrPerceived, (*i).rnti, (*i).numSym, (*i).size, (*i).mcs);
 
        bool corrupt = m_random->GetValue () > tbStats.tbler ? false : true;
        if(!corrupt)

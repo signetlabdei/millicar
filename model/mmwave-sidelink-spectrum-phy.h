@@ -69,7 +69,7 @@ typedef Callback< void, Ptr<Packet> > MmWavePhyRxDataEndOkCallback;
 * @param numSym number of symbols associated to the transport block
 * @param size size of the transport block
 */
-typedef Callback< void, const SpectrumValue&, uint16_t, uint8_t, uint32_t> MmWaveSidelinkSinrReportCallback;
+typedef Callback< void, const SpectrumValue&, uint16_t, uint8_t, uint32_t, uint8_t> MmWaveSidelinkSinrReportCallback;
 
 //typedef Callback< void, std::list<Ptr<MmWaveControlMessage> > > MmWavePhyRxCtrlEndOkCallback;
 

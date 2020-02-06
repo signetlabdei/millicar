@@ -140,14 +140,15 @@ public:
   /**
   * \brief This method generates a new SINR report and sends it to the MAC layer.
            It is hooked to the callback MmWaveSidelinkSpectrumPhy::m_slSinrReportCallback
-  * \params sinr pointer to the SpectrumValue instance representing the SINR
+  * \param sinr pointer to the SpectrumValue instance representing the SINR
             measured on all the spectrum chunks
-  * \params rnti the RNTI of the tranmitting device
-  * \params numSym size of the transport block that generated the report in
+  * \param rnti the RNTI of the tranmitting device
+  * \param numSym size of the transport block that generated the report in
             number of OFDM symbols
-  * \params tbSize size of the transport block that generated the report in bytes
+  * \param tbSize size of the transport block that generated the report in bytes
+  * \param mcs the MCS of the transmission
   */
-  void GenerateSinrReport (const SpectrumValue& sinr, uint16_t rnti, uint8_t numSym, uint32_t tbSize);
+  void GenerateSinrReport (const SpectrumValue& sinr, uint16_t rnti, uint8_t numSym, uint32_t tbSize, uint8_t mcs);
 
 private:
 

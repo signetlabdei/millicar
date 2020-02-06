@@ -358,9 +358,9 @@ MmWaveSidelinkPhy::Receive (Ptr<Packet> p)
 }
 
 void
-MmWaveSidelinkPhy::GenerateSinrReport (const SpectrumValue& sinr, uint16_t rnti, uint8_t numSym, uint32_t tbSize)
+MmWaveSidelinkPhy::GenerateSinrReport (const SpectrumValue& sinr, uint16_t rnti, uint8_t numSym, uint32_t tbSize, uint8_t mcs)
 {
-  NS_LOG_FUNCTION (this);
+  NS_LOG_FUNCTION (this << rnti << (uint32_t)numSym << tbSize << (uint32_t)mcs);
 
   double sinrAvg = Sum (sinr) / (sinr.GetSpectrumModel ()->GetNumBands ());
   NS_LOG_INFO ("Average SINR with dev " << rnti << " = " << 10 * std::log10 (sinrAvg));
