@@ -24,6 +24,7 @@
 #include "ns3/net-device-container.h"
 #include "ns3/spectrum-channel.h"
 #include "ns3/mmwave-phy-mac-common.h"
+#include "ns3/mmwave-vehicular-traces-helper.h"
 
 namespace ns3 {
 
@@ -123,6 +124,7 @@ private:
   std::string m_spectrumPropagationLossModelType; //!< the type id of the spectrum propagation loss model to be used
   std::string m_propagationDelayModelType; //!< the type id of the delay model to be used
 
+  Ptr<MmWaveVehicularTracesHelper> m_phyTraceHelper; //!< Ptr to an helper for the physical layer traces
 
 };
 

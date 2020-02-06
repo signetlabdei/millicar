@@ -159,6 +159,7 @@ MmWaveSidelinkMac::DoSlotIndication (mmwave::SfnSf timingInfo)
     {
       Ptr<PacketBurst> pb = CreateObject<PacketBurst> ();
       pb->AddPacket (it->pdu);
+      //NS_LOG_UNCOND("it->pdu.GetSize() " << it->pdu->GetSize() << " allocationInfo.front ().m_dci.m_tbSize " << allocationInfo.front ().m_dci.m_tbSize );
       NS_LOG_DEBUG("allocationInfo.size () = " << allocationInfo.size () << " | m_txBuffer.size () =  " << m_txBuffer.size ());
       m_phySapProvider->AddTransportBlock (pb, allocationInfo.front ());
       allocationInfo.pop_front ();
@@ -220,6 +221,7 @@ MmWaveSidelinkMac::ScheduleResources (mmwave::SfnSf timingInfo)
     uint32_t availableBitsPerLc = m_amc->GetTbSizeFromMcsSymbols(mcs, availableSymbolsPerLc);
 
     // compute the number of bits required by this LC
+    //NS_LOG_UNCOND("bsrIt->second.txQueueSize " << bsrIt->second.txQueueSize);
     uint32_t requiredBits = (bsrIt->second.txQueueSize + bsrIt->second.retxQueueSize + bsrIt->second.statusPduSize) * 8;
 
     // assign a number of bits which is less or equal to the available bits
@@ -235,6 +237,7 @@ MmWaveSidelinkMac::ScheduleResources (mmwave::SfnSf timingInfo)
 
     // compute the number of symbols assigned to this LC
     uint32_t assignedSymbols = m_amc->GetNumSymbolsFromTbsMcs (assignedBits, mcs);
+    NS_LOG_DEBUG("assignedSymbols =\t" << assignedSymbols);
 
     //if (assignedSymbols <= availableSymbols) // TODO check if needed
     //{
@@ -248,6 +251,8 @@ MmWaveSidelinkMac::ScheduleResources (mmwave::SfnSf timingInfo)
     info.m_dci.m_mcs = mcs;
     info.m_dci.m_tbSize = assignedBits / 8; // the TB size in bytes
     info.m_slotType = mmwave::SlotAllocInfo::DATA; // the TB carries data
+
+    NS_LOG_DEBUG("info.m_dci.m_tbSize =\t" << info.m_dci.m_tbSize);
 
     allocationInfo.push_back (info);
 

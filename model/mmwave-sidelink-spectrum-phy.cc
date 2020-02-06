@@ -22,7 +22,6 @@
 #include <ns3/boolean.h>
 #include <cmath>
 #include <ns3/simulator.h>
-#include <ns3/trace-source-accessor.h>
 #include <ns3/antenna-model.h>
 #include "mmwave-sidelink-spectrum-phy.h"
 #include "mmwave-sidelink-spectrum-signal-parameters.h"
@@ -380,7 +379,7 @@ MmWaveSidelinkSpectrumPhy::EndRxData ()
        mmwave::MmWaveTbStats_t tbStats = mmwave::MmWaveMiErrorModel::GetTbDecodificationStats (m_sinrPerceived, (*i).rbBitmap, (*i).size, (*i).mcs, harqInfoList);
 
        // trigger measure reporting
-       m_slSinrReportCallback(m_sinrPerceived, (*i).rnti, (*i).numSym, (*i).size, (*i).mcs);
+       m_slSinrReportCallback(m_sinrPerceived, (*i).rnti, (*i).numSym, (*i).size, (*i).mcs); // TODO also export corrupt and tbler
 
        bool corrupt = m_random->GetValue () > tbStats.tbler ? false : true;
        if(!corrupt)

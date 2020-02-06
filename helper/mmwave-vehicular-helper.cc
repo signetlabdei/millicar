@@ -25,6 +25,7 @@
 #include "ns3/antenna-array-model.h"
 #include "ns3/mmwave-vehicular-spectrum-propagation-loss-model.h"
 #include "ns3/pointer.h"
+#include "ns3/config.h"
 
 namespace ns3 {
 
@@ -35,6 +36,7 @@ namespace mmwave_vehicular {
 NS_OBJECT_ENSURE_REGISTERED (MmWaveVehicularHelper); // TODO check if this has to be defined here
 
 MmWaveVehicularHelper::MmWaveVehicularHelper ()
+: m_phyTraceHelper{CreateObject<MmWaveVehicularTracesHelper>("sinr-mcs.txt")} // TODO name as attribute
 {
   NS_LOG_FUNCTION (this);
 }
@@ -227,6 +229,11 @@ MmWaveVehicularHelper::InstallSingleMmWaveVehicularNetDevice (Ptr<Node> node, ui
 
   // connect the callback to report the SINR
   ssp->SetSidelinkSinrReportCallback (MakeCallback (&MmWaveSidelinkPhy::GenerateSinrReport, phy));
+
+  if(m_phyTraceHelper != 0)
+  {
+    ssp->SetSidelinkSinrReportCallback (MakeCallback (&MmWaveVehicularTracesHelper::McsSinrCallback, m_phyTraceHelper));
+  }
 
   // create the mac
   Ptr<MmWaveSidelinkMac> mac = CreateObject<MmWaveSidelinkMac> (m_phyMacConfig);

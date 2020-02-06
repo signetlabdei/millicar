@@ -18,6 +18,7 @@ def build(bld):
         'model/mmwave-sidelink-mac.cc',
         'model/mmwave-vehicular-net-device.cc',
         'helper/mmwave-vehicular-helper.cc',
+        'helper/mmwave-vehicular-traces-helper.cc'
         ]
 
     module_test = bld.create_ns3_module_test_library('mmwave-vehicular')
@@ -42,6 +43,7 @@ def build(bld):
         'model/mmwave-sidelink-sap.h',
         'model/mmwave-vehicular-net-device.h',
         'helper/mmwave-vehicular-helper.h',
+        'helper/mmwave-vehicular-traces-helper.h'
         ]
 
     if bld.env.ENABLE_EXAMPLES:

@@ -28,10 +28,11 @@ using namespace mmwave_vehicular;
 int main (int argc, char *argv[])
 {
 
-  uint32_t packetSize = 1024; // bytes
-  Time startTime = Seconds (1.5);
+  uint32_t packetSize = 512; // bytes
+  Time startTime = Seconds (1.0);
   Time endTime = Seconds (10.0);
-  uint8_t mcs = 12;
+  uint8_t mcs = 28;
+  double bandwidth = 1e8;
 
   double speed = 20; // m/s
   CommandLine cmd;
@@ -42,7 +43,11 @@ int main (int argc, char *argv[])
   Config::SetDefault ("ns3::MmWaveSidelinkMac::Mcs", UintegerValue (mcs));
   Config::SetDefault ("ns3::MmWavePhyMacCommon::CenterFreq", DoubleValue (60.0e9));
   Config::SetDefault ("ns3::MmWaveVehicularPropagationLossModel::Frequency", DoubleValue (60.0e9));
+  Config::SetDefault ("ns3::MmWaveVehicularPropagationLossModel::ChannelCondition", StringValue ("l"));
   Config::SetDefault ("ns3::MmWaveVehicularSpectrumPropagationLossModel::Frequency", DoubleValue (60.0e9));
+  Config::SetDefault ("ns3::MmWaveVehicularNetDevice::RlcType", StringValue("LteRlcUm"));
+  Config::SetDefault ("ns3::LteRlcUm::MaxTxBufferSize", UintegerValue (50*1024));
+  Config::SetDefault ("ns3::MmWaveVehicularHelper::Bandwidth", DoubleValue (bandwidth));
 
   // create the nodes
   NodeContainer group1, group2;
@@ -106,19 +111,18 @@ int main (int argc, char *argv[])
   NS_LOG_DEBUG("IPv4 Address node 1 group 2: " << group2.Get (1)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal ());
 
   Ptr<mmwave::MmWaveAmc> m_amc = CreateObject <mmwave::MmWaveAmc> (helper->GetConfigurationParameters());
-  double availableRate = m_amc->GetTbSizeFromMcsSymbols(mcs, 14) / 0.001; // bps
+  double availableRate = m_amc->GetTbSizeFromMcsSymbols(28, 14) / 0.001; // bps
   uint16_t port = 4000;  // well-known echo port number
-  uint32_t maxPacketCount = 500000;
-  packetSize = m_amc->GetTbSizeFromMcsSymbols(mcs, 14) / 8 - 28;
+  uint32_t maxPacketCount = 800000;
+  //packetSize = m_amc->GetTbSizeFromMcsSymbols(mcs, 14) / 8 - 28;
   Time interPacketInterval =  Seconds(double((packetSize * 8) / availableRate));
 
   NS_LOG_INFO ("Create applications for group number 1.");
 
-  UdpServerHelper server1 (port);
+  UdpEchoServerHelper server1 (port);
 
   ApplicationContainer apps1 = server1.Install (group1.Get (1));
   apps1.Start (Seconds (1.0));
-  apps1.Stop (Seconds(14.0));
 
   UdpEchoClientHelper client1 (group1.Get (1)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal (), port);
   client1.SetAttribute ("MaxPackets", UintegerValue (maxPacketCount));
@@ -130,11 +134,10 @@ int main (int argc, char *argv[])
 
   NS_LOG_INFO ("Create applications for group number 2.");
 
-  UdpServerHelper server2 (port);
+  UdpEchoServerHelper server2 (port);
 
   ApplicationContainer apps2 = server2.Install (group2.Get (1));
   apps2.Start (Seconds (1.0));
-  apps2.Stop (Seconds(14.0));
 
   UdpEchoClientHelper client2 (group2.Get (1)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal (), port);
   client2.SetAttribute ("MaxPackets", UintegerValue (maxPacketCount));

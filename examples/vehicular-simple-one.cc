@@ -24,12 +24,6 @@ uint32_t g_txPackets; // total number of transmitted packets
 Time g_firstReceived; // timestamp of the first time a packet is received
 Time g_lastReceived; // timestamp of the last received packet
 
-static void Tx (Ptr<const Packet> p)
-{
- NS_LOG_UNCOND ("TX event");
- g_txPackets++;
-}
-
 static void Rx (Ptr<OutputStreamWrapper> stream, Ptr<const Packet> p)
 {
  g_rxPackets++;
@@ -56,17 +50,15 @@ int main (int argc, char *argv[])
   // These nodes exchange packets through a UDP application,
   // and they communicate using a wireless channel at 60 GHz.
 
-
-  double endSim = 10.0;
-  double xDistanceNode2 = 10;
+  double endSim = 5.0;
+  double xDistanceNode2 = 70;
   double yDistanceNode2 = 0;
   double xSpeedNode2 = 20; // in m/s
   //double pktInterval = 10;
-  double bandwidth = 1e8;
+  double bandwidth = 4e8;
   uint8_t mcs = 24;
   bool useAmc = false;
-
-  //RngSeedManager::SetRun(464);
+  uint32_t packetSize = 512;
 
   CommandLine cmd;
 
@@ -92,11 +84,12 @@ int main (int argc, char *argv[])
 
   Config::SetDefault ("ns3::MmWavePhyMacCommon::CenterFreq", DoubleValue (60.0e9));
   Config::SetDefault ("ns3::MmWaveVehicularNetDevice::RlcType", StringValue("LteRlcUm"));
-  Config::SetDefault ("ns3::LteRlcUm::MaxTxBufferSize", UintegerValue (50*1024));
+  Config::SetDefault ("ns3::LteRlcUm::MaxTxBufferSize", UintegerValue (1000*512));
   Config::SetDefault ("ns3::MmWaveVehicularPropagationLossModel::Frequency", DoubleValue (60.0e9));
   Config::SetDefault ("ns3::MmWaveVehicularPropagationLossModel::ChannelCondition", StringValue ("l"));
   Config::SetDefault ("ns3::MmWaveVehicularSpectrumPropagationLossModel::Frequency", DoubleValue (60.0e9));
   Config::SetDefault ("ns3::MmWaveVehicularHelper::Bandwidth", DoubleValue (bandwidth));
+  Config::SetDefault ("ns3::LteRlcUm::ReportBufferStatusTimer", TimeValue (MilliSeconds (1)));
 
   // create the nodes
   NodeContainer n;
@@ -161,25 +154,19 @@ int main (int argc, char *argv[])
 
   Ptr<mmwave::MmWaveAmc> m_amc = CreateObject <mmwave::MmWaveAmc> (helper->GetConfigurationParameters());
   // the target rate is the highest possibile
-  //NS_LOG_UNCOND(m_amc->GetTbSizeFromMcsSymbols(28, 14));
   double availableRate = m_amc->GetTbSizeFromMcsSymbols(28, 14) / 0.001; // bps
 
-  uint32_t maxPacketCount = 800000;
-  // we chose the packetSize as the lowest possibile in order to avoid problems with RLC's TxOpportunities
-  //packetSize = m_amc->GetTbSizeFromMcsSymbols(0, 14) / 8 - 28 - 2;
-  Time interPacketInterval =  Seconds(double((512 * 8) / availableRate));
-  //NS_LOG_UNCOND(double((512 * 8) / availableRate));
+  uint32_t maxPacketCount = 4e6;
+  Time interPacketInterval =  Seconds(double((packetSize * 8) / availableRate));
+  NS_LOG_UNCOND ("ipi" << interPacketInterval.GetMicroSeconds ());
   //Time interPacketInterval = MicroSeconds(pktInterval);
-  //NS_LOG_UNCOND("txed " << (endSim - 1) / interPacketInterval.GetSeconds());
   UdpClientHelper client (n.Get (1)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal (), port);
   client.SetAttribute ("MaxPackets", UintegerValue (maxPacketCount));
   client.SetAttribute ("Interval", TimeValue (interPacketInterval));
-  client.SetAttribute ("PacketSize", UintegerValue (512));
+  client.SetAttribute ("PacketSize", UintegerValue (packetSize));
   ApplicationContainer apps = client.Install (n.Get (0));
   apps.Start (Seconds(1.0));
   apps.Stop (endTime);
-
-  apps.Get(0)->TraceConnectWithoutContext ("Tx", MakeCallback (&Tx));
 
   Simulator::Stop (endTime + Seconds (6));
   Simulator::Run ();
@@ -198,10 +185,9 @@ int main (int argc, char *argv[])
 
   std::cout << "----------- Statistics -----------" << std::endl;
   std::cout << "Available Rate:\t\t" << availableRate/1e6 << " Mbps" << std::endl;
-  std::cout << "Packets size:\t\t" << 512 << " Bytes" << std::endl;
-  //std::cout << "Packets transmitted:\t" << g_txPackets << std::endl;
+  std::cout << "Packets size:\t\t" << packetSize << " Bytes" << std::endl;
   std::cout << "Packets received:\t" << g_rxPackets << std::endl;
-  std::cout << "Average Throughput:\t" << (double(g_rxPackets)*(double(512)*8)/double( g_lastReceived.GetSeconds() - g_firstReceived.GetSeconds()))/1e6 << " Mbps" << std::endl;
+  std::cout << "Average Throughput:\t" << (double(g_rxPackets)*(double(packetSize)*8)/double( g_lastReceived.GetSeconds() - g_firstReceived.GetSeconds()))/1e6 << " Mbps" << std::endl;
 
   return 0;
 }
