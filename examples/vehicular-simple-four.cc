@@ -55,7 +55,6 @@ int main (int argc, char *argv[])
   Config::SetDefault ("ns3::MmWaveVehicularSpectrumPropagationLossModel::Frequency", DoubleValue (60.0e9));
   Config::SetDefault ("ns3::MmWaveVehicularHelper::Bandwidth", DoubleValue (bandwidth));
 
-
   // create the nodes
   NodeContainer group;
   group.Create (3);
@@ -66,10 +65,10 @@ int main (int argc, char *argv[])
   mobility.Install (group);
 
   group.Get (0)->GetObject<MobilityModel> ()->SetPosition (Vector (0,0,0));
-  group.Get (0)->GetObject<ConstantVelocityMobilityModel> ()->SetVelocity (Vector (0, speed, 0));
+  group.Get (0)->GetObject<ConstantVelocityMobilityModel> ()->SetVelocity (Vector (0, -speed, 0));
 
   group.Get (1)->GetObject<MobilityModel> ()->SetPosition (Vector (20,0,0));
-  group.Get (1)->GetObject<ConstantVelocityMobilityModel> ()->SetVelocity (Vector (0, -speed, 0));
+  group.Get (1)->GetObject<ConstantVelocityMobilityModel> ()->SetVelocity (Vector (0, speed, 0));
 
   group.Get (2)->GetObject<MobilityModel> ()->SetPosition (Vector (10,20,0));
   group.Get (2)->GetObject<ConstantVelocityMobilityModel> ()->SetVelocity (Vector (0, speed, 0));

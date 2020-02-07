@@ -213,7 +213,7 @@ void
 MmWaveSidelinkSpectrumPhy::SetSidelinkSinrReportCallback (MmWaveSidelinkSinrReportCallback c)
 {
   NS_LOG_FUNCTION (this);
-  m_slSinrReportCallback = c;
+  m_slSinrReportCallback.push_back(c);
 }
 
 void
@@ -378,8 +378,12 @@ MmWaveSidelinkSpectrumPhy::EndRxData ()
        NS_LOG_DEBUG ("average sinr " << 10*log10 (sinrAvg) << " MCS " <<  (uint16_t)(*i).mcs);
        mmwave::MmWaveTbStats_t tbStats = mmwave::MmWaveMiErrorModel::GetTbDecodificationStats (m_sinrPerceived, (*i).rbBitmap, (*i).size, (*i).mcs, harqInfoList);
 
-       // trigger measure reporting
-       m_slSinrReportCallback(m_sinrPerceived, (*i).rnti, (*i).numSym, (*i).size, (*i).mcs); // TODO also export corrupt and tbler
+       // trigger callbacks
+       for(std::vector<MmWaveSidelinkSinrReportCallback>::iterator it = m_slSinrReportCallback.begin(); it != m_slSinrReportCallback.end(); ++it)
+       {
+         MmWaveSidelinkSinrReportCallback c = (*it);
+         c(m_sinrPerceived, (*i).rnti, (*i).numSym, (*i).size, (*i).mcs); // TODO also export corrupt and tbler
+       }
 
        bool corrupt = m_random->GetValue () > tbStats.tbler ? false : true;
        if(!corrupt)

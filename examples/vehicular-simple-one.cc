@@ -51,13 +51,13 @@ int main (int argc, char *argv[])
   // and they communicate using a wireless channel at 60 GHz.
 
   double endSim = 5.0;
-  double xDistanceNode2 = 70;
+  double xDistanceNode2 = 10;
   double yDistanceNode2 = 0;
   double xSpeedNode2 = 20; // in m/s
   //double pktInterval = 10;
-  double bandwidth = 4e8;
+  double bandwidth = 1e8;
   uint8_t mcs = 24;
-  bool useAmc = false;
+  bool useAmc = true;
   uint32_t packetSize = 512;
 
   CommandLine cmd;
@@ -105,7 +105,7 @@ int main (int argc, char *argv[])
   mobility.Install (n);
 
   n.Get (0)->GetObject<MobilityModel> ()->SetPosition (Vector (0,0,0));
-  n.Get (0)->GetObject<ConstantVelocityMobilityModel> ()->SetVelocity (Vector (20, 0, 0));
+  n.Get (0)->GetObject<ConstantVelocityMobilityModel> ()->SetVelocity (Vector (0, 0, 0));
 
   n.Get (1)->GetObject<MobilityModel> ()->SetPosition (Vector (xDistanceNode2, yDistanceNode2, 0));
   n.Get (1)->GetObject<ConstantVelocityMobilityModel> ()->SetVelocity (Vector (xSpeedNode2, 0, 0));
@@ -160,7 +160,7 @@ int main (int argc, char *argv[])
   Time interPacketInterval =  Seconds(double((packetSize * 8) / availableRate));
   NS_LOG_UNCOND ("ipi" << interPacketInterval.GetMicroSeconds ());
   //Time interPacketInterval = MicroSeconds(pktInterval);
-  UdpClientHelper client (n.Get (1)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal (), port);
+  UdpEchoClientHelper client (n.Get (1)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal (), port);
   client.SetAttribute ("MaxPackets", UintegerValue (maxPacketCount));
   client.SetAttribute ("Interval", TimeValue (interPacketInterval));
   client.SetAttribute ("PacketSize", UintegerValue (packetSize));
