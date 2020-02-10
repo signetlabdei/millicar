@@ -150,17 +150,22 @@ MmWaveSidelinkMac::DoSlotIndication (mmwave::SfnSf timingInfo)
     std::list<mmwave::SlotAllocInfo> allocationInfo = ScheduleResources (timingInfo);
 
     // associate slot alloc info and pdu
-    NS_LOG_DEBUG(allocationInfo.size () << " " << m_txBuffer.size ());
-    NS_ASSERT_MSG (allocationInfo.size () == m_txBuffer.size (), "A LC has not used the tx opportunity");
-    auto it = m_txBuffer.begin();
-    while (it != m_txBuffer.end ())
+    for (auto it = allocationInfo.begin(); it != allocationInfo.end (); it++)
     {
+      // retrieve the tx buffer corresponding to the assigned destination
+      auto txBuffer = m_txBufferMap.find (it->m_rnti); // the destination RNTI
+
+      if (txBuffer == m_txBufferMap.end () || txBuffer->second.empty ())
+      {
+        // discard the tranmission opportunity and go to the next transmission
+        continue;
+      }
+
+      // otherwise, forward the packet to the PHY
       Ptr<PacketBurst> pb = CreateObject<PacketBurst> ();
-      pb->AddPacket (it->pdu);
-      m_phySapProvider->AddTransportBlock (pb, allocationInfo.front ());
-      allocationInfo.pop_front ();
-      m_txBuffer.pop_front ();
-      it = m_txBuffer.begin();
+      pb->AddPacket (txBuffer->second.front ().pdu);
+      m_phySapProvider->AddTransportBlock (pb, *it);
+      txBuffer->second.pop_front ();
     }
   }
   else if (m_sfAllocInfo[timingInfo.m_slotNum] != 0) // if the slot is assigned to another device, prepare for reception
@@ -382,9 +387,21 @@ MmWaveSidelinkMac::DoTransmitPdu (LteMacSapProvider::TransmitPduParameters param
   NS_LOG_FUNCTION (this);
   LteRadioBearerTag tag (params.rnti, params.lcid, params.layer);
   params.pdu->AddPacketTag (tag);
+
   //insert the packet at the end of the buffer
   NS_LOG_DEBUG("Add packet for RNTI " << params.rnti << " LCID " << uint32_t(params.lcid));
-  m_txBuffer.push_back (params);
+
+  auto it = m_txBufferMap.find (params.rnti);
+  if (it == m_txBufferMap.end ())
+  {
+    std::list<LteMacSapProvider::TransmitPduParameters> txBuffer;
+    txBuffer.push_back (params);
+    m_txBufferMap.insert (std::make_pair (params.rnti, txBuffer));
+  }
+  else
+  {
+    it->second.push_back (params);
+  }
 }
 
 void
@@ -400,6 +417,8 @@ MmWaveSidelinkMac::DoReceivePhyPdu (Ptr<Packet> p)
   rxPduParams.p = p;
   rxPduParams.rnti = tag.GetRnti ();
   rxPduParams.lcid = tag.GetLcid ();
+
+  NS_LOG_DEBUG ("Received a packet " << rxPduParams.rnti << " " << (uint16_t)rxPduParams.lcid);
 
   LteMacSapUser* macSapUser = m_lcidToMacSap.find(rxPduParams.lcid)->second;
   macSapUser->ReceivePdu (rxPduParams);
