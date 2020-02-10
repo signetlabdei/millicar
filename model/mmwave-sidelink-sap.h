@@ -20,6 +20,9 @@
 #define SRC_MMWAVE_MODEL_MMWAVE_SAP_H_
 
 #include <ns3/packet-burst.h>
+#include <ns3/lte-mac-sap.h>
+#include <ns3/lte-rlc-am.h>
+#include <ns3/spectrum-value.h>
 #include <ns3/mmwave-phy-mac-common.h>
 
 namespace ns3 {

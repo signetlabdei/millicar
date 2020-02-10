@@ -18,6 +18,9 @@
 
 #include <ns3/mac64-address.h>
 #include <ns3/net-device.h>
+#include "ns3/lte-pdcp.h"
+#include "ns3/lte-radio-bearer-info.h"
+#include "ns3/epc-tft-classifier.h"
 #include "mmwave-sidelink-phy.h"
 #include "mmwave-sidelink-mac.h"
 
@@ -27,6 +30,19 @@
 namespace ns3 {
 
 namespace mmwave_vehicular {
+
+  /**
+   * store information on active radio bearer instance
+   *
+   */
+class SidelinkRadioBearerInfo : public LteRadioBearerInfo
+{
+public:
+  SidelinkRadioBearerInfo (void) {};
+  virtual ~SidelinkRadioBearerInfo (void) {};
+
+  uint16_t m_rnti; //!< rnti of the other endpoint of this bearer
+};
 
 class MmWaveVehicularNetDevice : public NetDevice
 {
@@ -102,13 +118,6 @@ public:
   virtual bool SupportsSendFrom (void) const;
 
   /**
-   * \brief Associate to the device a univocal (with respect to the transmitting device) RNTI
-   * \param address IP address
-   * \param rnti univocal RNTI
-   */
-  virtual void RegisterDevice (const Address& address, uint16_t rnti);
-
-  /**
    * \brief Set MAC address associated to the NetDevice
    * \param address MAC address
    */
@@ -153,18 +162,55 @@ public:
    */
   void Receive (Ptr<Packet> p);
 
+  /**
+   * \brief a logical channel with instances of PDCP/RLC layers is created and associated to a specific receiving device
+   * \param bearerId identifier of the tunnel between two devices
+   * \param destRnti the rnti of the destination
+   * \param dest IP destination address
+  */
+  void ActivateBearer (const uint8_t bearerId, const uint16_t destRnti, const Address& dest);
+
 protected:
   NetDevice::ReceiveCallback m_rxCallback; //!< callback that is fired when a packet is received
 
 private:
   Ptr<MmWaveSidelinkMac> m_mac; //!< pointer to the MAC instance to be associated to the NetDevice
   Ptr<MmWaveSidelinkPhy> m_phy; //!< pointer to the PHY instance to be associated to the NetDevice
+  std::map<uint8_t, Ptr<SidelinkRadioBearerInfo>> m_bearerToInfoMap; //!< map to store RLC and PDCP instances associated to a specific bearer ID
   Mac64Address m_macAddr; //!< MAC address associated to the NetDevice
   mutable uint16_t m_mtu; //!< MTU associated to the NetDevice
-  std::map<Address, uint16_t> m_ipRnti; //!< map that associates each IP address to a specific univocal (with respect to the transmitting device) RNTI
+  uint8_t m_bidCounter = 0; //!< counter of bearer connections activated for a single UE
+  uint8_t m_lcidCounter = 0; //!< counter of logical channels created on this NetDevice
+  std::map<uint8_t,uint8_t> m_bid2lcid; //!< map from the BID to a unique LCID
   uint32_t m_ifIndex;
   bool m_linkUp; //!< boolean that indicates if the link is UP (true) or DOWN (false)
   Ptr<Node> m_node; //!< pointer to the node associated to the NetDevice
+  EpcTftClassifier m_tftClassifier;
+
+  /**
+   * Return the LCID associated to a certain bearer
+   * \param bearerId the bearer
+   * \return the logical channel ID
+   */
+  uint8_t BidToLcid(const uint8_t bearerId) const;
+};
+
+class PdcpSpecificSidelinkPdcpSapUser : public LtePdcpSapUser
+{
+public:
+  /**
+   * Constructor
+   *
+   * \param netDevice the specific netDevice to be connected to the PDCP SAP
+   */
+   PdcpSpecificSidelinkPdcpSapUser (Ptr<MmWaveVehicularNetDevice> netDevice);
+
+  // Interface implemented from LtePdcpSapUser
+  virtual void ReceivePdcpSdu (ReceivePdcpSduParameters params);
+
+private:
+  PdcpSpecificSidelinkPdcpSapUser ();
+  Ptr<MmWaveVehicularNetDevice> m_netDevice; ///< NetDevice
 };
 
 } // mmwave namespace

@@ -227,7 +227,7 @@ MmWaveVehicularHelper::InstallSingleMmWaveVehicularNetDevice (Ptr<Node> node, ui
 
   // connect the callback to report the SINR
   ssp->SetSidelinkSinrReportCallback (MakeCallback (&MmWaveSidelinkPhy::GenerateSinrReport, phy));
-  
+
   // create the mac
   Ptr<MmWaveSidelinkMac> mac = CreateObject<MmWaveSidelinkMac> (m_phyMacConfig);
   mac->SetRnti (rnti);
@@ -274,29 +274,41 @@ MmWaveVehicularHelper::PairDevices (NetDeviceContainer devices)
     NS_LOG_DEBUG ("slot " << i << " assigned to rnti " << pattern.at (i));
   }
 
+  uint8_t bearerIdCounter = 1;
+
   for (NetDeviceContainer::Iterator i = devices.Begin (); i != devices.End (); ++i)
     {
+      uint8_t bearerId = bearerIdCounter++;
 
       Ptr<MmWaveVehicularNetDevice> di = DynamicCast<MmWaveVehicularNetDevice> (*i);
+      Ptr<Node> iNode = di->GetNode ();
+      Ptr<Ipv4> iNodeIpv4 = iNode->GetObject<Ipv4> ();
+      NS_ASSERT_MSG (iNodeIpv4 != 0, "Nodes need to have IPv4 installed before pairing can be activated");
 
-      di->GetMac ()->SetSfAllocationInfo (pattern);
+      di->GetMac ()->SetSfAllocationInfo (pattern); // this is called ONCE for each NetDevice
 
-      for (NetDeviceContainer::Iterator j = devices.Begin (); j != devices.End (); ++j)
+      for (NetDeviceContainer::Iterator j = i + 1; j != devices.End (); ++j)
       {
         Ptr<MmWaveVehicularNetDevice> dj = DynamicCast<MmWaveVehicularNetDevice> (*j);
         Ptr<Node> jNode = dj->GetNode ();
         Ptr<Ipv4> jNodeIpv4 = jNode->GetObject<Ipv4> ();
         NS_ASSERT_MSG (jNodeIpv4 != 0, "Nodes need to have IPv4 installed before pairing can be activated");
 
-        if (*i != *j)
-        {
-          // initialize the <IP address, RNTI> map of the devices
-          int32_t interface =  jNodeIpv4->GetInterfaceForDevice (dj);
-          di->RegisterDevice (jNodeIpv4->GetAddress (interface, 0).GetLocal (), dj->GetMac ()->GetRnti ());
+        // initialize the <IP address, RNTI> map of the devices
+        int32_t interface =  jNodeIpv4->GetInterfaceForDevice (dj);
+        Ipv4Address diAddr = iNodeIpv4->GetAddress (interface, 0).GetLocal ();
+        Ipv4Address djAddr = jNodeIpv4->GetAddress (interface, 0).GetLocal ();
 
-          // register the associated devices in the PHY
-          di->GetPhy ()->AddDevice (dj->GetMac ()->GetRnti (), dj);
-        }
+        // register the associated devices in the PHY
+        di->GetPhy ()->AddDevice (dj->GetMac ()->GetRnti (), dj);
+        dj->GetPhy ()->AddDevice (di->GetMac ()->GetRnti (), di);
+
+        // bearer activation by creating a logical channel between the two devices
+        NS_LOG_DEBUG("Activation of bearer between " << diAddr << " and " << djAddr);
+        NS_LOG_DEBUG("Bearer ID: " << uint32_t(bearerId) << " - Associate RNTI " << di->GetMac ()->GetRnti () << " to " << dj->GetMac ()->GetRnti ());
+
+        di->ActivateBearer(bearerId, dj->GetMac ()->GetRnti (), djAddr);
+        dj->ActivateBearer(bearerId, di->GetMac ()->GetRnti (), diAddr);
       }
 
     }

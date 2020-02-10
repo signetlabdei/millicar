@@ -18,16 +18,31 @@
 
 #include <ns3/uinteger.h>
 #include <ns3/log.h>
-#include <ns3/lte-mac-sap.h>
 #include <ns3/ipv4-header.h>
 #include <ns3/ipv4-l3-protocol.h>
 #include <ns3/ipv6-header.h>
 #include <ns3/ipv6-l3-protocol.h>
+#include "ns3/epc-tft.h"
+#include "mmwave-sidelink-mac.h"
 #include "mmwave-vehicular-net-device.h"
 
 namespace ns3 {
 
 namespace mmwave_vehicular {
+
+PdcpSpecificSidelinkPdcpSapUser::PdcpSpecificSidelinkPdcpSapUser (Ptr<MmWaveVehicularNetDevice> netDevice)
+  : m_netDevice (netDevice)
+{
+
+}
+
+void
+PdcpSpecificSidelinkPdcpSapUser::ReceivePdcpSdu (ReceivePdcpSduParameters params)
+{
+  m_netDevice->Receive (params.pdcpSdu);
+}
+
+//-----------------------------------------------------------------------
 
 NS_LOG_COMPONENT_DEFINE ("MmWaveVehicularNetDevice");
 
@@ -230,11 +245,51 @@ MmWaveVehicularNetDevice::GetMtu (void) const
 }
 
 void
-MmWaveVehicularNetDevice::RegisterDevice (const Address& dest, uint16_t rnti)
+MmWaveVehicularNetDevice::ActivateBearer(const uint8_t bearerId, const uint16_t destRnti, const Address& dest)
 {
-  NS_LOG_FUNCTION (this);
-  NS_ASSERT_MSG(m_ipRnti.find (dest) == m_ipRnti.end (), "This device had already been registered ");
-  m_ipRnti.insert (std::make_pair (dest, rnti));
+  NS_LOG_FUNCTION(this << bearerId);
+  uint8_t lcid = bearerId; // set the LCID to be equal to the bearerId
+  // future extensions could consider a different mapping
+  // and will actually exploit the following map
+  m_bid2lcid.insert(std::make_pair(bearerId, lcid));
+
+  NS_ASSERT_MSG(m_bearerToInfoMap.find (bearerId) == m_bearerToInfoMap.end (),
+    "There's another bearer associated to this bearerId: " << bearerId);
+
+  EpcTft::PacketFilter slFilter;
+  slFilter.remoteAddress= Ipv4Address::ConvertFrom(dest);
+
+  Ptr<EpcTft> tft = Create<EpcTft> (); // Create a new tft
+  tft->Add (slFilter); // Add the packet filter
+
+  m_tftClassifier.Add(tft, bearerId);
+
+  // Create RLC instance with specific RNTI and LCID
+  Ptr<LteRlc> rlc = CreateObject<LteRlcAm> ();
+  rlc->SetLteMacSapProvider (m_mac->GetMacSapProvider());
+  rlc->SetRnti (destRnti); // this is the rnti of the destination
+  rlc->SetLcId (lcid);
+
+  // Call to the MAC method that created the SAP for binding the MAC instance on this node to the RLC instance just created
+  m_mac->AddMacSapUser(lcid, rlc->GetLteMacSapUser());
+
+  Ptr<LtePdcp> pdcp = CreateObject<LtePdcp> ();
+  pdcp->SetRnti (destRnti); // this is the rnti of the destination
+  pdcp->SetLcId (lcid);
+
+  // Create the PDCP SAP that connects the PDCP instance to this NetDevice
+  LtePdcpSapUser* pdcpSapUser = new PdcpSpecificSidelinkPdcpSapUser (this);
+  pdcp->SetLtePdcpSapUser (pdcpSapUser);
+  pdcp->SetLteRlcSapProvider (rlc->GetLteRlcSapProvider ());
+  rlc->SetLteRlcSapUser (pdcp->GetLteRlcSapUser ());
+
+  Ptr<SidelinkRadioBearerInfo> rbInfo = CreateObject<SidelinkRadioBearerInfo> ();
+  rbInfo->m_rlc= rlc;
+  rbInfo->m_pdcp = pdcp;
+  rbInfo->m_rnti = destRnti;
+
+  // insert the tuple <lcid, pdcpSapProvider> in the map of this NetDevice, so that we are able to associate it to them later
+  m_bearerToInfoMap.insert (std::make_pair (bearerId, rbInfo));
 }
 
 void
@@ -266,23 +321,35 @@ bool
 MmWaveVehicularNetDevice::Send (Ptr<Packet> packet, const Address& dest, uint16_t protocolNumber)
 {
   NS_LOG_FUNCTION (this);
-  
-  LteMacSapProvider::TransmitPduParameters params;
 
-  Ptr<Packet> copy = packet->Copy ();
-  Ipv4Header iph;
-  copy->RemoveHeader (iph);
+  // classify the incoming packet
+  uint32_t id = m_tftClassifier.Classify (packet, EpcTft::UPLINK, protocolNumber);
+  NS_ASSERT ((id & 0xFFFFFF00) == 0);
+  uint8_t bid = (uint8_t) (id & 0x000000FF);
+  uint8_t lcid = BidToLcid(bid);
 
-  Ipv4Address ipDest = iph.GetDestination();
+  // get the SidelinkRadioBearerInfo
+  NS_ASSERT_MSG(m_bearerToInfoMap.find (bid) != m_bearerToInfoMap.end (), "No logical channel associated to this communication");
+  auto bearerInfo = m_bearerToInfoMap.find (bid)->second;
 
-  NS_ASSERT_MSG(m_ipRnti.find (ipDest) != m_ipRnti.end (), "No registered device corresponding to the destination IP address.");
+  LtePdcpSapProvider::TransmitPdcpSduParameters params;
+  params.pdcpSdu = packet;
+  params.rnti = bearerInfo->m_rnti;
+  params.lcid = lcid;
 
-  params.pdu = packet;
-  params.rnti = (m_ipRnti.find(ipDest))->second; // association between destination address and destination RNTI
+  NS_LOG_DEBUG("SRC RNTI: " << m_mac->GetRnti() << " - BID: " << uint32_t(bid) << " - LCID: " << uint32_t(lcid));
 
-  m_mac->DoTransmitPdu(params);
+  bearerInfo->m_pdcp->GetLtePdcpSapProvider()->TransmitPdcpSdu (params);
 
   return true;
+}
+
+uint8_t
+MmWaveVehicularNetDevice::BidToLcid(const uint8_t bearerId) const
+{
+  NS_ASSERT_MSG(m_bid2lcid.find(bearerId) != m_bid2lcid.end(),
+    "BearerId to LCID mapping not found " << bearerId);
+  return m_bid2lcid.find(bearerId)->second;
 }
 
 }

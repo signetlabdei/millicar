@@ -22,7 +22,6 @@
 #include "mmwave-sidelink-sap.h"
 #include "ns3/mmwave-amc.h"
 #include "ns3/mmwave-phy-mac-common.h"
-#include "ns3/lte-mac-sap.h"
 #include "ns3/traced-callback.h"
 
 namespace ns3 {
@@ -96,6 +95,12 @@ public:
   void SetPhySapProvider (MmWaveSidelinkPhySapProvider* sap);
 
   /**
+  * \brief return the MAC SAP provider
+  * \return the MacSapProvider
+  */
+  LteMacSapProvider* GetMacSapProvider () const;
+
+  /**
   * \brief assign a proper value to the RNTI associated to a specific user
   * \param rnti value of the rnti
   */
@@ -133,6 +138,13 @@ public:
    */
   typedef void (* SlSchedulingTracedCallback) (SlSchedulingCallback params);
 
+  /**
+   * Associate a MAC SAP user instance to the LCID and add it in the map
+   * \param lcid Logical Channel ID
+   * \param macSapUser LteMacSapUser to be associated to a single LCID and added to the respective map
+   */
+  void AddMacSapUser (uint8_t lcid, LteMacSapUser* macSapUser);
+
 private:
   // forwarded from PHY SAP
  /**
@@ -163,6 +175,8 @@ private:
 
   MmWaveSidelinkPhySapUser* m_phySapUser; //!< Sidelink PHY SAP user
   MmWaveSidelinkPhySapProvider* m_phySapProvider; //!< Sidelink PHY SAP provider
+  LteMacSapProvider* m_macSapProvider; //!< Sidelink MAC SAP provider
+  std::map<uint8_t, LteMacSapUser*> m_lcidToMacSap; //!< map that associates to an LCID the respective MAC SAP
   Ptr<mmwave::MmWavePhyMacCommon> m_phyMacConfig; //!< PHY and MAC configuration pointer
   Ptr<mmwave::MmWaveAmc> m_amc; //!< pointer to AMC instance
   bool m_useAmc; //!< set to true to use adaptive modulation and coding
@@ -192,6 +206,24 @@ public:
 private:
   Ptr<MmWaveSidelinkMac> m_mac;
 
+};
+
+class RlcSidelinkMemberMacSapProvider : public LteMacSapProvider
+{
+public:
+  /**
+   * Constructor
+   *
+   * \param mac the MAC class
+   */
+  RlcSidelinkMemberMacSapProvider (Ptr<MmWaveSidelinkMac> mac);
+
+  // inherited from LteMacSapProvider
+  virtual void TransmitPdu (TransmitPduParameters params);
+  virtual void ReportBufferStatus (ReportBufferStatusParameters params);
+
+private:
+  Ptr<MmWaveSidelinkMac> m_mac; ///< the MAC class
 };
 
 } // mmwave namespace

@@ -18,6 +18,7 @@
 
 #include "ns3/mmwave-phy-mac-common.h"
 #include "ns3/mmwave-amc.h"
+#include "ns3/lte-mac-sap.h"
 #include "mmwave-sidelink-mac.h"
 #include "ns3/log.h"
 #include "ns3/uinteger.h"
@@ -51,6 +52,26 @@ void
 MacSidelinkMemberPhySapUser::SlSinrReport (const SpectrumValue& sinr, uint16_t rnti, uint8_t numSym, uint32_t tbSize)
 {
   m_mac->DoSlSinrReport (sinr, rnti, numSym, tbSize);
+}
+
+//-----------------------------------------------------------------------
+
+RlcSidelinkMemberMacSapProvider::RlcSidelinkMemberMacSapProvider (Ptr<MmWaveSidelinkMac> mac)
+  : m_mac (mac)
+{
+
+}
+
+void
+RlcSidelinkMemberMacSapProvider::TransmitPdu (TransmitPduParameters params)
+{
+  m_mac->DoTransmitPdu (params);
+}
+
+void
+RlcSidelinkMemberMacSapProvider::ReportBufferStatus (ReportBufferStatusParameters params)
+{
+  // TODO update this method
 }
 
 //-----------------------------------------------------------------------
@@ -91,6 +112,9 @@ MmWaveSidelinkMac::MmWaveSidelinkMac (Ptr<mmwave::MmWavePhyMacCommon> pmc)
 
   // create the PHY SAP USER
   m_phySapUser = new MacSidelinkMemberPhySapUser (this);
+
+  // create the MAC SAP PROVIDER
+  m_macSapProvider = new RlcSidelinkMemberMacSapProvider(this);
 
   // create the mmwave::MmWaveAmc instance
   m_amc = CreateObject <mmwave::MmWaveAmc> (m_phyMacConfig);
@@ -216,7 +240,16 @@ void
 MmWaveSidelinkMac::DoReceivePhyPdu (Ptr<Packet> p)
 {
   NS_LOG_FUNCTION(this << p);
-  m_forwardUpCallback(p);
+
+  LteMacSapUser::ReceivePduParameters rxPduParams;
+
+  // TODO pick the right lcid associated to this communication. As discussed, this can be done via a dedicated SidelinkBearerTag
+  rxPduParams.p = p;
+  rxPduParams.rnti = m_rnti;
+  rxPduParams.lcid = 1;
+
+  LteMacSapUser* macSapUser = m_lcidToMacSap.find(rxPduParams.lcid)->second;
+  macSapUser->ReceivePdu (rxPduParams);
 }
 
 MmWaveSidelinkPhySapUser*
@@ -231,6 +264,13 @@ MmWaveSidelinkMac::SetPhySapProvider (MmWaveSidelinkPhySapProvider* sap)
 {
   NS_LOG_FUNCTION (this);
   m_phySapProvider = sap;
+}
+
+LteMacSapProvider*
+MmWaveSidelinkMac::GetMacSapProvider () const
+{
+  NS_LOG_FUNCTION (this);
+  return m_macSapProvider;
 }
 
 void
@@ -308,6 +348,12 @@ MmWaveSidelinkMac::GetMcs (uint16_t rnti)
   return mcs;
 }
 
+void
+MmWaveSidelinkMac::AddMacSapUser (uint8_t lcid, LteMacSapUser* macSapUser)
+{
+  NS_LOG_FUNCTION (this);
+  m_lcidToMacSap.insert(std::make_pair(lcid, macSapUser));
+}
 
 } // mmwave namespace
 
