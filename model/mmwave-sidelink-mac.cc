@@ -149,9 +149,7 @@ MmWaveSidelinkMac::DoSlotIndication (mmwave::SfnSf timingInfo)
   {
     std::list<mmwave::SlotAllocInfo> allocationInfo = ScheduleResources (timingInfo);
 
-    // TODO inform phy about the allocatio ?
-
-    // TODO associate slot alloc info and pdu
+    // associate slot alloc info and pdu
     NS_LOG_DEBUG(allocationInfo.size () << " " << m_txBuffer.size ());
     NS_ASSERT_MSG (allocationInfo.size () == m_txBuffer.size (), "A LC has not used the tx opportunity");
     auto it = m_txBuffer.begin();
@@ -159,13 +157,10 @@ MmWaveSidelinkMac::DoSlotIndication (mmwave::SfnSf timingInfo)
     {
       Ptr<PacketBurst> pb = CreateObject<PacketBurst> ();
       pb->AddPacket (it->pdu);
-      //NS_LOG_UNCOND("it->pdu.GetSize() " << it->pdu->GetSize() << " allocationInfo.front ().m_dci.m_tbSize " << allocationInfo.front ().m_dci.m_tbSize );
-      NS_LOG_DEBUG("allocationInfo.size () = " << allocationInfo.size () << " | m_txBuffer.size () =  " << m_txBuffer.size ());
       m_phySapProvider->AddTransportBlock (pb, allocationInfo.front ());
       allocationInfo.pop_front ();
       m_txBuffer.pop_front ();
       it = m_txBuffer.begin();
-      // TODO add assert if sizes are different
     }
   }
   else if (m_sfAllocInfo[timingInfo.m_slotNum] != 0) // if the slot is assigned to another device, prepare for reception
@@ -221,7 +216,6 @@ MmWaveSidelinkMac::ScheduleResources (mmwave::SfnSf timingInfo)
     uint32_t availableBitsPerLc = m_amc->GetTbSizeFromMcsSymbols(mcs, availableSymbolsPerLc);
 
     // compute the number of bits required by this LC
-    //NS_LOG_UNCOND("bsrIt->second.txQueueSize " << bsrIt->second.txQueueSize);
     uint32_t requiredBits = (bsrIt->second.txQueueSize + bsrIt->second.retxQueueSize + bsrIt->second.statusPduSize) * 8;
 
     // assign a number of bits which is less or equal to the available bits
@@ -301,14 +295,6 @@ MmWaveSidelinkMac::ScheduleResources (mmwave::SfnSf timingInfo)
     {
       bsrIt = m_bufferStatusReportMap.begin ();
     }
-    //}
-    // else
-    // {
-    //   // the remaining available bits are not enough to transmit the next
-    //   // packet in the buffer
-    //   NS_LOG_INFO ("Available bits " << m_amc->GetTbSizeFromMcsSymbols(mcs, availableSymbols) << " next pdu size " << pduInfo.pdu->GetSize () * 8);
-    //   break;
-    // }
 
   }
   return allocationInfo;
@@ -394,7 +380,6 @@ void
 MmWaveSidelinkMac::DoTransmitPdu (LteMacSapProvider::TransmitPduParameters params)
 {
   NS_LOG_FUNCTION (this);
-  //NS_LOG_UNCOND("RNTI dst: " << params.rnti << " LCID:" << (uint32_t)params.lcid);
   LteRadioBearerTag tag (params.rnti, params.lcid, params.layer);
   params.pdu->AddPacketTag (tag);
   //insert the packet at the end of the buffer
@@ -411,7 +396,7 @@ MmWaveSidelinkMac::DoReceivePhyPdu (Ptr<Packet> p)
   LteRadioBearerTag tag;
   p->PeekPacketTag (tag);
 
-  // TODO pick the right lcid associated to this communication. As discussed, this can be done via a dedicated SidelinkBearerTag
+  // pick the right lcid associated to this communication. As discussed, this can be done via a dedicated SidelinkBearerTag
   rxPduParams.p = p;
   rxPduParams.rnti = tag.GetRnti ();
   rxPduParams.lcid = tag.GetLcid ();
