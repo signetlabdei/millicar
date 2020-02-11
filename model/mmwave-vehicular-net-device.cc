@@ -268,9 +268,14 @@ MmWaveVehicularNetDevice::GetRlcType (std::string rlcType)
   {
     return LteRlcUm::GetTypeId ();
   }
-
-  return LteRlcTm::GetTypeId ();
-
+  else if (rlcType == "LteRlcTm")
+  {
+    return LteRlcTm::GetTypeId ();
+  }
+  else
+  {
+    NS_FATAL_ERROR ("Unknown RLC type");
+  }
 }
 
 void

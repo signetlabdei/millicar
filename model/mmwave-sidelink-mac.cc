@@ -216,7 +216,7 @@ MmWaveSidelinkMac::ScheduleResources (mmwave::SfnSf timingInfo)
 
     uint8_t mcs = GetMcs (rntiDest); // select the MCS
 
-    NS_LOG_DEBUG("mcs =\t" << uint32_t(mcs));
+    NS_LOG_DEBUG("rnti " << rntiDest << " mcs = " << uint16_t(mcs));
     // compute the number of bits for this LC
     uint32_t availableBitsPerLc = m_amc->GetTbSizeFromMcsSymbols(mcs, availableSymbolsPerLc);
 

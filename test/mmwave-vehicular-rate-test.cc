@@ -199,7 +199,7 @@ MmWaveVehicularRateTestCase::StartTest (uint8_t mcs)
   double availableRate = m_amc->GetTbSizeFromMcsSymbols(mcs, 14) / 0.001; // bps
 
   uint32_t maxPacketCount = 500000;
-  packetSize = m_amc->GetTbSizeFromMcsSymbols(mcs, 14) / 8 - 28 - 2;
+  packetSize = m_amc->GetTbSizeFromMcsSymbols(mcs, 14) / 8 - 28 - 2; // TB size - header sizes (UDP, IP, PDCP, RLC) 
   Time interPacketInterval =  Seconds(double((packetSize * 8) / availableRate));
   UdpEchoClientHelper client (n.Get (1)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal (), port);
   client.SetAttribute ("MaxPackets", UintegerValue (maxPacketCount));

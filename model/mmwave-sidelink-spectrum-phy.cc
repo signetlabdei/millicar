@@ -379,11 +379,10 @@ MmWaveSidelinkSpectrumPhy::EndRxData ()
        mmwave::MmWaveTbStats_t tbStats = mmwave::MmWaveMiErrorModel::GetTbDecodificationStats (m_sinrPerceived, (*i).rbBitmap, (*i).size, (*i).mcs, harqInfoList);
 
        // trigger callbacks
-       for(std::vector<MmWaveSidelinkSinrReportCallback>::iterator it = m_slSinrReportCallback.begin(); it != m_slSinrReportCallback.end(); ++it)
-       {
-         MmWaveSidelinkSinrReportCallback c = (*it);
-         c(m_sinrPerceived, (*i).rnti, (*i).numSym, (*i).size, (*i).mcs); // TODO also export corrupt and tbler
-       }
+       for (auto& it : m_slSinrReportCallback)
+        {
+          it(m_sinrPerceived, (*i).rnti, (*i).numSym, (*i).size, (*i).mcs); // TODO also export corrupt and tbler)
+        }
 
        bool corrupt = m_random->GetValue () > tbStats.tbler ? false : true;
        if(!corrupt)

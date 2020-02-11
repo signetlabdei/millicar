@@ -158,6 +158,8 @@ public:
 
   /**
    * \brief Returns valid LteRlc TypeId based on the parameter passed
+   * \param rlcType string representing the selected RLC type
+   * \return the type id of the proper RLC class
    */
   TypeId GetRlcType (std::string rlcType);
 

@@ -287,7 +287,7 @@ private:
 
   //MmWavePhyRxCtrlEndOkCallback m_phyRxCtrlEndOkCallback;
   MmWavePhyRxDataEndOkCallback m_phyRxDataEndOkCallback;  ///< the mmwave sidelink phy receive data end ok callback
-  std::vector<MmWaveSidelinkSinrReportCallback> m_slSinrReportCallback; ///< the mmwave sidelink SINR report callback
+  std::vector<MmWaveSidelinkSinrReportCallback> m_slSinrReportCallback; ///< the vector with mmwave sidelink SINR report callbacks
 
   SpectrumValue m_sinrPerceived; ///< the perceived SINR
 
