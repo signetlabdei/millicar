@@ -504,7 +504,7 @@ MmWaveSidelinkMac::GetMcs (uint16_t rnti)
     if (m_slCqiReported.find (rnti) != m_slCqiReported.end ())
     {
       std::vector <int> cqi = m_slCqiReported.find (rnti)->second;
-      mcs = m_amc->GetMcsFromCqi(*std::min_element (cqi.begin(), cqi.end()));
+      mcs = m_amc->GetMcsFromCqi(cqi.back ());
     }
     else
     {
