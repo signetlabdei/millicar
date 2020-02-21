@@ -20,7 +20,7 @@ using namespace mmwave_vehicular;
 /**
   This script creates two pairs of vehicles moving at 20 m/s. The two groups are virtually positioned in two different lanes.
   In the same group, the vehicles are positioned one in front of the other at 20 m distance, and they exchange packets through a UDP application.
-  Communication is done via a wireless channel at 60 GHz.
+  Communication is done via a wireless channel.
   The aim of this example is to check whether the interference was evaluated correctly when different groups
   of nodes are transmitting in the same slot, sharing the same cell.
 */
@@ -50,9 +50,9 @@ int main (int argc, char *argv[])
   Config::SetDefault ("ns3::MmWavePhyMacCommon::CenterFreq", DoubleValue (60.0e9));
   Config::SetDefault ("ns3::MmWaveVehicularNetDevice::RlcType", StringValue("LteRlcUm"));
   Config::SetDefault ("ns3::LteRlcUm::MaxTxBufferSize", UintegerValue (50*1024));
-  Config::SetDefault ("ns3::MmWaveVehicularPropagationLossModel::Frequency", DoubleValue (60.0e9));
+  Config::SetDefault ("ns3::MmWaveVehicularPropagationLossModel::Frequency", DoubleValue (28.0e9));
   Config::SetDefault ("ns3::MmWaveVehicularPropagationLossModel::ChannelCondition", StringValue ("l"));
-  Config::SetDefault ("ns3::MmWaveVehicularSpectrumPropagationLossModel::Frequency", DoubleValue (60.0e9));
+  Config::SetDefault ("ns3::MmWaveVehicularSpectrumPropagationLossModel::Frequency", DoubleValue (28.0e9));
   Config::SetDefault ("ns3::MmWaveVehicularHelper::Bandwidth", DoubleValue (bandwidth));
 
   // create the nodes

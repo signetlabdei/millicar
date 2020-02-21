@@ -48,67 +48,70 @@ int main (int argc, char *argv[])
 {
   // This script creates two nodes moving at 20 m/s, placed at a distance of 10 m.
   // These nodes exchange packets through a UDP application,
-  // and they communicate using a wireless channel at 60 GHz.
+  // and they communicate using a wireless channel.
 
-  double endSim = 5.0;
-  double xDistanceNode2 = 10;
-  double yDistanceNode2 = 0;
-  double xSpeedNode2 = 20; // in m/s
-  //double pktInterval = 10;
-  double bandwidth = 1e8;
-  uint8_t mcs = 24;
-  bool useAmc = true;
-  uint32_t packetSize = 512;
+  // system parameters
+  double bandwidth = 1e8; // bandwidth in Hz
+  double frequency = 28e9; // the carrier frequency
+  uint32_t numerology = 3; // the numerology
+
+  // applications
+  uint32_t packetSize = 1024; // UDP packet size in bytes
+  uint32_t startTime = 50; // application start time in milliseconds
+  uint32_t endTime = 2000; // application end time in milliseconds
+  uint32_t interPacketInterval = 30; // interpacket interval in microseconds
+
+  // mobility
+  double speed = 20; // speed of the vehicles m/s
+  double intraGroupDistance = 10; // distance between two vehicles belonging to the same group
 
   CommandLine cmd;
-
-  cmd.AddValue ("endSim", "duration of the application", endSim);
-  cmd.AddValue ("useAmc", "enable the use of AMC, false by default", useAmc);
-  cmd.AddValue ("mcs", "set different mcs", mcs);
+  //
   cmd.AddValue ("bandwidth", "used bandwidth", bandwidth);
-  //cmd.AddValue ("pktInterval", "inter packet interval, in microseconds", pktInterval);
-  cmd.AddValue ("xDistanceNode2", "distance from Node 1, x-coord", xDistanceNode2);
-  cmd.AddValue ("yDistanceNode2", "distance from Node 1, y-coord", yDistanceNode2);
-  cmd.AddValue ("xSpeedNode2", "speed at which Node 2 is moving in the x axis", xSpeedNode2);
+  cmd.AddValue ("iip", "inter packet interval, in microseconds", interPacketInterval);
+  cmd.AddValue ("intraGroupDistance", "distance between two vehicles belonging to the same group, y-coord", intraGroupDistance);
+  cmd.AddValue ("numerology", "set the numerology to use at the physical layer", numerology);
+  cmd.AddValue ("frequency", "set the carrier frequency", frequency);
   cmd.Parse (argc, argv);
 
-  Time startTime = Seconds (1.0);
-  Time endTime = Seconds (endSim);
+  Config::SetDefault ("ns3::MmWaveSidelinkMac::UseAmc", BooleanValue (true));
+  Config::SetDefault ("ns3::MmWavePhyMacCommon::CenterFreq", DoubleValue (frequency));
+  Config::SetDefault ("ns3::MmWaveVehicularPropagationLossModel::Frequency", DoubleValue (frequency));
+  Config::SetDefault ("ns3::MmWaveVehicularSpectrumPropagationLossModel::Frequency", DoubleValue (frequency));
+  Config::SetDefault ("ns3::MmWaveVehicularHelper::Bandwidth", DoubleValue (bandwidth));
+  Config::SetDefault ("ns3::MmWaveVehicularHelper::Numerology", UintegerValue (numerology));
+  Config::SetDefault ("ns3::MmWaveVehicularPropagationLossModel::ChannelCondition", StringValue ("a"));
+  Config::SetDefault ("ns3::MmWaveVehicularPropagationLossModel::Shadowing", BooleanValue (true));
+  Config::SetDefault ("ns3::MmWaveVehicularSpectrumPropagationLossModel::UpdatePeriod", TimeValue (MilliSeconds (1)));
+  Config::SetDefault ("ns3::AntennaArrayModel::AntennaElements", UintegerValue (16));
+  Config::SetDefault ("ns3::AntennaArrayModel::AntennaElementPattern", StringValue ("3GPP-V2V"));
+  Config::SetDefault ("ns3::AntennaArrayModel::IsotropicAntennaElements", BooleanValue (true));
+  Config::SetDefault ("ns3::AntennaArrayModel::NumSectors", UintegerValue (2));
 
-  Config::SetDefault ("ns3::MmWaveSidelinkMac::UseAmc", BooleanValue (useAmc));
-
-  if (!useAmc)
+  Config::SetDefault ("ns3::MmWaveVehicularNetDevice::RlcType", StringValue("LteRlcUm"));
+  if (bandwidth == 1e8)
   {
-    Config::SetDefault ("ns3::MmWaveSidelinkMac::Mcs", UintegerValue (mcs));
+    Config::SetDefault ("ns3::LteRlcUm::MaxTxBufferSize", UintegerValue (50*1024));
+  }
+  else
+  {
+    Config::SetDefault ("ns3::LteRlcUm::MaxTxBufferSize", UintegerValue (1000*1024));
   }
 
-  Config::SetDefault ("ns3::MmWavePhyMacCommon::CenterFreq", DoubleValue (60.0e9));
-  Config::SetDefault ("ns3::MmWaveVehicularNetDevice::RlcType", StringValue("LteRlcUm"));
-  Config::SetDefault ("ns3::LteRlcUm::MaxTxBufferSize", UintegerValue (1000*512));
-  Config::SetDefault ("ns3::MmWaveVehicularPropagationLossModel::Frequency", DoubleValue (60.0e9));
-  Config::SetDefault ("ns3::MmWaveVehicularPropagationLossModel::ChannelCondition", StringValue ("l"));
-  Config::SetDefault ("ns3::MmWaveVehicularSpectrumPropagationLossModel::Frequency", DoubleValue (60.0e9));
-  Config::SetDefault ("ns3::MmWaveVehicularHelper::Bandwidth", DoubleValue (bandwidth));
-  Config::SetDefault ("ns3::LteRlcUm::ReportBufferStatusTimer", TimeValue (MilliSeconds (1)));
 
   // create the nodes
   NodeContainer n;
   n.Create (2);
-
   // create the mobility models
   MobilityHelper mobility;
-  Ptr<ListPositionAllocator> positionAlloc = CreateObject<ListPositionAllocator> ();
-  positionAlloc->Add (Vector (0.0, 0.0, 0.0));
-  positionAlloc->Add (Vector (10.0, 0.0, 0.0));
-  mobility.SetPositionAllocator (positionAlloc);
   mobility.SetMobilityModel ("ns3::ConstantVelocityMobilityModel");
   mobility.Install (n);
 
   n.Get (0)->GetObject<MobilityModel> ()->SetPosition (Vector (0,0,0));
-  n.Get (0)->GetObject<ConstantVelocityMobilityModel> ()->SetVelocity (Vector (0, 0, 0));
+  n.Get (0)->GetObject<ConstantVelocityMobilityModel> ()->SetVelocity (Vector (0, speed, 0));
 
-  n.Get (1)->GetObject<MobilityModel> ()->SetPosition (Vector (xDistanceNode2, yDistanceNode2, 0));
-  n.Get (1)->GetObject<ConstantVelocityMobilityModel> ()->SetVelocity (Vector (xSpeedNode2, 0, 0));
+  n.Get (1)->GetObject<MobilityModel> ()->SetPosition (Vector (0, intraGroupDistance,  0));
+  n.Get (1)->GetObject<ConstantVelocityMobilityModel> ()->SetVelocity (Vector (0, speed, 0));
 
   // create and configure the helper
   Ptr<MmWaveVehicularHelper> helper = CreateObject<MmWaveVehicularHelper> ();
@@ -139,49 +142,35 @@ int main (int argc, char *argv[])
   NS_LOG_DEBUG("IPv4 Address node 0: " << n.Get (0)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal ());
   NS_LOG_DEBUG("IPv4 Address node 1: " << n.Get (1)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal ());
 
-  NS_LOG_INFO ("Create Applications.");
-  //
-  // Create a UdpEchoServer application on node one.
-  //
-  uint16_t port = 4000;  // well-known echo port number
+  Ptr<mmwave::MmWaveAmc> m_amc = CreateObject <mmwave::MmWaveAmc> (helper->GetConfigurationParameters());
+  double availableRate = m_amc->GetTbSizeFromMcsSymbols(28, 14) / 0.001; // bps
+
+  // setup the applications
+  Config::SetDefault ("ns3::UdpClient::MaxPackets", UintegerValue (0xFFFFFFFF));
+  Config::SetDefault ("ns3::UdpClient::Interval", TimeValue (MicroSeconds (interPacketInterval)));
+  Config::SetDefault ("ns3::UdpClient::PacketSize", UintegerValue (packetSize));
+
+  // create the applications
+  uint32_t port = 4000;
+
   UdpEchoServerHelper server (port);
   ApplicationContainer echoApps = server.Install (n.Get (1));
   echoApps.Start (Seconds (0.0));
 
   AsciiTraceHelper asciiTraceHelper;
-  Ptr<OutputStreamWrapper> stream = asciiTraceHelper.CreateFileStream ("stats.txt");
+  Ptr<OutputStreamWrapper> stream = asciiTraceHelper.CreateFileStream ("simple-one-stats.txt");
   echoApps.Get(0)->TraceConnectWithoutContext ("Rx", MakeBoundCallback (&Rx, stream));
 
-  Ptr<mmwave::MmWaveAmc> m_amc = CreateObject <mmwave::MmWaveAmc> (helper->GetConfigurationParameters());
-  // the target rate is the highest possibile
-  double availableRate = m_amc->GetTbSizeFromMcsSymbols(28, 14) / 0.001; // bps
-
-  uint32_t maxPacketCount = 4e6;
-  Time interPacketInterval =  Seconds(double((packetSize * 8) / availableRate));
-  NS_LOG_UNCOND ("ipi" << interPacketInterval.GetMicroSeconds ());
-  //Time interPacketInterval = MicroSeconds(pktInterval);
-  UdpEchoClientHelper client (n.Get (1)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal (), port);
-  client.SetAttribute ("MaxPackets", UintegerValue (maxPacketCount));
-  client.SetAttribute ("Interval", TimeValue (interPacketInterval));
-  client.SetAttribute ("PacketSize", UintegerValue (packetSize));
+  UdpClientHelper client (n.Get (1)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal (), port);
   ApplicationContainer apps = client.Install (n.Get (0));
-  apps.Start (Seconds(1.0));
-  apps.Stop (endTime);
 
-  Simulator::Stop (endTime + Seconds (6));
+  // set the application start/end time
+  apps.Start (MilliSeconds (startTime));
+  apps.Stop (MilliSeconds (endTime));
+
+  Simulator::Stop (MilliSeconds (endTime + 1000));
   Simulator::Run ();
   Simulator::Destroy ();
-
-  std::cout << "----------- Parameters ---------- " << std::endl;
-  std::cout << "endSim:\t" << endSim << std::endl;
-  std::cout << "useAmc:\t" << useAmc << std::endl;
-  if(!useAmc)
-  {
-    std::cout << "mcs:\t" << uint32_t(mcs) << std::endl;
-  }
-  std::cout << "xDistanceNode2:\t" << xDistanceNode2 << std::endl;
-  std::cout << "yDistanceNode2:\t" << yDistanceNode2 << std::endl;
-  std::cout << "xSpeedNode2:\t" << xSpeedNode2 << " m/s" << std::endl;
 
   std::cout << "----------- Statistics -----------" << std::endl;
   std::cout << "Available Rate:\t\t" << availableRate/1e6 << " Mbps" << std::endl;
