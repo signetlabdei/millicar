@@ -1,7 +1,10 @@
 /* -*-  Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil; -*- */
 /*
 *   Copyright (c) 2011 Centre Tecnologic de Telecomunicacions de Catalunya (CTTC)
-*   Copyright (c) 2015, NYU WIRELESS, Tandon School of Engineering, New York University
+*   Copyright (c) 2015, NYU WIRELESS, Tandon School of Engineering, New York
+*   University
+*   Copyright (c) 2020 University of Padova, Dep. of Information Engineering,
+*   SIGNET lab.
 *
 *   This program is free software; you can redistribute it and/or modify
 *   it under the terms of the GNU General Public License version 2 as
@@ -39,7 +42,7 @@
 
 namespace ns3 {
 
-namespace mmwave_vehicular {
+namespace millicar {
 
 struct channelCondition
 {
@@ -121,7 +124,7 @@ class MmWaveVehicularPropagationLossModel : public PropagationLossModel
     double m_percType3Vehicles;
 };
 
-} // namespace mmwave_vehicular
+} // namespace millicar
 
 } // namespace ns3
 

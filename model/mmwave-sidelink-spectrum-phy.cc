@@ -1,5 +1,10 @@
-/* -*-  Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil; -*- */
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
+*   Copyright (c) 2011 Centre Tecnologic de Telecomunicacions de Catalunya (CTTC)
+*   Copyright (c) 2015, NYU WIRELESS, Tandon School of Engineering, New York
+*   University
+*   Copyright (c) 2020 University of Padova, Dep. of Information Engineering,
+*   SIGNET lab.
 *
 *   This program is free software; you can redistribute it and/or modify
 *   it under the terms of the GNU General Public License version 2 as
@@ -13,7 +18,6 @@
 *   You should have received a copy of the GNU General Public License
 *   along with this program; if not, write to the Free Software
 *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*
 */
 
 #include <ns3/object-factory.h>
@@ -29,12 +33,13 @@
 #include <ns3/double.h>
 #include <ns3/mmwave-mi-error-model.h>
 #include <ns3/mmwave-vehicular-net-device.h>
+#include <ns3/mmwave-vehicular-antenna-array-model.h>
 
 namespace ns3 {
 
 NS_LOG_COMPONENT_DEFINE ("MmWaveSidelinkSpectrumPhy");
 
-namespace mmwave_vehicular {
+namespace millicar {
 
 NS_OBJECT_ENSURE_REGISTERED (MmWaveSidelinkSpectrumPhy);
 
@@ -577,7 +582,7 @@ MmWaveSidelinkSpectrumPhy::ConfigureBeamforming (Ptr<NetDevice> dev)
 {
   NS_LOG_FUNCTION (this);
 
-  Ptr<mmwave::AntennaArrayModel> antennaArray = DynamicCast<mmwave::AntennaArrayModel> (m_antenna);
+  Ptr<MmWaveVehicularAntennaArrayModel> antennaArray = DynamicCast<MmWaveVehicularAntennaArrayModel> (m_antenna);
   if (antennaArray)
   {
     //TODO consider to update this in order to not recompute the beamforming

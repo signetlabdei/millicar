@@ -1,4 +1,21 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
+/*
+*   Copyright (c) 2020 University of Padova, Dep. of Information Engineering,
+*   SIGNET lab.
+*
+*   This program is free software; you can redistribute it and/or modify
+*   it under the terms of the GNU General Public License version 2 as
+*   published by the Free Software Foundation;
+*
+*   This program is distributed in the hope that it will be useful,
+*   but WITHOUT ANY WARRANTY; without even the implied warranty of
+*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*   GNU General Public License for more details.
+*
+*   You should have received a copy of the GNU General Public License
+*   along with this program; if not, write to the Free Software
+*   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+*/
 
 #include "ns3/mmwave-sidelink-spectrum-phy.h"
 #include "ns3/mmwave-vehicular-net-device.h"
@@ -17,7 +34,7 @@ NS_LOG_COMPONENT_DEFINE ("MmWaveVehicularRateTestSuite");
 
 using namespace ns3;
 using namespace mmwave;
-using namespace mmwave_vehicular;
+using namespace millicar;
 
 /**
  * This is a test to check if the designed vehicular stack (MAC and PHY) is able
@@ -199,7 +216,7 @@ MmWaveVehicularRateTestCase::StartTest (uint8_t mcs)
   double availableRate = m_amc->GetTbSizeFromMcsSymbols(mcs, 14) / 0.001; // bps
 
   uint32_t maxPacketCount = 500000;
-  packetSize = m_amc->GetTbSizeFromMcsSymbols(mcs, 14) / 8 - 28 - 2; // TB size - header sizes (UDP, IP, PDCP, RLC) 
+  packetSize = m_amc->GetTbSizeFromMcsSymbols(mcs, 14) / 8 - 28 - 2; // TB size - header sizes (UDP, IP, PDCP, RLC)
   Time interPacketInterval =  Seconds(double((packetSize * 8) / availableRate));
   UdpEchoClientHelper client (n.Get (1)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal (), port);
   client.SetAttribute ("MaxPackets", UintegerValue (maxPacketCount));

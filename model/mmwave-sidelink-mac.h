@@ -1,5 +1,7 @@
-/* -*-  Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil; -*- */
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
+*   Copyright (c) 2020 University of Padova, Dep. of Information Engineering,
+*   SIGNET lab.
 *
 *   This program is free software; you can redistribute it and/or modify
 *   it under the terms of the GNU General Public License version 2 as
@@ -13,7 +15,6 @@
 *   You should have received a copy of the GNU General Public License
 *   along with this program; if not, write to the Free Software
 *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*
 */
 
 #ifndef SRC_MMWAVE_MODEL_MMWAVE_SIDELINK_MAC_H_
@@ -26,7 +27,7 @@
 
 namespace ns3 {
 
-namespace mmwave_vehicular {
+namespace millicar {
 
 /// structure used for the scheduling info callback
 struct SlSchedulingCallback
@@ -209,7 +210,7 @@ private:
   uint8_t m_mcs; //!< the MCS used to transmit the packets if AMC is not used
   uint16_t m_rnti; //!< radio network temporary identifier
   std::vector<uint16_t> m_sfAllocInfo; //!< defines the subframe allocation, m_sfAllocInfo[i] = RNTI of the device scheduled for slot i
-  std::map<uint16_t, std::list<LteMacSapProvider::TransmitPduParameters>> m_txBufferMap; //!< map containing the <RNTI, tx buffer> pairs 
+  std::map<uint16_t, std::list<LteMacSapProvider::TransmitPduParameters>> m_txBufferMap; //!< map containing the <RNTI, tx buffer> pairs
   std::map<uint16_t, std::vector<int>> m_slCqiReported; //!< map containing the <RNTI, CQI> pairs
   Callback<void, Ptr<Packet> > m_forwardUpCallback; //!< upward callback to the NetDevice
   std::map<uint8_t, LteMacSapProvider::ReportBufferStatusParameters> m_bufferStatusReportMap; //!< map containing the <LCID, buffer status in bits> pairs

@@ -1,6 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
-*   Copyright (c) 2019 University of Padova, Dep. of Information Engineering, SIGNET lab.
+*   Copyright (c) 2020 University of Padova, Dep. of Information Engineering,
+*   SIGNET lab.
 *
 *   This program is free software; you can redistribute it and/or modify
 *   it under the terms of the GNU General Public License version 2 as
@@ -22,7 +23,7 @@
 #include "ns3/mmwave-vehicular-net-device.h"
 #include "ns3/internet-stack-helper.h"
 #include "ns3/single-model-spectrum-channel.h"
-#include "ns3/antenna-array-model.h"
+#include "ns3/mmwave-vehicular-antenna-array-model.h"
 #include "ns3/mmwave-vehicular-spectrum-propagation-loss-model.h"
 #include "ns3/pointer.h"
 #include "ns3/config.h"
@@ -31,7 +32,7 @@ namespace ns3 {
 
 NS_LOG_COMPONENT_DEFINE ("MmWaveVehicularHelper"); // TODO check if this has to be defined here
 
-namespace mmwave_vehicular {
+namespace millicar {
 
 NS_OBJECT_ENSURE_REGISTERED (MmWaveVehicularHelper); // TODO check if this has to be defined here
 
@@ -159,9 +160,7 @@ MmWaveVehicularHelper::SetNumerology (uint8_t index)
   m_phyMacConfig->SetSymbPerSlot(14); // TR 38.802 Section 5.3: each slot must have 14 symbols < Symbol duration is dependant on the numerology
   m_phyMacConfig->SetSlotPerSubframe(std::pow (2, m_numerologyIndex)); // flexible number of slots per subframe - depends on numerology
   m_phyMacConfig->SetSubframePeriod (1000); // TR 38.802 Section 5.3: the subframe duration is 1ms, i.e., 1000us, and the frame length is 10ms.
-  m_phyMacConfig->SetSlotPeriod ( (m_phyMacConfig->GetSubframePeriod() / m_phyMacConfig->GetSlotsPerSubframe()) / 1e6); // 1 ms is dedicated to each subframe, the slot period is evaluated accordingly
-
-  m_phyMacConfig->SetSymbolPeriod ( (1 / subcarrierSpacing) * 1e6 ); // symbol period is required in microseconds
+  m_phyMacConfig->SetSymbolPeriod ( m_phyMacConfig->GetSubframePeriod () / m_phyMacConfig->GetSlotsPerSubframe () / m_phyMacConfig->GetSymbPerSlot ()); // symbol period is required in microseconds
 
   double subCarriersPerRB = 12;
 
@@ -202,7 +201,7 @@ MmWaveVehicularHelper::InstallSingleMmWaveVehicularNetDevice (Ptr<Node> node, ui
   NS_LOG_FUNCTION (this);
 
   // create the antenna
-  Ptr<mmwave::AntennaArrayModel> aam = CreateObject<mmwave::AntennaArrayModel> ();
+  Ptr<MmWaveVehicularAntennaArrayModel> aam = CreateObject<MmWaveVehicularAntennaArrayModel> ();
 
   // create and configure the tx spectrum phy
   Ptr<MmWaveSidelinkSpectrumPhy> ssp = CreateObject<MmWaveSidelinkSpectrumPhy> ();
@@ -343,5 +342,5 @@ MmWaveVehicularHelper::SetPropagationDelayModelType (std::string pdm)
   m_propagationDelayModelType = pdm;
 }
 
-} // namespace mmwave_vehicular
+} // namespace millicar
 } // namespace ns3

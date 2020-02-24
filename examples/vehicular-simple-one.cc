@@ -1,4 +1,21 @@
-/* -*-  Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil; -*- */
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
+/*
+*   Copyright (c) 2020 University of Padova, Dep. of Information Engineering,
+*   SIGNET lab.
+*
+*   This program is free software; you can redistribute it and/or modify
+*   it under the terms of the GNU General Public License version 2 as
+*   published by the Free Software Foundation;
+*
+*   This program is distributed in the hope that it will be useful,
+*   but WITHOUT ANY WARRANTY; without even the implied warranty of
+*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*   GNU General Public License for more details.
+*
+*   You should have received a copy of the GNU General Public License
+*   along with this program; if not, write to the Free Software
+*   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+*/
 
 #include "ns3/mmwave-sidelink-spectrum-phy.h"
 #include "ns3/mmwave-vehicular-net-device.h"
@@ -16,7 +33,7 @@
 NS_LOG_COMPONENT_DEFINE ("VehicularSimpleOne");
 
 using namespace ns3;
-using namespace mmwave_vehicular;
+using namespace millicar;
 
 uint32_t g_rxPackets; // total number of received packets
 uint32_t g_txPackets; // total number of transmitted packets
@@ -83,21 +100,13 @@ int main (int argc, char *argv[])
   Config::SetDefault ("ns3::MmWaveVehicularPropagationLossModel::ChannelCondition", StringValue ("a"));
   Config::SetDefault ("ns3::MmWaveVehicularPropagationLossModel::Shadowing", BooleanValue (true));
   Config::SetDefault ("ns3::MmWaveVehicularSpectrumPropagationLossModel::UpdatePeriod", TimeValue (MilliSeconds (1)));
-  Config::SetDefault ("ns3::AntennaArrayModel::AntennaElements", UintegerValue (16));
-  Config::SetDefault ("ns3::AntennaArrayModel::AntennaElementPattern", StringValue ("3GPP-V2V"));
-  Config::SetDefault ("ns3::AntennaArrayModel::IsotropicAntennaElements", BooleanValue (true));
-  Config::SetDefault ("ns3::AntennaArrayModel::NumSectors", UintegerValue (2));
+  Config::SetDefault ("ns3::MmWaveVehicularAntennaArrayModel::AntennaElements", UintegerValue (16));
+  Config::SetDefault ("ns3::MmWaveVehicularAntennaArrayModel::AntennaElementPattern", StringValue ("3GPP-V2V"));
+  Config::SetDefault ("ns3::MmWaveVehicularAntennaArrayModel::IsotropicAntennaElements", BooleanValue (true));
+  Config::SetDefault ("ns3::MmWaveVehicularAntennaArrayModel::NumSectors", UintegerValue (2));
 
   Config::SetDefault ("ns3::MmWaveVehicularNetDevice::RlcType", StringValue("LteRlcUm"));
-  if (bandwidth == 1e8)
-  {
-    Config::SetDefault ("ns3::LteRlcUm::MaxTxBufferSize", UintegerValue (50*1024));
-  }
-  else
-  {
-    Config::SetDefault ("ns3::LteRlcUm::MaxTxBufferSize", UintegerValue (1000*1024));
-  }
-
+  Config::SetDefault ("ns3::LteRlcUm::MaxTxBufferSize", UintegerValue (500*1024));
 
   // create the nodes
   NodeContainer n;

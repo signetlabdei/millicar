@@ -1,5 +1,7 @@
-/* -*-  Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil; -*- */
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
+*   Copyright (c) 2020 University of Padova, Dep. of Information Engineering,
+*   SIGNET lab.
 *
 *   This program is free software; you can redistribute it and/or modify
 *   it under the terms of the GNU General Public License version 2 as
@@ -11,10 +13,8 @@
 *   GNU General Public License for more details.
 *
 *   You should have received a copy of the GNU General Public License
-*   along with this program; if not, write to the Free Software:100cento
-
+*   along with this program; if not, write to the Free Software
 *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*
 */
 
 
@@ -27,7 +27,7 @@
 
 namespace ns3 {
 
-namespace mmwave_vehicular {
+namespace millicar {
 
 MacSidelinkMemberPhySapProvider::MacSidelinkMemberPhySapProvider (Ptr<MmWaveSidelinkPhy> phy)
   : m_phy (phy)
@@ -227,7 +227,7 @@ MmWaveSidelinkPhy::StartSlot (mmwave::SfnSf timingInfo)
 
   // convert the slot period from seconds to nanoseconds
   // TODO change GetSlotPeriod to return a TimeValue
-  double slotPeriod = m_phyMacConfig->GetSlotPeriod () * 1e9;
+  double slotPeriod = m_phyMacConfig->GetSymbolPeriod () * 1e3 * m_phyMacConfig->GetSymbPerSlot ();
 
   // update the timing information
   timingInfo = UpdateTimingInfo (timingInfo);
@@ -238,12 +238,6 @@ uint8_t
 MmWaveSidelinkPhy::SlData (Ptr<PacketBurst> pb, mmwave::SlotAllocInfo info)
 {
   NS_LOG_FUNCTION (this);
-
-  // retrieve the RNTI of the device we want to communicate with and properly
-  // configure the beamforming
-  // NOTE: this information is contained in mmwave::SlotAllocInfo.m_rnti parameter
-  NS_ASSERT_MSG (m_deviceMap.find (info.m_rnti) != m_deviceMap.end (), "Device not found");
-  m_sidelinkSpectrumPhy->ConfigureBeamforming (m_deviceMap.at (info.m_rnti));
 
   // create the tx PSD
   //TODO do we need to create a new psd at each TTI?
@@ -274,6 +268,12 @@ MmWaveSidelinkPhy::SendDataChannels (Ptr<PacketBurst> pb,
   mmwave::SlotAllocInfo info,
   std::vector<int> rbBitmap)
 {
+  // retrieve the RNTI of the device we want to communicate with and properly
+  // configure the beamforming
+  // NOTE: this information is contained in mmwave::SlotAllocInfo.m_rnti parameter
+  NS_ASSERT_MSG (m_deviceMap.find (info.m_rnti) != m_deviceMap.end (), "Device not found");
+  m_sidelinkSpectrumPhy->ConfigureBeamforming (m_deviceMap.at (info.m_rnti));
+
   m_sidelinkSpectrumPhy->StartTxDataFrames (pb, duration, info.m_slotIdx, info.m_dci.m_mcs, info.m_dci.m_tbSize, info.m_dci.m_numSym, info.m_dci.m_rnti, info.m_rnti, rbBitmap);
 }
 
@@ -369,5 +369,5 @@ MmWaveSidelinkPhy::GenerateSinrReport (const SpectrumValue& sinr, uint16_t rnti,
   m_phySapUser->SlSinrReport (sinr, rnti, numSym, tbSize);
 }
 
-} // namespace mmwave_vehicular
+} // namespace millicar
 } // namespace ns3

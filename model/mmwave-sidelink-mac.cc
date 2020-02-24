@@ -1,5 +1,7 @@
-/* -*-  Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil; -*- */
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
+*   Copyright (c) 2020 University of Padova, Dep. of Information Engineering,
+*   SIGNET lab.
 *
 *   This program is free software; you can redistribute it and/or modify
 *   it under the terms of the GNU General Public License version 2 as
@@ -13,7 +15,6 @@
 *   You should have received a copy of the GNU General Public License
 *   along with this program; if not, write to the Free Software
 *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*
 */
 
 #include "ns3/mmwave-phy-mac-common.h"
@@ -29,7 +30,7 @@ namespace ns3 {
 
 NS_LOG_COMPONENT_DEFINE ("MmWaveSidelinkMac");
 
-namespace mmwave_vehicular {
+namespace millicar {
 
 MacSidelinkMemberPhySapUser::MacSidelinkMemberPhySapUser (Ptr<MmWaveSidelinkMac> mac)
   : m_mac (mac)
@@ -97,7 +98,7 @@ MmWaveSidelinkMac::GetTypeId (void)
     .AddTraceSource ("SchedulingInfo",
                      "Information regarding the scheduling.",
                      MakeTraceSourceAccessor (&MmWaveSidelinkMac::m_schedulingTrace),
-                     "ns3::mmwave_vehicular::MmWaveSidelinkMac::SlSchedulingTracedCallback")
+                     "ns3::millicar::MmWaveSidelinkMac::SlSchedulingTracedCallback")
   ;
   return tid;
 }

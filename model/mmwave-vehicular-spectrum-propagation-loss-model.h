@@ -1,6 +1,9 @@
 /* -*-  Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil; -*- */
 /*
-*   Copyright (c) 2015, NYU WIRELESS, Tandon School of Engineering, New York University
+*   Copyright (c) 2015, NYU WIRELESS, Tandon School of Engineering, New York
+*   University
+*   Copyright (c) 2016, 2018, 2020 University of Padova, Dep. of Information
+*   Engineering, SIGNET lab.
 *
 *   This program is free software; you can redistribute it and/or modify
 *   it under the terms of the GNU General Public License version 2 as
@@ -15,11 +18,6 @@
 *   along with this program; if not, write to the Free Software
 *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 *
-*
-*   Author: Marco Mezzavilla < mezzavilla@nyu.edu>
-*                Sourjya Dutta <sdutta@nyu.edu>
-*                Russell Ford <russell.ford@nyu.edu>
-*                Menglei Zhang <menglei@nyu.edu>
 */
 
 
@@ -38,7 +36,7 @@
 #include <ns3/random-variable-stream.h>
 #include <ns3/mmwave-phy-mac-common.h>
 #include <ns3/mmwave-vehicular-propagation-loss-model.h>
-#include <ns3/antenna-array-model.h>
+#include <ns3/mmwave-vehicular-antenna-array-model.h>
 // #include <ns3/mmwave-3gpp-buildings-propagation-loss-model.h>
 
 #define AOA_INDEX 0
@@ -54,7 +52,7 @@
 
 namespace ns3 {
 
-namespace mmwave_vehicular {
+namespace millicar {
 
 //class MmWave3gppBuildingsPropagationLossModel;
 
@@ -187,9 +185,9 @@ public:
   /**
    * Add a device
    * @param a pointer to the NetDevice
-   * @param a pointer to the associated mmwave::AntennaArrayModel
+   * @param a pointer to the associated MmWaveVehicularAntennaArrayModel
    */
-  void AddDevice (Ptr<NetDevice>, Ptr<mmwave::AntennaArrayModel>);
+  void AddDevice (Ptr<NetDevice>, Ptr<MmWaveVehicularAntennaArrayModel>);
 
   /**
    * Set the pathloss model associated to this class
@@ -227,7 +225,7 @@ private:
    * @returns the channel realization in a Params3gpp object
    */
   Ptr<Params3gpp> GetNewChannel (Ptr<ParamsTable> table3gpp, Vector locUT, char condition, bool o2i,
-                                 Ptr<mmwave::AntennaArrayModel> txAntenna, Ptr<mmwave::AntennaArrayModel> rxAntenna,
+                                 Ptr<MmWaveVehicularAntennaArrayModel> txAntenna, Ptr<MmWaveVehicularAntennaArrayModel> rxAntenna,
                                  uint16_t *txAntennaNum, uint16_t *rxAntennaNum, Angles &rxAngle, Angles &txAngle,
                                  Vector speed, double dis2D, double dis3D) const;
 
@@ -245,7 +243,7 @@ private:
    * @returns the channel realization in a Params3gpp object
    */
   Ptr<Params3gpp> UpdateChannel (Ptr<Params3gpp> params3gpp, Ptr<ParamsTable> table3gpp,
-                                 Ptr<mmwave::AntennaArrayModel> txAntenna, Ptr<mmwave::AntennaArrayModel> rxAntenna,
+                                 Ptr<MmWaveVehicularAntennaArrayModel> txAntenna, Ptr<MmWaveVehicularAntennaArrayModel> rxAntenna,
                                  uint16_t *txAntennaNum, uint16_t *rxAntennaNum, Angles &rxAngle, Angles &txAngle) const;
 
   /**
@@ -344,12 +342,12 @@ private:
   bool m_interferenceOrDataMode;
   bool m_o2i; // true if outdoor to indoor propagation
 
-  std::map < Ptr<NetDevice>, Ptr<mmwave::AntennaArrayModel> > m_deviceAntennaMap;
+  std::map < Ptr<NetDevice>, Ptr<MmWaveVehicularAntennaArrayModel> > m_deviceAntennaMap;
 
 };
 
 
-} // namespace mmwave_vehicular
+} // namespace millicar
 }  // namespace ns3
 
 

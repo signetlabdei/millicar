@@ -7,7 +7,7 @@
 #     conf.check_nonfatal(header_name='stdint.h', define_name='HAVE_STDINT_H')
 
 def build(bld):
-    module = bld.create_ns3_module('mmwave-vehicular', ['core', 'propagation', 'spectrum', 'mmwave'])
+    module = bld.create_ns3_module('millicar', ['core', 'propagation', 'spectrum', 'mmwave'])
     module.source = [
         'model/mmwave-vehicular.cc',
         'model/mmwave-vehicular-propagation-loss-model.cc',
@@ -17,13 +17,13 @@ def build(bld):
         'model/mmwave-sidelink-phy.cc',
         'model/mmwave-sidelink-mac.cc',
         'model/mmwave-vehicular-net-device.cc',
+        'model/mmwave-vehicular-antenna-array-model.cc',
         'helper/mmwave-vehicular-helper.cc',
         'helper/mmwave-vehicular-traces-helper.cc'
         ]
 
-    module_test = bld.create_ns3_module_test_library('mmwave-vehicular')
+    module_test = bld.create_ns3_module_test_library('millicar')
     module_test.source = [
-        'test/mmwave-vehicular-test-suite.cc',
         'test/mmwave-vehicular-sidelink-spectrum-phy-test.cc',
         'test/mmwave-sidelink-phy-test-suite.cc',
         'test/mmwave-vehicular-rate-test.cc',
@@ -31,7 +31,7 @@ def build(bld):
         ]
 
     headers = bld(features='ns3header')
-    headers.module = 'mmwave-vehicular'
+    headers.module = 'millicar'
     headers.source = [
         'model/mmwave-vehicular.h',
         'model/mmwave-vehicular-propagation-loss-model.h',
@@ -42,6 +42,7 @@ def build(bld):
         'model/mmwave-sidelink-mac.h',
         'model/mmwave-sidelink-sap.h',
         'model/mmwave-vehicular-net-device.h',
+        'model/mmwave-vehicular-antenna-array-model.h',
         'helper/mmwave-vehicular-helper.h',
         'helper/mmwave-vehicular-traces-helper.h'
         ]

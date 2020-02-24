@@ -1,6 +1,7 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
-*   Copyright (c) 2019 University of Padova, Dep. of Information Engineering, SIGNET lab.
+*   Copyright (c) 2020 University of Padova, Dep. of Information Engineering,
+*   SIGNET lab.
 *
 *   This program is free software; you can redistribute it and/or modify
 *   it under the terms of the GNU General Public License version 2 as
@@ -26,13 +27,13 @@
 
 namespace ns3 {
 
-namespace mmwave_vehicular {
+namespace millicar {
 
 /**
  * Class that manages the connection to a trace
  * in MmWaveSidelinkSpectrumPhy and prints to a file
  */
-class MmWaveVehicularTracesHelper : public Object 
+class MmWaveVehicularTracesHelper : public Object
 {
 public:
   /**

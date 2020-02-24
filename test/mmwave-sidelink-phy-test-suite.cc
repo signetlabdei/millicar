@@ -1,4 +1,21 @@
 /* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
+/*
+*   Copyright (c) 2020 University of Padova, Dep. of Information Engineering,
+*   SIGNET lab.
+*
+*   This program is free software; you can redistribute it and/or modify
+*   it under the terms of the GNU General Public License version 2 as
+*   published by the Free Software Foundation;
+*
+*   This program is distributed in the hope that it will be useful,
+*   but WITHOUT ANY WARRANTY; without even the implied warranty of
+*   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+*   GNU General Public License for more details.
+*
+*   You should have received a copy of the GNU General Public License
+*   along with this program; if not, write to the Free Software
+*   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+*/
 
 #include "ns3/mmwave-sidelink-spectrum-phy.h"
 #include "ns3/constant-position-mobility-model.h"
@@ -12,7 +29,7 @@
 NS_LOG_COMPONENT_DEFINE ("MmWaveVehicularSpectrumPhyTestSuite");
 
 using namespace ns3;
-using namespace mmwave_vehicular;
+using namespace millicar;
 
 /**
  * In this test, two packets are sent from the tx node the rx node.
@@ -98,7 +115,7 @@ MmWaveVehicularSpectrumPhyTestCase1::Tx (Ptr<MmWaveSidelinkPhy> tx_phy, Time ipi
   dci.m_mcs = 0; // dummy value
   dci.m_tbSize = p->GetSize (); // dummy value
   dci.m_symStart = 0; // dummy value
-  dci.m_numSym = 30; // dummy value
+  dci.m_numSym = 3; // dummy value
   dci.m_rnti = 1; // RNTI of the TX node
 
   // create the mmwave::SlotAllocInfo containing the transmission information
@@ -139,27 +156,27 @@ MmWaveVehicularSpectrumPhyTestCase1::DoRun (void)
 
   TestVector test1;
   test1.distance = 400;
-  test1.ipi = MicroSeconds (800); // subframe period is 800 us in default configuration
+  test1.ipi = MicroSeconds (1000); // subframe period is 800 us in default configuration
   tests.push_back (test1);
 
   TestVector test2;
   test2.distance = 450;
-  test2.ipi = MicroSeconds (800);
+  test2.ipi = MicroSeconds (1000);
   tests.push_back (test2);
 
   TestVector test3;
   test3.distance = 500;
-  test3.ipi = MicroSeconds (800);
+  test3.ipi = MicroSeconds (1000);
   tests.push_back (test3);
 
   TestVector test4;
   test4.distance = 550;
-  test4.ipi = MicroSeconds (800);
+  test4.ipi = MicroSeconds (1000);
   tests.push_back (test4);
 
   TestVector test5;
   test5.distance = 600;
-  test5.ipi = MicroSeconds (800);
+  test5.ipi = MicroSeconds (1000);
   tests.push_back (test5);
 
   for (auto t : tests)
@@ -204,6 +221,16 @@ MmWaveVehicularSpectrumPhyTestCase1::StartTest (TestVector testVector)
 
   // create the configuration
   Ptr<mmwave::MmWavePhyMacCommon> pmc = CreateObject<mmwave::MmWavePhyMacCommon> ();
+  double subcarrierSpacing = 15 * std::pow (2, 2) * 1000; // subcarrier spacing based on the numerology. Only 60KHz and 120KHz is supported in NR V2X.
+  pmc->SetSymbPerSlot(14); // TR 38.802 Section 5.3: each slot must have 14 symbols < Symbol duration is dependant on the numerology
+  pmc->SetSlotPerSubframe(std::pow (2, 2)); // flexible number of slots per subframe - depends on numerology
+  pmc->SetSubframePeriod (1000); // TR 38.802 Section 5.3: the subframe duration is 1ms, i.e., 1000us, and the frame length is 10ms.
+  double symbolPeriod = pmc->GetSubframePeriod () / pmc->GetSlotsPerSubframe () / 14.0;
+  pmc->SetSymbolPeriod (symbolPeriod); // symbol period is required in microseconds
+  double subCarriersPerRB = 12;
+  pmc->SetNumChunkPerRB(1); // each resource block contains 1 chunk
+  pmc->SetNumRb ( uint32_t( 100e6 / (subcarrierSpacing * subCarriersPerRB) ) );
+  pmc->SetChunkWidth (subCarriersPerRB*subcarrierSpacing);
 
   // create and configure the tx spectrum phy
   Ptr<MmWaveSidelinkSpectrumPhy> tx_ssp = CreateObject<MmWaveSidelinkSpectrumPhy> ();
@@ -231,7 +258,7 @@ MmWaveVehicularSpectrumPhyTestCase1::StartTest (TestVector testVector)
   // create the rx phy
   Ptr<MmWaveSidelinkPhy> rx_phy = CreateObject<MmWaveSidelinkPhy> (rx_ssp, pmc);
 
-  // creating mac instance in order to be able to call the method DoSlotIndication from MmWaveSidelinkPhy::StartSlot() 
+  // creating mac instance in order to be able to call the method DoSlotIndication from MmWaveSidelinkPhy::StartSlot()
   Ptr<MmWaveSidelinkMac> rx_mac = CreateObject<MmWaveSidelinkMac> (pmc);
   rx_mac->SetRnti(2);
   rx_phy->SetPhySapUser(rx_mac->GetPhySapUser());
@@ -259,7 +286,7 @@ MmWaveVehicularSpectrumPhyTestCase1::StartTest (TestVector testVector)
   tx_phy->AddDevice (2, rxDev);
   rx_phy->AddDevice (1, txDev);
 
-  Simulator::Schedule (MicroSeconds (800), &MmWaveVehicularSpectrumPhyTestCase1::Tx, this, tx_phy, ipi);
+  Simulator::Schedule (MicroSeconds (1000), &MmWaveVehicularSpectrumPhyTestCase1::Tx, this, tx_phy, ipi);
 
   Simulator::Stop (Seconds (2));
   Simulator::Run ();

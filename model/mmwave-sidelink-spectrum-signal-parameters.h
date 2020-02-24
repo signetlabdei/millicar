@@ -1,7 +1,10 @@
-/* -*-  Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil; -*- */
+/* -*- Mode:C++; c-file-style:"gnu"; indent-tabs-mode:nil; -*- */
 /*
 *   Copyright (c) 2011 Centre Tecnologic de Telecomunicacions de Catalunya (CTTC)
-*   Copyright (c) 2015, NYU WIRELESS, Tandon School of Engineering, New York University
+*   Copyright (c) 2015, NYU WIRELESS, Tandon School of Engineering, New York
+*   University
+*   Copyright (c) 2020 University of Padova, Dep. of Information Engineering,
+*   SIGNET lab.
 *
 *   This program is free software; you can redistribute it and/or modify
 *   it under the terms of the GNU General Public License version 2 as
@@ -15,7 +18,6 @@
 *   You should have received a copy of the GNU General Public License
 *   along with this program; if not, write to the Free Software
 *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
-*
 */
 
 #ifndef MMWAVE_SIDELINK_SPECTRUM_SIGNAL_PARAMETERS_H
@@ -27,7 +29,7 @@ namespace ns3 {
 
 class PacketBurst;
 
-namespace mmwave_vehicular {
+namespace millicar {
 
 class MmWaveSidelinkControlMessage;
 
@@ -69,7 +71,7 @@ struct MmWaveSidelinkSpectrumSignalParameters : public SpectrumSignalParameters
 
 };
 
-} // namespace mmwave_vehicular
+} // namespace millicar
 
 }  // namespace ns3
 

@@ -2,20 +2,17 @@
 
 def build(bld):
 
-    obj = bld.create_ns3_program('mmwave-vehicular-example', ['mmwave-vehicular','core', 'propagation', 'spectrum', 'mmwave'])
-    obj.source = 'mmwave-vehicular-example.cc'
-
-    obj = bld.create_ns3_program('vehicular-simple-one', ['mmwave-vehicular','core', 'propagation', 'spectrum', 'mmwave'])
+    obj = bld.create_ns3_program('vehicular-simple-one', ['millicar','core', 'propagation', 'spectrum', 'mmwave'])
     obj.source = 'vehicular-simple-one.cc'
 
-    obj = bld.create_ns3_program('vehicular-simple-two', ['mmwave-vehicular','core', 'propagation', 'spectrum', 'mmwave'])
+    obj = bld.create_ns3_program('vehicular-simple-two', ['millicar','core', 'propagation', 'spectrum', 'mmwave'])
     obj.source = 'vehicular-simple-two.cc'
 
-    obj = bld.create_ns3_program('vehicular-simple-three', ['mmwave-vehicular','core', 'propagation', 'spectrum', 'mmwave'])
+    obj = bld.create_ns3_program('vehicular-simple-three', ['millicar','core', 'propagation', 'spectrum', 'mmwave'])
     obj.source = 'vehicular-simple-three.cc'
 
-    obj = bld.create_ns3_program('vehicular-simple-four', ['mmwave-vehicular','core', 'propagation', 'spectrum', 'mmwave'])
+    obj = bld.create_ns3_program('vehicular-simple-four', ['millicar','core', 'propagation', 'spectrum', 'mmwave'])
     obj.source = 'vehicular-simple-four.cc'
 
-    obj = bld.create_ns3_program('mmwave-vehicular-link-adaptation-example', ['mmwave-vehicular'])
+    obj = bld.create_ns3_program('mmwave-vehicular-link-adaptation-example', ['millicar'])
     obj.source = 'mmwave-vehicular-link-adaptation-example.cc'
