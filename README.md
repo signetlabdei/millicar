@@ -1,7 +1,7 @@
 # Millicar - An ns-3 Module for MmWave NR V2X Networks #
 
 This is an [ns-3](https://www.nsnam.org "ns-3 Website") module for the simulation
-of Vehicle-to-Vehicle networks operating at mmWaves. A description of this module can be found on [TBD].
+of Vehicle-to-Vehicle networks operating at mmWaves. A description of this module can be found on [arXiv](https://arxiv.org/abs/2002.10347 "arXiv link").
 
 This module currently includes features such as:
 - support to the latest 3GPP channel model for V2X networks, for frequency spectrum above 6 GHz;
