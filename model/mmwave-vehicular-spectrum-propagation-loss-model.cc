@@ -1,4 +1,4 @@
-/* -*-  Mode: C++; c-file-style: "gnu"; indent-tabs-mode:nil; -*- */
+
 /*
 *   Copyright (c) 2015, NYU WIRELESS, Tandon School of Engineering, New York
 *   University
@@ -530,7 +530,7 @@ MmWaveVehicularSpectrumPropagationLossModel::CalLongTerm (Ptr<Params3gpp> params
           std::complex<double> rxSum (0,0);
           for (uint16_t rxIndex = 0; rxIndex < rxAntenna; rxIndex++)
             {
-              rxSum = rxSum + std::conj (params->m_rxW.at (rxIndex)) * params->m_channel.at (rxIndex).at (txIndex).at (cIndex);
+              rxSum = rxSum + params->m_rxW.at (rxIndex) * params->m_channel.at (rxIndex).at (txIndex).at (cIndex);
             }
           txSum = txSum + params->m_txW.at (txIndex) * rxSum;
         }
