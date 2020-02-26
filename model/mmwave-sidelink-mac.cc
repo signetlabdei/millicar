@@ -294,7 +294,7 @@ MmWaveSidelinkMac::ScheduleResources (mmwave::SfnSf timingInfo)
     }
 
     // update index to the next available symbol
-    symStart = symStart + assignedSymbols + 1;
+    symStart = symStart + assignedSymbols;
 
     // if the iterator reached the end of the map, start again
     if (bsrIt == m_bufferStatusReportMap.end ())

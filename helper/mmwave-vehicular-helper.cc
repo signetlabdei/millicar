@@ -87,6 +87,15 @@ MmWaveVehicularHelper::GetTypeId ()
                  DoubleValue (1e8),
                  MakeDoubleAccessor (&MmWaveVehicularHelper::m_bandwidth),
                  MakeDoubleChecker<double> ())
+  .AddAttribute ("SchedulingPatternOption",
+                 "The type of scheduling pattern option to be used for resources assignation."
+                 "Default   : one single slot per subframe for each device"
+                 "Optimized : each slot of the subframe is used",
+                 EnumValue(DEFAULT),
+                 MakeEnumAccessor (&MmWaveVehicularHelper::SetSchedulingPatternOptionType,
+                                   &MmWaveVehicularHelper::GetSchedulingPatternOptionType),
+                 MakeEnumChecker(DEFAULT, "Default",
+                                 OPTIMIZED, "Optimized"))
   ;
 
   return tid;
@@ -264,21 +273,10 @@ MmWaveVehicularHelper::PairDevices (NetDeviceContainer devices)
 {
   NS_LOG_FUNCTION (this);
 
-  // define the scheduling pattern
-  // NOTE we assume a fixed scheduling pattern which periodically repeats at
-  // each subframe. Each slot in the subframe is assigned to a different user.
-  // If the number of devices is greater than the number of slots per subframe
-  // an assert is raised
   // TODO update this part to enable a more flexible configuration of the
   // scheduling pattern
-  NS_ASSERT_MSG (devices.GetN () <= m_phyMacConfig->GetSlotsPerSubframe (), "Too many devices");
-  std::vector<uint16_t> pattern (m_phyMacConfig->GetSlotsPerSubframe ());
-  for (uint16_t i = 0; i < devices.GetN (); i++)
-  {
-    Ptr<MmWaveVehicularNetDevice> di = DynamicCast<MmWaveVehicularNetDevice> (devices.Get (i));
-    pattern.at (i) = di->GetMac ()->GetRnti ();
-    NS_LOG_DEBUG ("slot " << i << " assigned to rnti " << pattern.at (i));
-  }
+
+  std::vector<uint16_t> pattern = CreateSchedulingPattern(devices);
 
   uint8_t bearerId = 1;
 
@@ -321,6 +319,75 @@ MmWaveVehicularHelper::PairDevices (NetDeviceContainer devices)
     }
 }
 
+std::vector<uint16_t>
+MmWaveVehicularHelper::CreateSchedulingPattern (NetDeviceContainer devices)
+{
+  // The maximum supported number of vehicles in the group is equal to the available number of slots per subframe
+  // TODO implement scheduling pattern that support groups with a number of vehicle greater than the number of slots per subframe
+  NS_ABORT_MSG_IF (devices.GetN () > m_phyMacConfig->GetSlotsPerSubframe (), "Too many devices");
+
+  // NOTE fixed scheduling pattern, set in configuration time and assumed the same for each subframe
+
+  uint8_t slotPerSf = m_phyMacConfig->GetSlotsPerSubframe ();
+  std::vector<uint16_t> pattern;
+
+  switch (m_schedulingOpt)
+  {
+    case DEFAULT:
+    {
+      // Each slot in the subframe is assigned to a different user.
+      // If (numDevices < numSlots), the remaining available slots are unused
+      pattern = std::vector<uint16_t> (slotPerSf);
+      for (uint16_t i = 0; i < devices.GetN (); i++)
+      {
+        Ptr<MmWaveVehicularNetDevice> di = DynamicCast<MmWaveVehicularNetDevice> (devices.Get (i));
+        pattern.at(i) = di->GetMac ()->GetRnti ();
+        NS_LOG_DEBUG ("slot " << i << " assigned to rnti " << di->GetMac ()->GetRnti ());
+      }
+      break;
+    }
+    case OPTIMIZED:
+    {
+      // Each slot in the subframe is used
+      uint8_t slotPerDev = std::floor ( slotPerSf / devices.GetN ());
+      uint8_t remainingSlots = slotPerSf % devices.GetN ();
+
+      NS_LOG_DEBUG("Minimum number of slots per device = " << (uint16_t)slotPerDev);
+      NS_LOG_DEBUG("Available slots = " << (uint16_t)slotPerSf);
+
+      uint8_t slotCnt = 0;
+
+      for (uint16_t i = 0; i < devices.GetN (); i++)
+      {
+        Ptr<MmWaveVehicularNetDevice> di = DynamicCast<MmWaveVehicularNetDevice> (devices.Get (i));
+
+        for (uint8_t j = 0; j < slotPerDev; j++)
+        {
+          pattern.push_back(di->GetMac ()->GetRnti ());
+          NS_LOG_DEBUG ("slot " << uint16_t(slotCnt) << " assigned to rnti " << di->GetMac ()->GetRnti ());
+          slotCnt++;
+        }
+      }
+
+      NS_LOG_DEBUG("Remaining slots = " << (uint16_t)remainingSlots);
+      for (uint16_t i = 0; i < remainingSlots; i++)
+      {
+        Ptr<MmWaveVehicularNetDevice> di = DynamicCast<MmWaveVehicularNetDevice> (devices.Get (i));
+        pattern.push_back(di->GetMac ()->GetRnti ());
+        NS_LOG_DEBUG ("slot " << uint16_t(slotCnt) << " assigned to rnti " << di->GetMac ()->GetRnti ());
+        slotCnt++;
+      }
+      break;
+    }
+    default:
+    {
+      NS_FATAL_ERROR("Programming Error.");
+    }
+  }
+
+  return pattern;
+}
+
 void
 MmWaveVehicularHelper::SetPropagationLossModelType (std::string plm)
 {
@@ -340,6 +407,20 @@ MmWaveVehicularHelper::SetPropagationDelayModelType (std::string pdm)
 {
   NS_LOG_FUNCTION (this);
   m_propagationDelayModelType = pdm;
+}
+
+void
+MmWaveVehicularHelper::SetSchedulingPatternOptionType (SchedulingPatternOption_t spo)
+{
+  NS_LOG_FUNCTION (this);
+  m_schedulingOpt = spo;
+}
+
+MmWaveVehicularHelper::SchedulingPatternOption_t
+MmWaveVehicularHelper::GetSchedulingPatternOptionType () const
+{
+  NS_LOG_FUNCTION (this);
+  return m_schedulingOpt;
 }
 
 } // namespace millicar

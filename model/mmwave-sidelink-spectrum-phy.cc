@@ -489,7 +489,8 @@ MmWaveSidelinkSpectrumPhy::StartTxDataFrames (Ptr<PacketBurst> pb,
 
         m_channel->StartTx (txParams);
 
-        m_endTxEvent = Simulator::Schedule (duration, &MmWaveSidelinkSpectrumPhy::EndTx, this);
+        // The end of the tranmission is reduced by 1 ns to avoid collision in case of a consecutive tranmission in the same slot.
+        m_endTxEvent = Simulator::Schedule (duration - NanoSeconds(1.0), &MmWaveSidelinkSpectrumPhy::EndTx, this);
       }
       break;
     default:

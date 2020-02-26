@@ -253,7 +253,7 @@ MmWaveSidelinkPhy::SlData (Ptr<PacketBurst> pb, mmwave::SlotAllocInfo info)
   NS_ASSERT_MSG (duration.GetNanoSeconds () == int64_t(info.m_dci.m_numSym * m_phyMacConfig->GetSymbolPeriod () * 1e3), "duration was not been correctly set");
 
   // send the transport block
-  Simulator::Schedule (startTime + NanoSeconds (1.0), &MmWaveSidelinkPhy::SendDataChannels, this,
+  Simulator::Schedule (startTime, &MmWaveSidelinkPhy::SendDataChannels, this,
                        pb,
                        duration,
                        info,

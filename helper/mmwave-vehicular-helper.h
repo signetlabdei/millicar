@@ -103,6 +103,31 @@ public:
    */
   void SetNumerology (uint8_t index);
 
+  /**
+   * Configure the scheduling pattern for a specific group of devices
+   * \param devices the NetDeviceContainer with the devices
+   * \return a vector of integers representing the scheduling pattern
+  */
+  std::vector<uint16_t> CreateSchedulingPattern (NetDeviceContainer devices);
+
+  /**
+   * Identifies the supported scheduling pattern policies
+   */
+  enum SchedulingPatternOption_t {DEFAULT = 1,
+                                   OPTIMIZED = 2};
+
+  /**
+  * Set the scheduling pattern option type
+  * \param spo the enum representing the scheduling pattern policy to be adopted
+  */
+  void SetSchedulingPatternOptionType (SchedulingPatternOption_t spo);
+
+  /**
+  * Returns the adopted scheduling pattern policy
+  * \return the adopted scheduling pattern policy
+  */
+  SchedulingPatternOption_t GetSchedulingPatternOptionType () const;
+
 protected:
   // inherited from Object
   virtual void DoInitialize (void) override;
@@ -124,6 +149,7 @@ private:
   std::string m_propagationLossModelType; //!< the type id of the propagation loss model to be used
   std::string m_spectrumPropagationLossModelType; //!< the type id of the spectrum propagation loss model to be used
   std::string m_propagationDelayModelType; //!< the type id of the delay model to be used
+  SchedulingPatternOption_t m_schedulingOpt; //!< the type of scheduling pattern policy to be adopted
 
   Ptr<MmWaveVehicularTracesHelper> m_phyTraceHelper; //!< Ptr to an helper for the physical layer traces
 
