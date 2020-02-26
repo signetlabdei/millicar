@@ -333,6 +333,7 @@ MmWaveVehicularNetDevice::ActivateBearer(const uint8_t bearerId, const uint16_t 
   pdcp->SetLtePdcpSapUser (pdcpSapUser);
   pdcp->SetLteRlcSapProvider (rlc->GetLteRlcSapProvider ());
   rlc->SetLteRlcSapUser (pdcp->GetLteRlcSapUser ());
+  rlc->Initialize (); // this is needed to trigger the BSR procedure if RLC SM is selected
 
   Ptr<SidelinkRadioBearerInfo> rbInfo = CreateObject<SidelinkRadioBearerInfo> ();
   rbInfo->m_rlc= rlc;
