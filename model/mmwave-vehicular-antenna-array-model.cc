@@ -40,18 +40,18 @@ namespace millicar {
 
 NS_OBJECT_ENSURE_REGISTERED (MmWaveVehicularAntennaArrayModel);
 
-MmWaveVehicularAntennaArrayModel::MmWaveVehicularAntennaArrayModel ()
+MmWaveVehicularAntennaArrayModel::MmWaveVehicularAntennaArrayModel () :
+m_omniTx {false},
+m_currentPanelId {0},
+m_noPlane {0},
+m_isUe {false},
+m_totNoArrayElements {0},
+m_hpbw {0},       //HPBW value of each antenna element
+m_gMax {0}       //directivity value expressed in dBi and valid only for TRP (see table A.1.6-3 in 38.802)
 // :m_minAngle (0),m_maxAngle(2*M_PI)
 {
-  m_omniTx = false;
   m_lastUpdateMap.clear ();
   m_lastUpdatePairMap.clear ();
-
-  m_hpbw = 0;       //HPBW value of each antenna element
-  m_gMax = 0;       //directivity value expressed in dBi and valid only for TRP (see table A.1.6-3 in 38.802)
-  m_noPlane = 0;
-  m_isUe = false;
-  m_totNoArrayElements = 0;
 }
 
 MmWaveVehicularAntennaArrayModel::~MmWaveVehicularAntennaArrayModel ()
