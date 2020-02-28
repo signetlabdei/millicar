@@ -271,6 +271,12 @@ MmWaveSidelinkSpectrumPhy::StartRxData (Ptr<MmWaveSidelinkSpectrumSignalParamete
       NS_FATAL_ERROR ("Cannot receive control in data period");
       break;
     case RX_DATA:
+      // If this device is in the RX_DATA state and another call to StartRx is
+      // triggered, it means that multiple concurrent signals are being received.
+      // In this case, we assume that the device will synchronize with the first
+      // received signal, while the other will act as interferers
+      m_interferenceData->AddSignal (params->psd, params->duration);
+      break;
     case IDLE:
       {
         // check if the packet is for this device, otherwise
