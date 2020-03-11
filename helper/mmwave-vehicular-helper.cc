@@ -178,6 +178,9 @@ MmWaveVehicularHelper::SetNumerology (uint8_t index)
 
   m_phyMacConfig->SetChunkWidth (subCarriersPerRB*subcarrierSpacing);
 
+  //TODO: How many reference subcarriers per symbols should we consider to be compliant with NR-V2X? 
+  m_phyMacConfig->SetNumRefScPerSym(0);
+
 }
 
 NetDeviceContainer
