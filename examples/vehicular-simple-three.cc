@@ -20,10 +20,7 @@
 #include "ns3/mmwave-sidelink-spectrum-phy.h"
 #include "ns3/mmwave-vehicular-net-device.h"
 #include "ns3/mmwave-vehicular-helper.h"
-#include "ns3/constant-position-mobility-model.h"
 #include "ns3/mobility-module.h"
-#include "ns3/isotropic-antenna-model.h"
-#include "ns3/spectrum-helper.h"
 #include "ns3/mmwave-spectrum-value-helper.h"
 #include "ns3/applications-module.h"
 #include "ns3/internet-module.h"
@@ -35,29 +32,113 @@ using namespace ns3;
 using namespace millicar;
 
 /**
-  This script creates two pairs of vehicles moving at 20 m/s. The two groups are virtually positioned in the same lane, one in front of the other at 20 m distance.
-  Also in the same group, the vehicles are positioned one in front of the other at 20 m distance, and they exchange packets through a UDP application.
-  Communication is done via a wireless channel.
-  The aim of this example is to check whether the interference was evaluated correctly when different groups
-  of nodes are transmitting in the same slot, sharing the same cell. It is basically the same as vehicular-simple-two, except for the position of the vehicles.
+  In this exampls, we considered two groups of vehicles traveling in
+  the same direction, either in the same ([sameLane] = true) or different lanes
+  ([sameLane] = false). Each group is composed of two vehicles, one behind the
+  other, moving at a constant speed of [speed] m/s and keeping a safety distance of
+  [intraGroupDistance] m. Within a group, the rear vehicle acts as a server and
+  generates data packets which are sent to the front vehicle. We considered an
+  ON-OFF traffic model, in which a UDP source keeps switching between the ON and
+  the OFF states. During the ON state, the source generates packets at a
+  constant rate for [onPeriod] ms, while in the OFF state it stays idle for a random
+  amount of time, which follows an exponential distribution with mean
+  [offPeriod] ms. All vehicles operate at 28 GHz with a bandwidth of 100 MHz,
+  possibly interfering in case of concurrent transmissions, and are equipped
+  with a Uniform Planar Array (UPA) of [numAntennaElements] antenna elements to
+  establish directional communications.
+  The simulation runs for [stopTime] ms, at outputs the overall Packet Reception
+  Ratio.
 */
+
+uint32_t g_txPacketsGroup1 = 0; // tx packet counter for group 1
+uint32_t g_txPacketsGroup2 = 0; // tx packet counter for group 2
+uint32_t g_rxPacketsGroup1 = 0; // rx packet counter for group 1
+uint32_t g_rxPacketsGroup2 = 0; // rx packet counter for group 2
+
+static void Tx (Ptr<OutputStreamWrapper> stream, uint8_t group, Ptr<const Packet> p)
+{
+  *stream->GetStream () << "Tx\t" << Simulator::Now ().GetSeconds () << "\t" << p->GetSize () << std::endl;
+  if (group == 1)
+  {
+    ++g_txPacketsGroup1;
+  }
+  else if (group == 2)
+  {
+    ++g_txPacketsGroup2;
+  }
+}
+
+static void Rx (Ptr<OutputStreamWrapper> stream, uint8_t group, Ptr<const Packet> packet, const Address& from)
+{
+  Ptr<Packet> newPacket = packet->Copy ();
+  SeqTsHeader seqTs;
+  newPacket->RemoveHeader (seqTs);
+  if (seqTs.GetTs ().GetNanoSeconds () != 0)
+  {
+    uint64_t delayNs = Simulator::Now ().GetNanoSeconds () - seqTs.GetTs ().GetNanoSeconds ();
+    *stream->GetStream () << "Rx\t" << Simulator::Now ().GetSeconds () << "\t" << packet->GetSize() << "\t" <<  delayNs << std::endl;
+  }
+  else
+  {
+    *stream->GetStream () << "Rx\t" << Simulator::Now ().GetSeconds () << "\t" << packet->GetSize() << std::endl;
+  }
+
+  if (group == 1)
+  {
+    ++g_rxPacketsGroup1;
+  }
+  else if (group == 2)
+  {
+    ++g_rxPacketsGroup2;
+  }
+}
+
 int main (int argc, char *argv[])
 {
-  uint32_t packetSize = 1024; // bytes
-  Time startTime = Seconds (1.5);
-  Time endTime = Seconds (10.0);
-  uint8_t mcs = 12;
+  uint32_t startTime = 100; // application start time in milliseconds
+  uint32_t stopTime = 5000; // application stop time in milliseconds
+  uint32_t onPeriod = 100; // on period duration in milliseconds
+  uint32_t offPeriod = 100; // mean duration of the off period in milliseconds
+  double dataRate = 100e6; // data rate in bps
+  uint32_t mcs = 28; // modulation and coding scheme
 
-  double speed = 20; // m/s
+  double interGroupDistance = 10; // distance between the two groups in meters
+  double speed = 20; // speed m/s
+  bool sameLane = true; // if true the two groups lie on the same lane (as a platoon), if false they lie on adjacent lanes
+
+  uint32_t numAntennaElements = 4; // number of antenna elements
+
+  bool orthogonalResources = true; // if true, resouces are orthogonal among the two groups, if false resources are shared
+
   CommandLine cmd;
-  cmd.AddValue ("vehicleSpeed", "The speed of the vehicle", speed);
+  cmd.AddValue ("startTime", "application stop time in milliseconds", startTime);
+  cmd.AddValue ("stopTime", "application stop time in milliseconds", stopTime);
+  cmd.AddValue ("onPeriod", "on period duration in milliseconds", onPeriod);
+  cmd.AddValue ("offPeriod", "mean duration of the off period in milliseconds", offPeriod);
+  cmd.AddValue ("dataRate", "data rate in bps", dataRate);
+  cmd.AddValue ("mcs", "modulation and coding scheme", mcs);
+  cmd.AddValue ("interGroupDistance", "distance between the two groups in meters", interGroupDistance);
+  cmd.AddValue ("speed", "the speed of the vehicles in m/s", speed);
+  cmd.AddValue ("numAntennaElements", "number of antenna elements", numAntennaElements);
+  cmd.AddValue ("orthogonalResources", "if true, resouces are orthogonal among the two groups, if false resources are shared", orthogonalResources);
+  cmd.AddValue ("sameLane", "if true the two groups lie on the same lane, if false they lie on adjacent lanes", sameLane);
   cmd.Parse (argc, argv);
 
   Config::SetDefault ("ns3::MmWaveSidelinkMac::UseAmc", BooleanValue (false));
   Config::SetDefault ("ns3::MmWaveSidelinkMac::Mcs", UintegerValue (mcs));
   Config::SetDefault ("ns3::MmWavePhyMacCommon::CenterFreq", DoubleValue (28.0e9));
+  Config::SetDefault ("ns3::MmWaveVehicularPropagationLossModel::ChannelCondition", StringValue ("l"));
   Config::SetDefault ("ns3::MmWaveVehicularPropagationLossModel::Frequency", DoubleValue (28.0e9));
   Config::SetDefault ("ns3::MmWaveVehicularSpectrumPropagationLossModel::Frequency", DoubleValue (28.0e9));
+
+  Config::SetDefault ("ns3::MmWaveVehicularNetDevice::RlcType", StringValue("LteRlcUm"));
+  Config::SetDefault ("ns3::MmWaveVehicularHelper::SchedulingPatternOption", EnumValue(2)); // use 2 for SchedulingPatternOption=OPTIMIZED, 1 or SchedulingPatternOption=DEFAULT
+  Config::SetDefault ("ns3::LteRlcUm::MaxTxBufferSize", UintegerValue (500*1024));
+
+  Config::SetDefault ("ns3::MmWaveVehicularAntennaArrayModel::AntennaElements", UintegerValue (numAntennaElements));
+  Config::SetDefault ("ns3::MmWaveVehicularAntennaArrayModel::AntennaElementPattern", StringValue ("3GPP-V2V"));
+  Config::SetDefault ("ns3::MmWaveVehicularAntennaArrayModel::IsotropicAntennaElements", BooleanValue (true));
+  Config::SetDefault ("ns3::MmWaveVehicularAntennaArrayModel::NumSectors", UintegerValue (2));
 
   // create the nodes
   NodeContainer group1, group2;
@@ -70,17 +151,26 @@ int main (int argc, char *argv[])
   mobility.Install (group1);
   mobility.Install (group2);
 
+  double intraGroupDistance = std::max (2.0, 2*speed); // distance between cars belonging to the same group in meters
   group1.Get (0)->GetObject<MobilityModel> ()->SetPosition (Vector (0,0,0));
-  group1.Get (0)->GetObject<ConstantVelocityMobilityModel> ()->SetVelocity (Vector (0, speed, 0));
+  group1.Get (0)->GetObject<ConstantVelocityMobilityModel> ()->SetVelocity (Vector (speed, 0, 0));
 
-  group1.Get (1)->GetObject<MobilityModel> ()->SetPosition (Vector (0,20,0));
-  group1.Get (1)->GetObject<ConstantVelocityMobilityModel> ()->SetVelocity (Vector (0, speed, 0));
+  group1.Get (1)->GetObject<MobilityModel> ()->SetPosition (Vector (intraGroupDistance,0,0));
+  group1.Get (1)->GetObject<ConstantVelocityMobilityModel> ()->SetVelocity (Vector (speed, 0, 0));
 
-  group2.Get (0)->GetObject<MobilityModel> ()->SetPosition (Vector (0,40,0));
-  group2.Get (0)->GetObject<ConstantVelocityMobilityModel> ()->SetVelocity (Vector (0, speed, 0));
+  if (sameLane)
+  {
+    group2.Get (0)->GetObject<MobilityModel> ()->SetPosition (Vector (intraGroupDistance+interGroupDistance,0,0));
+    group2.Get (1)->GetObject<MobilityModel> ()->SetPosition (Vector (intraGroupDistance*2+interGroupDistance,0,0));
 
-  group2.Get (1)->GetObject<MobilityModel> ()->SetPosition (Vector (0,60,0));
-  group2.Get (1)->GetObject<ConstantVelocityMobilityModel> ()->SetVelocity (Vector (0, speed, 0));
+  }
+  else
+  {
+    group2.Get (0)->GetObject<MobilityModel> ()->SetPosition (Vector (intraGroupDistance,interGroupDistance,0));
+    group2.Get (1)->GetObject<MobilityModel> ()->SetPosition (Vector (intraGroupDistance*2,interGroupDistance,0));
+  }
+  group2.Get (0)->GetObject<ConstantVelocityMobilityModel> ()->SetVelocity (Vector (speed, 0, 0));
+  group2.Get (1)->GetObject<ConstantVelocityMobilityModel> ()->SetVelocity (Vector (speed, 0, 0));
 
   // create and configure the helper
   Ptr<MmWaveVehicularHelper> helper = CreateObject<MmWaveVehicularHelper> ();
@@ -103,8 +193,18 @@ int main (int argc, char *argv[])
   ipv4.SetBase ("10.1.2.0", "255.255.255.0");
   i = ipv4.Assign (devs2);
 
-  helper->PairDevices(devs1);
-  helper->PairDevices(devs2);
+  if (orthogonalResources)
+  {
+    // resources are orthogonally partitioned among the two groups
+    helper->PairDevices (NetDeviceContainer (devs1, devs2));
+  }
+  else
+  {
+    // resources are othogally partitioned among devices belonging to the
+    // same group, while shared among the two groups
+    helper->PairDevices(devs1);
+    helper->PairDevices(devs2);
+  }
 
   Ipv4StaticRoutingHelper ipv4RoutingHelper;
 
@@ -117,51 +217,48 @@ int main (int argc, char *argv[])
   staticRouting = ipv4RoutingHelper.GetStaticRouting (group2.Get (0)->GetObject<Ipv4> ());
   staticRouting->SetDefaultRoute (group2.Get (1)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal () , 2 );
 
-  NS_LOG_DEBUG("IPv4 Address node 0 group 2: " << group2.Get (0)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal ());
-  NS_LOG_DEBUG("IPv4 Address node 1 group 2: " << group2.Get (1)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal ());
+  // create the random variables used to setup the applications
+  Ptr<ConstantRandomVariable> onPeriodRv = CreateObjectWithAttributes<ConstantRandomVariable> ("Constant", DoubleValue (onPeriod / 1000.0));
+  Ptr<ExponentialRandomVariable> offPeriodRv = CreateObjectWithAttributes<ExponentialRandomVariable> ("Mean", DoubleValue (offPeriod / 1000.0));
 
-  Ptr<mmwave::MmWaveAmc> m_amc = CreateObject <mmwave::MmWaveAmc> (helper->GetConfigurationParameters());
-  double availableRate = m_amc->GetTbSizeFromMcsSymbols(mcs, 14) / 0.001; // bps
-  uint16_t port = 4000;  // well-known echo port number
-  uint32_t maxPacketCount = 500000;
-  packetSize = m_amc->GetTbSizeFromMcsSymbols(mcs, 14) / 8 - 28;
-  Time interPacketInterval =  Seconds(double((packetSize * 8) / availableRate));
+  // create the appplications for group 1
+  uint32_t port = 1234;
+  OnOffHelper onoff ("ns3::UdpSocketFactory", Address (InetSocketAddress (group1.Get (1)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal (), port)));
+  onoff.SetConstantRate (DataRate (std::to_string (dataRate)+"b/s"));
+  onoff.SetAttribute ("OnTime", PointerValue (onPeriodRv));
+  onoff.SetAttribute ("OffTime", PointerValue (offPeriodRv));
+  ApplicationContainer onOffApps = onoff.Install (group1.Get (0));
 
-  NS_LOG_INFO ("Create applications for group number 1.");
+  PacketSinkHelper sink ("ns3::UdpSocketFactory", Address (InetSocketAddress (Ipv4Address::GetAny (), port)));
+  ApplicationContainer packetSinkApps = sink.Install (group1.Get (1));
 
-  UdpServerHelper server1 (port);
+  // create the applications for group 2
+  onoff.SetAttribute ("Remote", AddressValue (InetSocketAddress (group2.Get (1)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal (), port)));
+  onOffApps.Add (onoff.Install (group2.Get (0)));
 
-  ApplicationContainer apps1 = server1.Install (group1.Get (1));
-  apps1.Start (Seconds (1.0));
-  apps1.Stop (Seconds(14.0));
+  sink.SetAttribute ("Local", AddressValue (InetSocketAddress (Ipv4Address::GetAny (), port)));
+  packetSinkApps.Add (sink.Install (group2.Get (1)));
 
-  UdpEchoClientHelper client1 (group1.Get (1)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal (), port);
-  client1.SetAttribute ("MaxPackets", UintegerValue (maxPacketCount));
-  client1.SetAttribute ("Interval", TimeValue (interPacketInterval));
-  client1.SetAttribute ("PacketSize", UintegerValue (packetSize));
-  apps1 = client1.Install (group1.Get (0));
-  apps1.Start (startTime);
-  apps1.Stop (endTime);
+  onOffApps.Start (MilliSeconds (startTime));
+  onOffApps.Stop (MilliSeconds (stopTime));
 
-  NS_LOG_INFO ("Create applications for group number 2.");
+  packetSinkApps.Start (MilliSeconds (0.0));
 
-  UdpServerHelper server2 (port);
+  // connect the trace sources to the sinks
+  AsciiTraceHelper asciiTraceHelper;
+  Ptr<OutputStreamWrapper> stream = asciiTraceHelper.CreateFileStream ("group-1.txt");
+  onOffApps.Get (0)->TraceConnectWithoutContext ("Tx", MakeBoundCallback (&Tx, stream, 1));
+  packetSinkApps.Get (0)->TraceConnectWithoutContext ("Rx", MakeBoundCallback (&Rx, stream, 1));
 
-  ApplicationContainer apps2 = server2.Install (group2.Get (1));
-  apps2.Start (Seconds (1.0));
-  apps2.Stop (Seconds(14.0));
+  stream = asciiTraceHelper.CreateFileStream ("group-2.txt");
+  onOffApps.Get(1)->TraceConnectWithoutContext ("Tx", MakeBoundCallback (&Tx, stream, 2));
+  packetSinkApps.Get (1)->TraceConnectWithoutContext ("Rx", MakeBoundCallback (&Rx, stream, 2));
 
-  UdpEchoClientHelper client2 (group2.Get (1)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal (), port);
-  client2.SetAttribute ("MaxPackets", UintegerValue (maxPacketCount));
-  client2.SetAttribute ("Interval", TimeValue (interPacketInterval));
-  client2.SetAttribute ("PacketSize", UintegerValue (packetSize));
-  apps2 = client2.Install (group2.Get (0));
-  apps2.Start (startTime);
-  apps2.Stop (endTime);
-
-  Simulator::Stop (Seconds(14.0));
+  Simulator::Stop (MilliSeconds(stopTime + 1000));
   Simulator::Run ();
   Simulator::Destroy ();
+
+  std::cout << "PRR " << double(g_rxPacketsGroup1 + g_rxPacketsGroup2) / double(g_txPacketsGroup1 + g_txPacketsGroup2) << std::endl;
 
   return 0;
 }
