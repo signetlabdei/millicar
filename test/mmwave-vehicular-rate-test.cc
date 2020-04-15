@@ -135,38 +135,31 @@ MmWaveVehicularRateTestCase::DoRun (void)
 void
 MmWaveVehicularRateTestCase::StartTest (uint8_t mcs)
 {
-  // This test creates two nodes moving at 20 m/s, placed at a distance of 10 m.
-  // These nodes exchange packets through a UDP application with a fixed sending rate,
-  // and they communicate using a wireless channel at 60 GHz.
+  // This test creates two nodes that exchange packets through a UDP application
+  // with a fixed sending rate.
 
-  uint32_t packetSize = 1024; // bytes
-  Time startTime = Seconds (1.5);
-  Time endTime = Seconds (60.0);
+  Time startTime = MilliSeconds (100);
+  Time endTime = MilliSeconds (500);
 
   Config::SetDefault ("ns3::MmWaveSidelinkMac::Mcs", UintegerValue (mcs));
   Config::SetDefault ("ns3::MmWaveSidelinkMac::UseAmc", BooleanValue (false));
-  Config::SetDefault ("ns3::MmWavePhyMacCommon::CenterFreq", DoubleValue (60.0e9));
-  Config::SetDefault ("ns3::MmWaveVehicularPropagationLossModel::Frequency", DoubleValue (60.0e9));
-  Config::SetDefault ("ns3::MmWaveVehicularSpectrumPropagationLossModel::Frequency", DoubleValue (60.0e9));
+  Config::SetDefault ("ns3::LteRlcTm::MaxTxBufferSize", UintegerValue (1024 * 1024 * 1024)); // we want to avoid buffer drops
+  Config::SetDefault ("ns3::MmWaveVehicularNetDevice::Mtu", UintegerValue (65535)); // set equal to the IP MTU
 
   // create the nodes
   NodeContainer n;
   n.Create (2);
 
   // create the mobility models
+  // NOTE: the position does not matter since we are not applying any channel
+  // model, we just set it to avoid failures
   MobilityHelper mobility;
   Ptr<ListPositionAllocator> positionAlloc = CreateObject<ListPositionAllocator> ();
   positionAlloc->Add (Vector (0.0, 0.0, 0.0));
-  positionAlloc->Add (Vector (10.0, 0.0, 0.0));
+  positionAlloc->Add (Vector (1.0, 0.0, 0.0));
   mobility.SetPositionAllocator (positionAlloc);
-  mobility.SetMobilityModel ("ns3::ConstantVelocityMobilityModel");
+  mobility.SetMobilityModel ("ns3::ConstantPositionMobilityModel");
   mobility.Install (n);
-
-  n.Get (0)->GetObject<MobilityModel> ()->SetPosition (Vector (0,0,0));
-  n.Get (0)->GetObject<ConstantVelocityMobilityModel> ()->SetVelocity (Vector (20, 0, 0));
-
-  n.Get (1)->GetObject<MobilityModel> ()->SetPosition (Vector (10,0,0));
-  n.Get (1)->GetObject<ConstantVelocityMobilityModel> ()->SetVelocity (Vector (20, 0, 0));
 
   // create and configure the helper
   Ptr<MmWaveVehicularHelper> helper = CreateObject<MmWaveVehicularHelper> ();
@@ -195,15 +188,13 @@ MmWaveVehicularRateTestCase::StartTest (uint8_t mcs)
   NS_LOG_DEBUG("IPv4 Address node 0: " << n.Get (0)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal ());
   NS_LOG_DEBUG("IPv4 Address node 1: " << n.Get (1)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal ());
 
-  NS_LOG_INFO ("Create Applications.");
   //
   // Create a UdpEchoServer application on node one.
   //
-  uint16_t port = 4000;  // well-known echo port number
+  uint16_t port = 4000;
   UdpServerHelper server (port);
   ApplicationContainer apps = server.Install (n.Get (1));
-  apps.Start (Seconds (1.0));
-  apps.Stop (Seconds(64.0));
+  apps.Start (MilliSeconds (0));
 
   apps.Get(0)->TraceConnectWithoutContext ("Rx", MakeCallback (&MmWaveVehicularRateTestCase::Rx, this));
 
@@ -211,16 +202,22 @@ MmWaveVehicularRateTestCase::StartTest (uint8_t mcs)
   // Create a UdpClient application to send UDP datagrams from node zero to
   // node one.
   //
-
   Ptr<MmWaveAmc> m_amc = CreateObject <MmWaveAmc> (helper->GetConfigurationParameters());
-  double availableRate = m_amc->GetTbSizeFromMcsSymbols(mcs, 14) / 0.001; // bps
 
-  uint32_t maxPacketCount = 500000;
-  packetSize = m_amc->GetTbSizeFromMcsSymbols(mcs, 14) / 8 - 28 - 2; // TB size - header sizes (UDP, IP, PDCP, RLC)
-  Time interPacketInterval =  Seconds(double((packetSize * 8) / availableRate));
+  // The user is assigned to a single slot per subframe.
+  // Each slot has 14 OFDM symbols, hence the theoretical available rate is:
+  // bitPerSymbol * 14 / 1 ms
+  uint32_t availableBitsPerSlot = m_amc->GetTbSizeFromMcsSymbols(mcs, 14);
+  double availableRate =  availableBitsPerSlot * 1e3; // bps
+
+  // Configure the application to send a single packet per subframe, which has
+  // to occupy all the available resources in the slot
+  uint32_t headerSize = 30; // header sizes (UDP, IP, PDCP, RLC)
+  uint32_t packetSize = (availableBitsPerSlot / 8) - headerSize; // TB size - header sizes (UDP, IP, PDCP, RLC)
+  TimeValue interPacketInterval =  MilliSeconds (1);
   UdpEchoClientHelper client (n.Get (1)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal (), port);
-  client.SetAttribute ("MaxPackets", UintegerValue (maxPacketCount));
-  client.SetAttribute ("Interval", TimeValue (interPacketInterval));
+  client.SetAttribute ("MaxPackets", UintegerValue (0xFFFFFFFF));
+  client.SetAttribute ("Interval", interPacketInterval);
   client.SetAttribute ("PacketSize", UintegerValue (packetSize));
   apps = client.Install (n.Get (0));
   apps.Start (startTime);
@@ -228,7 +225,7 @@ MmWaveVehicularRateTestCase::StartTest (uint8_t mcs)
 
   apps.Get(0)->TraceConnectWithoutContext ("Tx", MakeCallback (&MmWaveVehicularRateTestCase::Tx, this));
 
-  Simulator::Stop (Seconds(64.0));
+  Simulator::Stop (endTime + Seconds (1.0));
   Simulator::Run ();
   Simulator::Destroy ();
 
@@ -237,7 +234,7 @@ MmWaveVehicularRateTestCase::StartTest (uint8_t mcs)
   std::cout << "Packets size:\t\t" << packetSize << " Bytes" << std::endl;
   std::cout << "Packets transmitted:\t" << g_txPackets << std::endl;
   std::cout << "Packets received:\t" << g_rxPackets << std::endl;
-  std::cout << "Average Throughput:\t" << (double(g_rxPackets)*double(packetSize+28)*8/double( g_lastReceived.GetSeconds() - g_firstReceived.GetSeconds()))/1e6 << " Mbps" << std::endl;
+  std::cout << "Average Throughput:\t" << (double(g_rxPackets)*double(packetSize + headerSize)*8/double( g_lastReceived.GetSeconds() - g_firstReceived.GetSeconds()))/1e6 << " Mbps" << std::endl;
 
 }
 
