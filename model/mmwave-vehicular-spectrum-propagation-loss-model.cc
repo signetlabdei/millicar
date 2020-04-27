@@ -73,23 +73,23 @@ static const double sqrtC_UMi_NLOS[6][6] = {
 };
 
 static const double oxygen_loss[17][2] = {
-  {52.0, 0.0},
-  {53.0, 1.0},
-  {54.0, 2.2},
-  {55.0, 4.0},
-  {56.0, 6.6},
-  {57.0, 9.7},
-  {58.0, 12.6},
-  {59.0, 14.6},
-  {60.0, 15.0},
-  {61.0, 14.6},
-  {62.0, 14.3},
-  {63.0, 10.5},
-  {64.0, 6.8},
-  {65.0, 3.9},
-  {66.0, 1.9},
-  {67.0, 1.0},
-  {68.0, 0.0}
+  {52.0e9, 0.0},
+  {53.0e9, 1.0},
+  {54.0e9, 2.2},
+  {55.0e9, 4.0},
+  {56.0e9, 6.6},
+  {57.0e9, 9.7},
+  {58.0e9, 12.6},
+  {59.0e9, 14.6},
+  {60.0e9, 15.0},
+  {61.0e9, 14.6},
+  {62.0e9, 14.3},
+  {63.0e9, 10.5},
+  {64.0e9, 6.8},
+  {65.0e9, 3.9},
+  {66.0e9, 1.9},
+  {67.0e9, 1.0},
+  {68.0e9, 0.0}
 };
 
 MmWaveVehicularSpectrumPropagationLossModel::MmWaveVehicularSpectrumPropagationLossModel ()
@@ -143,7 +143,7 @@ MmWaveVehicularSpectrumPropagationLossModel::GetTypeId (void)
                    MakeBooleanChecker ())
     .AddAttribute ("OxygenAbsorption",
                    "true for considering oxygen absortion, false for not considering it",
-                   BooleanValue (false),
+                   BooleanValue (true),
                    MakeBooleanAccessor (&MmWaveVehicularSpectrumPropagationLossModel::m_oxygenAbsorption),
                    MakeBooleanChecker ())
     .AddAttribute ("O2I",
@@ -399,7 +399,6 @@ MmWaveVehicularSpectrumPropagationLossModel::CalBeamformingGain (Ptr<const Spect
   Values::iterator vit = tempPsd->ValuesBegin ();
   Bands::const_iterator sbit = tempPsd->ConstBandsBegin(); // sub band iterator
 
-  uint16_t iSubband = 0;
   double slotTime = Simulator::Now ().GetSeconds ();
   complexVector_t doppler;
   for (uint8_t cIndex = 0; cIndex < numCluster; cIndex++)
@@ -464,7 +463,7 @@ MmWaveVehicularSpectrumPropagationLossModel::CalBeamformingGain (Ptr<const Spect
           *vit = (*vit) * (norm (subsbandGain));
         }
       vit++;
-      iSubband++;
+      sbit++;
     }
   return tempPsd;
 }
@@ -473,6 +472,7 @@ MmWaveVehicularSpectrumPropagationLossModel::CalBeamformingGain (Ptr<const Spect
 double
 MmWaveVehicularSpectrumPropagationLossModel::GetOxygenLoss (double f, double dist3D, double tau, double tauDelta) const
 {
+  NS_LOG_FUNCTION (this << f << dist3D << tau << tauDelta);
   double alpha = 0.0, loss = 0.0;
 
   if(f > oxygen_loss[0][0] && f < oxygen_loss[16][0])
@@ -481,8 +481,10 @@ MmWaveVehicularSpectrumPropagationLossModel::GetOxygenLoss (double f, double dis
     {
       if ( f > oxygen_loss[idx-1][0] && f <= oxygen_loss[idx][0] )
       {
+        // interpolation of the oxygen_loss table
         alpha = (oxygen_loss[idx][1] - oxygen_loss[idx-1][1])/(oxygen_loss[idx][0] - oxygen_loss[idx-1][0])*(f - oxygen_loss[idx-1][0]) + oxygen_loss[idx-1][1];
         loss = alpha / 1e3 * (dist3D + 3e8 * (tau + tauDelta));
+        NS_LOG_DEBUG ("f (subband) " << f << " alpha " << alpha << " dB/km loss " << loss << " dB");
       }
     }
   }
