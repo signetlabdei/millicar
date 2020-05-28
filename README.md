@@ -10,7 +10,7 @@ This module currently includes features such as:
 - helpers and examples to guide users that want to interact with the module.
 
 If you use this module in your research, please cite:
-M. Drago, T. Zugno, M. Polese, M. Giordani, M. Zorzi, _"Millicar - An ns-3 Module for MmWave NR V2X Networks,"_ submitted to the Workshop on ns-3 (WNS3), 2020.
+M. Drago, T. Zugno, M. Polese, M. Giordani, M. Zorzi, _"Millicar - An ns-3 Module for MmWave NR V2X Networks,"_ Proc. of the Workshop on ns-3 (WNS3), 2020.
 
 ## Getting Started ##
 
