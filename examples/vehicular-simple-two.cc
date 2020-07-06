@@ -46,7 +46,7 @@ of nodes are transmitting in the same slot, sharing the same cell.
 int main (int argc, char *argv[])
 {
   // system parameters
-  double bandwidth = 100e8; // bandwidth in Hz
+  double bandwidth = 100.0e6; // bandwidth in Hz
   double frequency = 28e9; // the carrier frequency
   uint32_t numerology = 3; // the numerology
 
