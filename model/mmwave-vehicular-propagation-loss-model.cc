@@ -115,8 +115,6 @@ MmWaveVehicularPropagationLossModel::GetMinLoss (void) const
 void
 MmWaveVehicularPropagationLossModel::SetFrequency (double freq)
 {
-  NS_ASSERT_MSG (freq != 0.0, "Frequency cannot be set to 0.0!");
-
   m_frequency = freq;
   m_lambda = g_C / m_frequency;
 }

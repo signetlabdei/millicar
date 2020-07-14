@@ -74,8 +74,6 @@ main (int argc, char *argv[])
   uint16_t numOfTx = std::ceil (endTime / ipi); // the number of transmissions
 
   Config::SetDefault ("ns3::MmWavePhyMacCommon::CenterFreq", DoubleValue (frequency));
-  Config::SetDefault ("ns3::MmWaveVehicularPropagationLossModel::Frequency", DoubleValue (frequency));
-  Config::SetDefault ("ns3::MmWaveVehicularSpectrumPropagationLossModel::Frequency", DoubleValue (frequency));
   Config::SetDefault ("ns3::MmWaveVehicularPropagationLossModel::ChannelCondition", StringValue ("l"));
 
   // create the nodes

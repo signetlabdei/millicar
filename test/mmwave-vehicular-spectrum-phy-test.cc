@@ -25,7 +25,7 @@
 #include "ns3/mmwave-spectrum-value-helper.h"
 #include "ns3/test.h"
 
-NS_LOG_COMPONENT_DEFINE ("MmWaveVehicularSidelinkSpectrumPhyTestSuite");
+NS_LOG_COMPONENT_DEFINE ("MmWaveVehicularSpectrumPhyTestSuite");
 
 using namespace ns3;
 using namespace millicar;
@@ -34,18 +34,18 @@ using namespace millicar;
  * This is a test to check if the class MmWaveSidelinkSpectrumPhy correctly
  * computes the SNR.
  */
-class MmWaveVehicularSidelinkSpectrumPhyTestCase1 : public TestCase
+class MmWaveVehicularSpectrumPhyTestCase1 : public TestCase
 {
 public:
   /**
    * Constructor
    */
-  MmWaveVehicularSidelinkSpectrumPhyTestCase1 ();
+  MmWaveVehicularSpectrumPhyTestCase1 ();
 
   /**
    * Destructor
    */
-  virtual ~MmWaveVehicularSidelinkSpectrumPhyTestCase1 ();
+  virtual ~MmWaveVehicularSpectrumPhyTestCase1 ();
 
 private:
 
@@ -53,6 +53,12 @@ private:
    * This method run the test
    */
   virtual void DoRun (void);
+  
+  /**
+   * This method runs the simulation using the specified distance between the devices
+   * \param dist inter-device distance
+   */
+  void StartTest (double dist);
 
   /**
    * This method is a callback sink which is fired when the rx receives a packet
@@ -70,23 +76,23 @@ private:
   double m_expectedSinr; //!< expected average SINR
 };
 
-MmWaveVehicularSidelinkSpectrumPhyTestCase1::MmWaveVehicularSidelinkSpectrumPhyTestCase1 ()
+MmWaveVehicularSpectrumPhyTestCase1::MmWaveVehicularSpectrumPhyTestCase1 ()
   : TestCase ("MmwaveVehicular test case (does nothing)")
 {
 }
 
-MmWaveVehicularSidelinkSpectrumPhyTestCase1::~MmWaveVehicularSidelinkSpectrumPhyTestCase1 ()
+MmWaveVehicularSpectrumPhyTestCase1::~MmWaveVehicularSpectrumPhyTestCase1 ()
 {
 }
 
 void
-MmWaveVehicularSidelinkSpectrumPhyTestCase1::Rx (Ptr<Packet> p)
+MmWaveVehicularSpectrumPhyTestCase1::Rx (Ptr<Packet> p)
 {
   NS_LOG_DEBUG ("Rx event");
 }
 
 void
-MmWaveVehicularSidelinkSpectrumPhyTestCase1::UpdateSinrPerceived (const SpectrumValue& sinr)
+MmWaveVehicularSpectrumPhyTestCase1::UpdateSinrPerceived (const SpectrumValue& sinr)
 {
   double actualSnr = 10 * log10 (Sum (sinr) / sinr.GetSpectrumModel ()->GetNumBands ());
   NS_LOG_DEBUG ("expected SINR " << m_expectedSinr << " actual SINR " << actualSnr << " dB" );
@@ -94,17 +100,29 @@ MmWaveVehicularSidelinkSpectrumPhyTestCase1::UpdateSinrPerceived (const Spectrum
 }
 
 void
-MmWaveVehicularSidelinkSpectrumPhyTestCase1::DoRun (void)
+MmWaveVehicularSpectrumPhyTestCase1::DoRun (void)
+{
+  for (double d = 400.0; d <= 600.0;)
+  {
+    // perform the test
+    StartTest (d);
+    
+    d += 50;
+  }
+}
+
+void
+MmWaveVehicularSpectrumPhyTestCase1::StartTest (double dist)
 {
   // This test creates two MmWaveSidelinkSpectrumPhy instances (tx and rx)
-  // and connects them through a SpectrumChannel. The SepctrumChannel is
+  // and connects them through a SpectrumChannel. The SpectrumChannel is
   // configured with a ConstantSpeedPropagationDelayModel and a
   // FriisSpectrumPropagationLossModel.
   // The tx instance sends a dummy signal to the rx, which computes the SNR.
   // The computed SNR is compared with the expected SNR, which is computed
   // offline using the link budget and the Friis formulas.
 
-  double distance = 100; // distance between tx and rx
+  double distance = dist; // distance between tx and rx
 
   // create the mobility model
   Ptr<MobilityModel> tx_mm = CreateObject<ConstantPositionMobilityModel> ();
@@ -136,12 +154,12 @@ MmWaveVehicularSidelinkSpectrumPhyTestCase1::DoRun (void)
   sc->AddRx (rx_ssp);
 
   // connect the rx callback to the sink
-  rx_ssp->SetPhyRxDataEndOkCallback (MakeCallback (&MmWaveVehicularSidelinkSpectrumPhyTestCase1::Rx, this));
+  rx_ssp->SetPhyRxDataEndOkCallback (MakeCallback (&MmWaveVehicularSpectrumPhyTestCase1::Rx, this));
 
   // create and configure the chunk processor
   Ptr<mmwave::mmWaveChunkProcessor> pData = Create<mmwave::mmWaveChunkProcessor> ();
   pData->AddCallback (MakeCallback (&MmWaveSidelinkSpectrumPhy::UpdateSinrPerceived, rx_ssp));
-  pData->AddCallback (MakeCallback (&MmWaveVehicularSidelinkSpectrumPhyTestCase1::UpdateSinrPerceived, this));
+  pData->AddCallback (MakeCallback (&MmWaveVehicularSpectrumPhyTestCase1::UpdateSinrPerceived, this));
   rx_ssp->AddDataSinrChunkProcessor (pData);
 
   // create the tx psd
@@ -201,17 +219,17 @@ MmWaveVehicularSidelinkSpectrumPhyTestCase1::DoRun (void)
 /**
  * Test suite for the class MmWaveSidelinkSpectrumPhy
  */
-class MmWaveVehicularSidelinkSpectrumPhyTestSuite : public TestSuite
+class MmWaveVehicularSpectrumPhyTestSuite : public TestSuite
 {
 public:
-  MmWaveVehicularSidelinkSpectrumPhyTestSuite ();
+  MmWaveVehicularSpectrumPhyTestSuite ();
 };
 
-MmWaveVehicularSidelinkSpectrumPhyTestSuite::MmWaveVehicularSidelinkSpectrumPhyTestSuite ()
-  : TestSuite ("mmwave-vehicular-sidelink-spectrum-phy", UNIT)
+MmWaveVehicularSpectrumPhyTestSuite::MmWaveVehicularSpectrumPhyTestSuite ()
+  : TestSuite ("mmwave-vehicular-spectrum-phy", UNIT)
 {
   // TestDuration for TestCase can be QUICK, EXTENSIVE or TAKES_FOREVER
-  AddTestCase (new MmWaveVehicularSidelinkSpectrumPhyTestCase1, TestCase::QUICK);
+  AddTestCase (new MmWaveVehicularSpectrumPhyTestCase1, TestCase::QUICK);
 }
 
-static MmWaveVehicularSidelinkSpectrumPhyTestSuite MmWaveVehicularSidelinkSpectrumPhyTestSuite;
+static MmWaveVehicularSpectrumPhyTestSuite MmWaveVehicularSpectrumPhyTestSuite;

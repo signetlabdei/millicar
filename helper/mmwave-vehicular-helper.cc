@@ -133,7 +133,13 @@ MmWaveVehicularHelper::DoInitialize ()
     Ptr<MmWaveVehicularSpectrumPropagationLossModel> threeGppSplm = DynamicCast<MmWaveVehicularSpectrumPropagationLossModel> (m_channel->GetSpectrumPropagationLossModel ());
     PointerValue plm;
     m_channel->GetAttribute ("PropagationLossModel", plm);
-    threeGppSplm->SetPathlossModel (plm.Get<PropagationLossModel> ()); // associate pathloss and fast fading models
+    
+    Ptr<MmWaveVehicularPropagationLossModel> pathloss = DynamicCast<MmWaveVehicularPropagationLossModel> (plm.Get<PropagationLossModel> ());
+    pathloss->SetFrequency (m_phyMacConfig->GetCenterFrequency());
+    
+    threeGppSplm->SetPathlossModel (pathloss); // associate pathloss and fast fading models
+    threeGppSplm->SetFrequency (m_phyMacConfig->GetCenterFrequency()); // set correct value of frequency
+    
   }
 }
 

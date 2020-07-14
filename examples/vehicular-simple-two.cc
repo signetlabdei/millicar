@@ -70,8 +70,6 @@ int main (int argc, char *argv[])
 
   Config::SetDefault ("ns3::MmWaveSidelinkMac::UseAmc", BooleanValue (true));
   Config::SetDefault ("ns3::MmWavePhyMacCommon::CenterFreq", DoubleValue (frequency));
-  Config::SetDefault ("ns3::MmWaveVehicularPropagationLossModel::Frequency", DoubleValue (frequency));
-  Config::SetDefault ("ns3::MmWaveVehicularSpectrumPropagationLossModel::Frequency", DoubleValue (frequency));
   Config::SetDefault ("ns3::MmWaveVehicularHelper::Bandwidth", DoubleValue (bandwidth));
   Config::SetDefault ("ns3::MmWaveVehicularHelper::Numerology", UintegerValue (numerology));
   Config::SetDefault ("ns3::MmWaveVehicularPropagationLossModel::ChannelCondition", StringValue ("l"));

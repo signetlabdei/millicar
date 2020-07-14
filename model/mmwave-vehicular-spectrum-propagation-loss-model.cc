@@ -114,7 +114,8 @@ MmWaveVehicularSpectrumPropagationLossModel::GetTypeId (void)
     .AddAttribute ("Frequency",
                    "Operating frequency in Hz",
                    DoubleValue (0.0),
-                   MakeDoubleAccessor (&MmWaveVehicularSpectrumPropagationLossModel::m_frequency),
+                   MakeDoubleAccessor (&MmWaveVehicularSpectrumPropagationLossModel::SetFrequency,
+                                       &MmWaveVehicularSpectrumPropagationLossModel::GetFrequency),
                    MakeDoubleChecker<double> ())
     .AddAttribute ("UpdatePeriod",
                    "Enable spatially-consistent UT mobility modeling procedure A, the update period unit is in ms, set to 0 ms to disable update",
@@ -507,7 +508,7 @@ MmWaveVehicularSpectrumPropagationLossModel::SetPathlossModel (Ptr<PropagationLo
   //   }
   else
     {
-      NS_FATAL_ERROR ("unkonw pathloss model");
+      NS_FATAL_ERROR ("unknown pathloss model");
     }
 }
 
@@ -2481,6 +2482,17 @@ MmWaveVehicularSpectrumPropagationLossModel::CalAttenuationOfBlockage (Ptr<Param
   return powerAttenuation;
 }
 
+void
+MmWaveVehicularSpectrumPropagationLossModel::SetFrequency (double freq)
+{
+  m_frequency = freq;
+}
+
+double
+MmWaveVehicularSpectrumPropagationLossModel::GetFrequency (void) const
+{
+  return m_frequency;
+}
 
 } // namespace millicar
 

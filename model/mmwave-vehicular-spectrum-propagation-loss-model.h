@@ -194,6 +194,17 @@ public:
    * @param a pointer to the pathloss model, which has to implement the PropagationLossModel interface
    */
   void SetPathlossModel (Ptr<PropagationLossModel> pathloss);
+  
+  /**
+   * \param freq the operating frequency (Hz)
+   */
+  void SetFrequency (double freq);
+
+  /**
+   * \returns the current frequency (Hz)
+   */
+  double GetFrequency (void) const;
+
 
 private:
   /**
