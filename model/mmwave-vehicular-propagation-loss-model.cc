@@ -506,8 +506,8 @@ MmWaveVehicularPropagationLossModel::GetAdditionalNlosVLoss (double distance3D, 
     // Pay attention to the ambiguous definition of the parameters.
     // Vehicular TR 37.885 defines mu_a and sigma_a as the mean and standard deviation of the log-normal random variable.
     // ns-3's RNG considers mu and sigma as specific parameters of the log-normal distribution, while the mean and standard deviation are evaluated separately.
-    m_logNorVar->SetAttribute ("Mu", DoubleValue (log(pow(mu_a,2) / sqrt(pow(sigma_a,2) + pow(mu_a,2)))));
-    m_logNorVar->SetAttribute ("Sigma", DoubleValue (sqrt(log(pow(sigma_a,2) / pow(mu_a,2) + 1))));
+    m_logNorVar->SetAttribute ("Mu", DoubleValue (log10(pow(mu_a,2) / sqrt(pow(sigma_a,2) + pow(mu_a,2)))));
+    m_logNorVar->SetAttribute ("Sigma", DoubleValue (sqrt(log10(pow(sigma_a,2) / pow(mu_a,2) + 1))));
     additionalLoss = std::max(0.0, m_logNorVar->GetValue());
   }
   else
@@ -518,8 +518,8 @@ MmWaveVehicularPropagationLossModel::GetAdditionalNlosVLoss (double distance3D, 
     // Pay attention to the ambiguous definition of the parameters.
     // Vehicular TR 37.885 defines mu_a and sigma_a as the mean and standard deviation of the log-normal random variable.
     // ns-3's RNG considers mu and sigma as specific parameters of the log-normal distribution, while the mean and standard deviation are evaluated separately.
-    m_logNorVar->SetAttribute ("Mu", DoubleValue (log(pow(mu_a,2) / sqrt(pow(sigma_a,2) + pow(mu_a,2)))));
-    m_logNorVar->SetAttribute ("Sigma", DoubleValue (sqrt(log(pow(sigma_a,2) / pow(mu_a,2) + 1))));
+    m_logNorVar->SetAttribute ("Mu", DoubleValue (log10(pow(mu_a,2) / sqrt(pow(sigma_a,2) + pow(mu_a,2)))));
+    m_logNorVar->SetAttribute ("Sigma", DoubleValue (sqrt(log10(pow(sigma_a,2) / pow(mu_a,2) + 1))));
     additionalLoss = std::max(0.0, m_logNorVar->GetValue());
   }
 
