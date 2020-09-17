@@ -27,8 +27,8 @@
 #include "mmwave-sidelink-phy.h"
 #include "mmwave-sidelink-mac.h"
 
-#ifndef SRC_MMWAVE_MODEL_MMWAVE_VEHICULAR_NET_DEVICE_H_
-#define SRC_MMWAVE_MODEL_MMWAVE_VEHICULAR_NET_DEVICE_H_
+#ifndef SRC_MMWAVE_VEHICULAR_NET_DEVICE_H_
+#define SRC_MMWAVE_VEHICULAR_NET_DEVICE_H_
 
 namespace ns3 {
 
@@ -228,4 +228,4 @@ private:
 
 } // ns3 namespace
 
-#endif /* SRC_MMWAVE_MODEL_MMWAVE_VEHICULAR_NET_DEVICE_H_ */
+#endif /* SRC_MMWAVE_VEHICULAR_NET_DEVICE_H_ */

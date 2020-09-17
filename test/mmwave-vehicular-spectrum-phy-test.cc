@@ -165,14 +165,18 @@ MmWaveVehicularSpectrumPhyTestCase1::StartTest (double dist)
   // create the tx psd
   Ptr<mmwave::MmWavePhyMacCommon> pmc = CreateObject<mmwave::MmWavePhyMacCommon> ();
   double txp = 30.0; // transmission power in dBm
-  std::vector<int> subChannelsForTx (72);
+  std::vector<int> subChannelsForTx (pmc->GetNumChunks ());
+  
   // create the transmission mask, use all the available subchannels
-  for (uint8_t i = 0; i < subChannelsForTx.size (); i++)
+  uint32_t i = 0;
+  for (auto& sc : subChannelsForTx)
   {
-    subChannelsForTx [i] = i;
+    sc = i++;
   }
+  
   Ptr<SpectrumValue> txPsd = mmwave::MmWaveSpectrumValueHelper::CreateTxPowerSpectralDensity (pmc, txp, subChannelsForTx);
   tx_ssp->SetTxPowerSpectralDensity (txPsd);
+  
 
   // set the rx noise psd
   double noiseFigure = 5.0; // noise figure in dB
@@ -199,16 +203,15 @@ MmWaveVehicularSpectrumPhyTestCase1::StartTest (double dist)
   Ptr<PacketBurst> pb = CreateObject<PacketBurst> ();
   pb->AddPacket (p);
   Time duration = MilliSeconds (1); // packet duration
-  uint8_t slotInd = 0; // slot index
   uint8_t mcs = 0; // MCS
   uint8_t numSym = 14; // number of symbols dedicated to the transport block
   uint8_t size = 20; // size of the transport block
 
   // send the transport block through the spectrum channel
-  tx_ssp->StartTxDataFrames (pb, duration, slotInd, mcs, size, numSym, 0, rxRnti, subChannelsForTx);
+  tx_ssp->StartTxDataFrames (pb, duration, mcs, size, numSym, 0, rxRnti, subChannelsForTx);
 
   // compute the expected SINR
-  m_expectedSinr = txp + 20 * log10 (3e8 / (4 * M_PI * distance * pmc->GetCenterFrequency ())) + 114 - noiseFigure - 10 * log10 (pmc->GetSystemBandwidth () / 1e6);
+  m_expectedSinr = txp + 20 * log10 (3e8 / (4 * M_PI * distance * pmc->GetCenterFrequency ())) + 114 - noiseFigure - 10 * log10 (pmc->GetBandwidth () / 1e6);
 
   Simulator::Stop (MilliSeconds(2));
   Simulator::Run ();

@@ -53,8 +53,6 @@ struct MmWaveSidelinkSpectrumSignalParameters : public SpectrumSignalParameters
 
   //std::list<Ptr<MmWaveSidelinkControlMessage>> ctrlMsgList;
 
-  uint8_t slotInd;
-
   uint8_t mcs; ///< the modulation and coding scheme index to be used to transmit the transport block
 
   uint8_t numSym; ///< the number of symbols associated to a specific transport block

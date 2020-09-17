@@ -36,7 +36,7 @@ MacSidelinkMemberPhySapProvider::MacSidelinkMemberPhySapProvider (Ptr<MmWaveSide
 }
 
 void
-MacSidelinkMemberPhySapProvider::AddTransportBlock (Ptr<PacketBurst> pb, mmwave::SlotAllocInfo info)
+MacSidelinkMemberPhySapProvider::AddTransportBlock (Ptr<PacketBurst> pb, mmwave::TtiAllocInfo info)
 {
   m_phy->DoAddTransportBlock (pb, info);
 }
@@ -175,7 +175,7 @@ MmWaveSidelinkPhy::SetPhySapUser (MmWaveSidelinkPhySapUser* sap)
 }
 
 void
-MmWaveSidelinkPhy::DoAddTransportBlock (Ptr<PacketBurst> pb, mmwave::SlotAllocInfo info)
+MmWaveSidelinkPhy::DoAddTransportBlock (Ptr<PacketBurst> pb, mmwave::TtiAllocInfo info)
 {
   // create a new entry for the PHY buffer
   PhyBufferEntry e = std::make_pair (pb, info);
@@ -198,18 +198,15 @@ MmWaveSidelinkPhy::StartSlot (mmwave::SfnSf timingInfo)
 
     // retrieve the first element in the list
     Ptr<PacketBurst> pktBurst;
-    mmwave::SlotAllocInfo info;
+    mmwave::TtiAllocInfo info;
     std::tie (pktBurst, info) = m_phyBuffer.front ();
 
-    // check if this TB has to be sent in this slot, otherwise raise an error
-    NS_ASSERT_MSG (info.m_slotIdx == timingInfo.m_slotNum, "This TB is not intended for this slot");
-
     // send the transport block
-    if (info.m_slotType == mmwave::SlotAllocInfo::DATA)
+    if (info.m_ttiType == mmwave::TtiAllocInfo::DATA)
     {
       usedSymbols += SlData (pktBurst, info);
     }
-    else if (info.m_slotType == mmwave::SlotAllocInfo::CTRL)
+    else if (info.m_ttiType == mmwave::TtiAllocInfo::CTRL)
     {
       NS_FATAL_ERROR ("Control messages are not currently supported");
     }
@@ -225,17 +222,13 @@ MmWaveSidelinkPhy::StartSlot (mmwave::SfnSf timingInfo)
     m_phyBuffer.pop_front ();
   }
 
-  // convert the slot period from seconds to nanoseconds
-  // TODO change GetSlotPeriod to return a TimeValue
-  double slotPeriod = m_phyMacConfig->GetSymbolPeriod () * 1e3 * m_phyMacConfig->GetSymbPerSlot ();
-
   // update the timing information
   timingInfo = UpdateTimingInfo (timingInfo);
-  Simulator::Schedule (NanoSeconds (slotPeriod), &MmWaveSidelinkPhy::StartSlot, this, timingInfo);
+  Simulator::Schedule (m_phyMacConfig->GetSlotPeriod (), &MmWaveSidelinkPhy::StartSlot, this, timingInfo);
 }
 
 uint8_t
-MmWaveSidelinkPhy::SlData (Ptr<PacketBurst> pb, mmwave::SlotAllocInfo info)
+MmWaveSidelinkPhy::SlData (Ptr<PacketBurst> pb, mmwave::TtiAllocInfo info)
 {
   NS_LOG_FUNCTION (this);
 
@@ -244,13 +237,13 @@ MmWaveSidelinkPhy::SlData (Ptr<PacketBurst> pb, mmwave::SlotAllocInfo info)
   std::vector<int> subChannelsForTx = SetSubChannelsForTransmission ();
 
   // compute the tx start time (IndexOfTheFirstSymbol * SymbolDuration)
-  Time startTime = NanoSeconds (info.m_dci.m_symStart * m_phyMacConfig->GetSymbolPeriod () * 1e3);
-  NS_ASSERT_MSG (startTime.GetNanoSeconds () == int64_t(info.m_dci.m_symStart * m_phyMacConfig->GetSymbolPeriod () * 1e3), "startTime was not been correctly set");
+  Time startTime = info.m_dci.m_symStart * m_phyMacConfig->GetSymbolPeriod ();
+  NS_ASSERT_MSG (startTime == info.m_dci.m_symStart * m_phyMacConfig->GetSymbolPeriod (), "startTime was not been correctly set");
 
   // compute the duration of the transmission (NumberOfSymbols * SymbolDuration)
-  Time duration = NanoSeconds (info.m_dci.m_numSym * m_phyMacConfig->GetSymbolPeriod () * 1e3);
+  Time duration = info.m_dci.m_numSym * m_phyMacConfig->GetSymbolPeriod ();
 
-  NS_ASSERT_MSG (duration.GetNanoSeconds () == int64_t(info.m_dci.m_numSym * m_phyMacConfig->GetSymbolPeriod () * 1e3), "duration was not been correctly set");
+  NS_ASSERT_MSG (duration == info.m_dci.m_numSym * m_phyMacConfig->GetSymbolPeriod (), "duration was not been correctly set");
 
   // send the transport block
   Simulator::Schedule (startTime, &MmWaveSidelinkPhy::SendDataChannels, this,
@@ -265,23 +258,23 @@ MmWaveSidelinkPhy::SlData (Ptr<PacketBurst> pb, mmwave::SlotAllocInfo info)
 void
 MmWaveSidelinkPhy::SendDataChannels (Ptr<PacketBurst> pb,
   Time duration,
-  mmwave::SlotAllocInfo info,
+  mmwave::TtiAllocInfo info,
   std::vector<int> rbBitmap)
 {
   // retrieve the RNTI of the device we want to communicate with and properly
   // configure the beamforming
-  // NOTE: this information is contained in mmwave::SlotAllocInfo.m_rnti parameter
+  // NOTE: this information is contained in mmwave::TtiAllocInfo.m_rnti parameter
   NS_ASSERT_MSG (m_deviceMap.find (info.m_rnti) != m_deviceMap.end (), "Device not found");
   m_sidelinkSpectrumPhy->ConfigureBeamforming (m_deviceMap.at (info.m_rnti));
 
-  m_sidelinkSpectrumPhy->StartTxDataFrames (pb, duration, info.m_slotIdx, info.m_dci.m_mcs, info.m_dci.m_tbSize, info.m_dci.m_numSym, info.m_dci.m_rnti, info.m_rnti, rbBitmap);
+  m_sidelinkSpectrumPhy->StartTxDataFrames (pb, duration, info.m_dci.m_mcs, info.m_dci.m_tbSize, info.m_dci.m_numSym, info.m_dci.m_rnti, info.m_rnti, rbBitmap);
 }
 
 std::vector<int>
 MmWaveSidelinkPhy::SetSubChannelsForTransmission ()
   {
     // create the transmission mask, use all the available subchannels
-    std::vector<int> subChannelsForTx (m_phyMacConfig->GetTotalNumChunk ());
+    std::vector<int> subChannelsForTx (m_phyMacConfig->GetNumChunks ());
     for (uint32_t i = 0; i < subChannelsForTx.size (); i++)
     {
       subChannelsForTx.at(i) = i;

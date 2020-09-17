@@ -187,9 +187,9 @@ private:
   *        logical channels
   * \params timingInfo the SfnSf object containing the frame, subframe and slot
   *         index
-  * \returns vector of SlotAllocInfo objects containing the scheduling information
+  * \returns SlotAllocInfo object containing the scheduling information
   */
-  std::list<mmwave::SlotAllocInfo> ScheduleResources (mmwave::SfnSf timingInfo);
+  mmwave::SlotAllocInfo ScheduleResources (mmwave::SfnSf timingInfo);
 
   /**
   * \brief Updates the BSR corresponding to the specified LC by subtracting the

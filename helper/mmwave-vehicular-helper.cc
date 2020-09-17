@@ -108,6 +108,13 @@ MmWaveVehicularHelper::DoInitialize ()
 
   // intialize the RNTI counter
   m_rntiCounter = 0;
+  
+  // if the PHY layer configuration object was not set manually, create it 
+  if (!m_phyMacConfig)
+  {
+    m_phyMacConfig = CreateObjectWithAttributes<mmwave::MmWavePhyMacCommon> ("Numerology", EnumValue (m_numerologyIndex),   
+                                                                             "Bandwidth", DoubleValue (m_bandwidth));
+  }
 
   // create the channel
   m_channel = CreateObject<SingleModelSpectrumChannel> ();
@@ -147,6 +154,7 @@ void
 MmWaveVehicularHelper::SetConfigurationParameters (Ptr<mmwave::MmWavePhyMacCommon> conf)
 {
   NS_LOG_FUNCTION (this);
+  NS_ASSERT_MSG (m_rntiCounter == 0, "The PHY configuration should be set before the installation of any device.");
   m_phyMacConfig = conf;
 }
 
@@ -157,36 +165,11 @@ MmWaveVehicularHelper::GetConfigurationParameters () const
   return m_phyMacConfig;
 }
 
-
 void
 MmWaveVehicularHelper::SetNumerology (uint8_t index)
 {
-
   NS_LOG_FUNCTION (this);
-
-  NS_ASSERT_MSG ( (index == 2) || (index == 3), "Numerology index is not valid.");
-
   m_numerologyIndex = index;
-
-  m_phyMacConfig = CreateObject<mmwave::MmWavePhyMacCommon> ();
-
-  double subcarrierSpacing = 15 * std::pow (2, m_numerologyIndex) * 1000; // subcarrier spacing based on the numerology. Only 60KHz and 120KHz is supported in NR V2X.
-
-  m_phyMacConfig->SetSymbPerSlot(14); // TR 38.802 Section 5.3: each slot must have 14 symbols < Symbol duration is dependant on the numerology
-  m_phyMacConfig->SetSlotPerSubframe(std::pow (2, m_numerologyIndex)); // flexible number of slots per subframe - depends on numerology
-  m_phyMacConfig->SetSubframePeriod (1000); // TR 38.802 Section 5.3: the subframe duration is 1ms, i.e., 1000us, and the frame length is 10ms.
-  m_phyMacConfig->SetSymbolPeriod ( m_phyMacConfig->GetSubframePeriod () / m_phyMacConfig->GetSlotsPerSubframe () / m_phyMacConfig->GetSymbPerSlot ()); // symbol period is required in microseconds
-
-  double subCarriersPerRB = 12;
-
-  m_phyMacConfig->SetNumChunkPerRB(1); // each resource block contains 1 chunk
-  m_phyMacConfig->SetNumRb ( uint32_t( m_bandwidth / (subcarrierSpacing * subCarriersPerRB) ) );
-
-  m_phyMacConfig->SetChunkWidth (subCarriersPerRB*subcarrierSpacing);
-
-  //TODO: How many reference subcarriers per symbols should we consider to be compliant with NR-V2X? 
-  m_phyMacConfig->SetNumRefScPerSym(0);
-
 }
 
 NetDeviceContainer

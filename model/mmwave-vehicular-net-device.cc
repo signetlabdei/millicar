@@ -20,6 +20,7 @@
  */
 
 #include <ns3/uinteger.h>
+#include <ns3/node.h>
 #include <ns3/log.h>
 #include <ns3/object-map.h>
 #include <ns3/ipv4-header.h>

@@ -148,10 +148,10 @@ MmWaveSidelinkMac::DoSlotIndication (mmwave::SfnSf timingInfo)
   NS_ASSERT_MSG (!m_sfAllocInfo.empty (), "First set the scheduling pattern");
   if(m_sfAllocInfo [timingInfo.m_slotNum] == m_rnti) // check if this slot is associated to the user who required it
   {
-    std::list<mmwave::SlotAllocInfo> allocationInfo = ScheduleResources (timingInfo);
+    mmwave::SlotAllocInfo allocationInfo = ScheduleResources (timingInfo);
 
     // associate slot alloc info and pdu
-    for (auto it = allocationInfo.begin(); it != allocationInfo.end (); it++)
+    for (auto it = allocationInfo.m_ttiAllocInfo.begin(); it != allocationInfo.m_ttiAllocInfo.end (); it++)
     {
       // retrieve the tx buffer corresponding to the assigned destination
       auto txBuffer = m_txBufferMap.find (it->m_rnti); // the destination RNTI
@@ -181,10 +181,12 @@ MmWaveSidelinkMac::DoSlotIndication (mmwave::SfnSf timingInfo)
 
 }
 
-std::list<mmwave::SlotAllocInfo>
+mmwave::SlotAllocInfo
 MmWaveSidelinkMac::ScheduleResources (mmwave::SfnSf timingInfo)
 {
-  std::list<mmwave::SlotAllocInfo> allocationInfo; // stores all the allocation decisions
+  mmwave::SlotAllocInfo allocationInfo; // stores all the allocation decisions
+  allocationInfo.m_sfnSf = timingInfo;
+  allocationInfo.m_numSymAlloc = 0;
 
   NS_LOG_DEBUG("m_bufferStatusReportMap.size () =\t" << m_bufferStatusReportMap.size ());
   // if there are no active channels return an empty vector
@@ -241,20 +243,21 @@ MmWaveSidelinkMac::ScheduleResources (mmwave::SfnSf timingInfo)
 
     //if (assignedSymbols <= availableSymbols) // TODO check if needed
     //{
-    // create the SlotAllocInfo object
-    mmwave::SlotAllocInfo info;
-    info.m_slotIdx = timingInfo.m_slotNum; // the TB will be sent in this slot
+    // create the TtiAllocInfo object
+    mmwave::TtiAllocInfo info;
+    info.m_ttiIdx = timingInfo.m_slotNum; // the TB will be sent in this slot
     info.m_rnti = rntiDest; // the RNTI of the destination node
     info.m_dci.m_rnti = m_rnti; // my RNTI
     info.m_dci.m_numSym = assignedSymbols; // the number of symbols required to tx the packet
     info.m_dci.m_symStart = symStart; // index of the first available symbol
     info.m_dci.m_mcs = mcs;
     info.m_dci.m_tbSize = assignedBits / 8; // the TB size in bytes
-    info.m_slotType = mmwave::SlotAllocInfo::DATA; // the TB carries data
+    info.m_ttiType = mmwave::TtiAllocInfo::TddTtiType::DATA; // the TB carries data
 
     NS_LOG_DEBUG("info.m_dci.m_tbSize =\t" << info.m_dci.m_tbSize);
 
-    allocationInfo.push_back (info);
+    allocationInfo.m_ttiAllocInfo.push_back (info);
+    allocationInfo.m_numSymAlloc += assignedSymbols;
 
     // fire the scheduling trace
     SlSchedulingCallback traceInfo;

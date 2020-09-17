@@ -45,7 +45,6 @@ MmWaveSidelinkSpectrumSignalParameters::MmWaveSidelinkSpectrumSignalParameters (
       packetBurst = p.packetBurst->Copy ();
     }
   //ctrlMsgList = p.ctrlMsgList;
-  slotInd = p.slotInd;
   mcs = p.mcs;
   size = p.size;
   rbBitmap = p.rbBitmap;

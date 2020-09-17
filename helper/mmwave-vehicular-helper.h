@@ -98,8 +98,8 @@ public:
   void PairDevices (NetDeviceContainer devices);
 
   /**
-   * Configure the frame structure to be consistent with the NR V2X numerology
-   * \param index numerology index, used to define the frame structure
+   * Configure the numerology index
+   * \param index numerology index, used to define PHY layer parameters
    */
   void SetNumerology (uint8_t index);
 

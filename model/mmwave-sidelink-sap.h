@@ -42,7 +42,7 @@ public:
    * \param pb burst of packets to be forwarded to the PHY layer
    * \param info information about slot allocation necessary to determine the transmission parameters
    */
-  virtual void AddTransportBlock (Ptr<PacketBurst> pb, mmwave::SlotAllocInfo info) = 0;
+  virtual void AddTransportBlock (Ptr<PacketBurst> pb, mmwave::TtiAllocInfo info) = 0;
 
   /**
    * \brief Called by the upper layer to prepare the PHY for the reception from

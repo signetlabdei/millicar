@@ -38,7 +38,6 @@
 #include <ns3/packet-burst.h>
 #include "mmwave-sidelink-spectrum-signal-parameters.h"
 #include "ns3/random-variable-stream.h"
-#include "ns3/mmwave-beamforming.h"
 #include "ns3/mmwave-interference.h"
 #include "ns3/mmwave-control-messages.h"
 
@@ -206,7 +205,7 @@ public:
   * @return true if an error occurred and the transmission was not
   * started, false otherwise.
   */
-  bool StartTxDataFrames (Ptr<PacketBurst> pb, Time duration, uint8_t slotInd, uint8_t mcs, uint32_t size, uint8_t numSym, uint16_t senderRnti, uint16_t destinationRnti, std::vector<int> rbBitmap);
+  bool StartTxDataFrames (Ptr<PacketBurst> pb, Time duration, uint8_t mcs, uint32_t size, uint8_t numSym, uint16_t senderRnti, uint16_t destinationRnti, std::vector<int> rbBitmap);
 
   //bool StartTxControlFrames (std::list<Ptr<MmWaveControlMessage> > ctrlMsgList, Time duration);       // control frames from enb to ue
 

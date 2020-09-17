@@ -452,7 +452,6 @@ MmWaveSidelinkSpectrumPhy::EndRxData ()
 bool
 MmWaveSidelinkSpectrumPhy::StartTxDataFrames (Ptr<PacketBurst> pb,
   Time duration,
-  uint8_t slotInd,
   uint8_t mcs,
   uint32_t size,
   uint8_t numSym,
@@ -484,7 +483,6 @@ MmWaveSidelinkSpectrumPhy::StartTxDataFrames (Ptr<PacketBurst> pb,
         txParams->psd = m_txPsd;
         txParams->packetBurst = pb;
         //txParams->ctrlMsgList = ctrlMsgList;
-        txParams->slotInd = slotInd;
         txParams->txAntenna = m_antenna;
         txParams->mcs = mcs;
         txParams->numSym = numSym;
