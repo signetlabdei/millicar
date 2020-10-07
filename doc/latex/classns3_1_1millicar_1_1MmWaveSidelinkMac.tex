@@ -1,0 +1,259 @@
+\hypertarget{classns3_1_1millicar_1_1MmWaveSidelinkMac}{}\section{ns3\+:\+:millicar\+:\+:Mm\+Wave\+Sidelink\+Mac Class Reference}
+\label{classns3_1_1millicar_1_1MmWaveSidelinkMac}\index{ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac@{ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac}}
+
+
+Inheritance diagram for ns3\+:\+:millicar\+:\+:Mm\+Wave\+Sidelink\+Mac\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=250pt]{classns3_1_1millicar_1_1MmWaveSidelinkMac__inherit__graph}
+\end{center}
+\end{figure}
+
+
+Collaboration diagram for ns3\+:\+:millicar\+:\+:Mm\+Wave\+Sidelink\+Mac\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=250pt]{classns3_1_1millicar_1_1MmWaveSidelinkMac__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Types}
+\begin{DoxyCompactItemize}
+\item 
+typedef void($\ast$ \hyperlink{classns3_1_1millicar_1_1MmWaveSidelinkMac_ad5c7416a57edcebe1e57106b503831c7}{Sl\+Scheduling\+Traced\+Callback}) (\hyperlink{structns3_1_1millicar_1_1SlSchedulingCallback}{Sl\+Scheduling\+Callback} params)
+\end{DoxyCompactItemize}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classns3_1_1millicar_1_1MmWaveSidelinkMac_a2c96de8928cbba2b7c8b0f71f2318e54}\label{classns3_1_1millicar_1_1MmWaveSidelinkMac_a2c96de8928cbba2b7c8b0f71f2318e54}} 
+\hyperlink{classns3_1_1millicar_1_1MmWaveSidelinkMac_a2c96de8928cbba2b7c8b0f71f2318e54}{Mm\+Wave\+Sidelink\+Mac} (void)=delete
+\begin{DoxyCompactList}\small\item\em Delete default constructor to avoid misuse. \end{DoxyCompactList}\item 
+\hyperlink{classns3_1_1millicar_1_1MmWaveSidelinkMac_ae4a82035baa66ee6c17d9b2094bacd24}{Mm\+Wave\+Sidelink\+Mac} (Ptr$<$ mmwave\+::\+Mm\+Wave\+Phy\+Mac\+Common $>$ pmc)
+\begin{DoxyCompactList}\small\item\em Class constructor. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classns3_1_1millicar_1_1MmWaveSidelinkMac_a8a34b3d135b391d9fc16004fb91fa208}\label{classns3_1_1millicar_1_1MmWaveSidelinkMac_a8a34b3d135b391d9fc16004fb91fa208}} 
+\hyperlink{classns3_1_1millicar_1_1MmWaveSidelinkMac_a8a34b3d135b391d9fc16004fb91fa208}{$\sim$\+Mm\+Wave\+Sidelink\+Mac} (void)
+\begin{DoxyCompactList}\small\item\em Class destructor. \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classns3_1_1millicar_1_1MmWaveSidelinkMac_af5aee81d76bc85ab6d57742cffc214de}\label{classns3_1_1millicar_1_1MmWaveSidelinkMac_af5aee81d76bc85ab6d57742cffc214de}} 
+virtual void \hyperlink{classns3_1_1millicar_1_1MmWaveSidelinkMac_af5aee81d76bc85ab6d57742cffc214de}{Do\+Dispose} (void)
+\begin{DoxyCompactList}\small\item\em Destructor implementation. \end{DoxyCompactList}\item 
+void \hyperlink{classns3_1_1millicar_1_1MmWaveSidelinkMac_af1c118a5b92dfce7a7b62c55ac50c020}{Do\+Slot\+Indication} (mmwave\+::\+Sfn\+Sf timing\+Info)
+\begin{DoxyCompactList}\small\item\em trigger the start of a new slot with all the necessary information \end{DoxyCompactList}\item 
+\hyperlink{classns3_1_1millicar_1_1MmWaveSidelinkPhySapUser}{Mm\+Wave\+Sidelink\+Phy\+Sap\+User} $\ast$ \hyperlink{classns3_1_1millicar_1_1MmWaveSidelinkMac_ae6a8f2b11ed7ac5d33dc0629937695e6}{Get\+Phy\+Sap\+User} () const
+\begin{DoxyCompactList}\small\item\em Get the P\+HY S\+AP user. \end{DoxyCompactList}\item 
+void \hyperlink{classns3_1_1millicar_1_1MmWaveSidelinkMac_a42acefcfc918c3500669e32e40bf42a0}{Set\+Phy\+Sap\+Provider} (\hyperlink{classns3_1_1millicar_1_1MmWaveSidelinkPhySapProvider}{Mm\+Wave\+Sidelink\+Phy\+Sap\+Provider} $\ast$sap)
+\begin{DoxyCompactList}\small\item\em Set the P\+HY S\+AP provider. \end{DoxyCompactList}\item 
+Lte\+Mac\+Sap\+Provider $\ast$ \hyperlink{classns3_1_1millicar_1_1MmWaveSidelinkMac_a9ac166a4e4d5e2449cb0e69a165719cb}{Get\+Mac\+Sap\+Provider} () const
+\begin{DoxyCompactList}\small\item\em return the M\+AC S\+AP provider \end{DoxyCompactList}\item 
+void \hyperlink{classns3_1_1millicar_1_1MmWaveSidelinkMac_af1686c0688c1bafeccb463ea2bc6f828}{Set\+Rnti} (uint16\+\_\+t rnti)
+\begin{DoxyCompactList}\small\item\em assign a proper value to the R\+N\+TI associated to a specific user \end{DoxyCompactList}\item 
+uint16\+\_\+t \hyperlink{classns3_1_1millicar_1_1MmWaveSidelinkMac_a229809ca241dc9416dfb8ec82d8e48f6}{Get\+Rnti} () const
+\begin{DoxyCompactList}\small\item\em return the R\+N\+TI associated to a specific user \end{DoxyCompactList}\item 
+void \hyperlink{classns3_1_1millicar_1_1MmWaveSidelinkMac_a3862171847195f4cf9122fb8f05ed3eb}{Set\+Sf\+Allocation\+Info} (std\+::vector$<$ uint16\+\_\+t $>$ pattern)
+\begin{DoxyCompactList}\small\item\em set the subframe allocation pattern \end{DoxyCompactList}\item 
+\mbox{\Hypertarget{classns3_1_1millicar_1_1MmWaveSidelinkMac_a36bc120898406b4fa124ec340266e30a}\label{classns3_1_1millicar_1_1MmWaveSidelinkMac_a36bc120898406b4fa124ec340266e30a}} 
+void \hyperlink{classns3_1_1millicar_1_1MmWaveSidelinkMac_a36bc120898406b4fa124ec340266e30a}{Do\+Transmit\+Pdu} (Lte\+Mac\+Sap\+Provider\+::\+Transmit\+Pdu\+Parameters params)
+\begin{DoxyCompactList}\small\item\em Transmit P\+DU function. \end{DoxyCompactList}\item 
+void \hyperlink{classns3_1_1millicar_1_1MmWaveSidelinkMac_af303cc45866c7094f9f2c36bbaa0a66c}{Set\+Forward\+Up\+Callback} (Callback$<$ void, Ptr$<$ Packet $>$ $>$ cb)
+\begin{DoxyCompactList}\small\item\em set the callback used to forward data packets up to the Net\+Device \end{DoxyCompactList}\item 
+void \hyperlink{classns3_1_1millicar_1_1MmWaveSidelinkMac_ad4c32a42bd58226a3ad07828e7b4cff0}{Add\+Mac\+Sap\+User} (uint8\+\_\+t lcid, Lte\+Mac\+Sap\+User $\ast$mac\+Sap\+User)
+\end{DoxyCompactItemize}
+\subsection*{Static Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+static Type\+Id \hyperlink{classns3_1_1millicar_1_1MmWaveSidelinkMac_a97fdea26e60baec2ab5f082da054e18e}{Get\+Type\+Id} (void)
+\begin{DoxyCompactList}\small\item\em Get the type ID. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\subsection*{Friends}
+\begin{DoxyCompactItemize}
+\item 
+\mbox{\Hypertarget{classns3_1_1millicar_1_1MmWaveSidelinkMac_a7718a67d36cf06d1d96b26fbea6910eb}\label{classns3_1_1millicar_1_1MmWaveSidelinkMac_a7718a67d36cf06d1d96b26fbea6910eb}} 
+class {\bfseries Mac\+Sidelink\+Member\+Phy\+Sap\+User}
+\item 
+\mbox{\Hypertarget{classns3_1_1millicar_1_1MmWaveSidelinkMac_a60d31e68fce742d4da754d8f69824337}\label{classns3_1_1millicar_1_1MmWaveSidelinkMac_a60d31e68fce742d4da754d8f69824337}} 
+class {\bfseries Rlc\+Sidelink\+Member\+Mac\+Sap\+Provider}
+\end{DoxyCompactItemize}
+
+
+\subsection{Member Typedef Documentation}
+\mbox{\Hypertarget{classns3_1_1millicar_1_1MmWaveSidelinkMac_ad5c7416a57edcebe1e57106b503831c7}\label{classns3_1_1millicar_1_1MmWaveSidelinkMac_ad5c7416a57edcebe1e57106b503831c7}} 
+\index{ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac@{ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac}!Sl\+Scheduling\+Traced\+Callback@{Sl\+Scheduling\+Traced\+Callback}}
+\index{Sl\+Scheduling\+Traced\+Callback@{Sl\+Scheduling\+Traced\+Callback}!ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac@{ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac}}
+\subsubsection{\texorpdfstring{Sl\+Scheduling\+Traced\+Callback}{SlSchedulingTracedCallback}}
+{\footnotesize\ttfamily typedef void($\ast$  ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac\+::\+Sl\+Scheduling\+Traced\+Callback) (\hyperlink{structns3_1_1millicar_1_1SlSchedulingCallback}{Sl\+Scheduling\+Callback} params)}
+
+Traced\+Callback signature for SL scheduling
+
+
+\begin{DoxyParams}{Parameters}
+{\em params} & the struct \hyperlink{structns3_1_1millicar_1_1SlSchedulingCallback}{Sl\+Scheduling\+Callback} containing the scheduling info \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\Hypertarget{classns3_1_1millicar_1_1MmWaveSidelinkMac_ae4a82035baa66ee6c17d9b2094bacd24}\label{classns3_1_1millicar_1_1MmWaveSidelinkMac_ae4a82035baa66ee6c17d9b2094bacd24}} 
+\index{ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac@{ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac}!Mm\+Wave\+Sidelink\+Mac@{Mm\+Wave\+Sidelink\+Mac}}
+\index{Mm\+Wave\+Sidelink\+Mac@{Mm\+Wave\+Sidelink\+Mac}!ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac@{ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac}}
+\subsubsection{\texorpdfstring{Mm\+Wave\+Sidelink\+Mac()}{MmWaveSidelinkMac()}}
+{\footnotesize\ttfamily ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac\+::\+Mm\+Wave\+Sidelink\+Mac (\begin{DoxyParamCaption}\item[{Ptr$<$ mmwave\+::\+Mm\+Wave\+Phy\+Mac\+Common $>$}]{pmc }\end{DoxyParamCaption})}
+
+
+
+Class constructor. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em pmc} & pointer to the mmwave\+::\+Mm\+Wave\+Phy\+Mac\+Common instance which specifies the P\+H\+Y/\+M\+AC parameters \\
+\hline
+\end{DoxyParams}
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classns3_1_1millicar_1_1MmWaveSidelinkMac_ad4c32a42bd58226a3ad07828e7b4cff0}\label{classns3_1_1millicar_1_1MmWaveSidelinkMac_ad4c32a42bd58226a3ad07828e7b4cff0}} 
+\index{ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac@{ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac}!Add\+Mac\+Sap\+User@{Add\+Mac\+Sap\+User}}
+\index{Add\+Mac\+Sap\+User@{Add\+Mac\+Sap\+User}!ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac@{ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac}}
+\subsubsection{\texorpdfstring{Add\+Mac\+Sap\+User()}{AddMacSapUser()}}
+{\footnotesize\ttfamily void ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac\+::\+Add\+Mac\+Sap\+User (\begin{DoxyParamCaption}\item[{uint8\+\_\+t}]{lcid,  }\item[{Lte\+Mac\+Sap\+User $\ast$}]{mac\+Sap\+User }\end{DoxyParamCaption})}
+
+Associate a M\+AC S\+AP user instance to the L\+C\+ID and add it in the map 
+\begin{DoxyParams}{Parameters}
+{\em lcid} & Logical Channel ID \\
+\hline
+{\em mac\+Sap\+User} & Lte\+Mac\+Sap\+User to be associated to a single L\+C\+ID and added to the respective map \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classns3_1_1millicar_1_1MmWaveSidelinkMac_af1c118a5b92dfce7a7b62c55ac50c020}\label{classns3_1_1millicar_1_1MmWaveSidelinkMac_af1c118a5b92dfce7a7b62c55ac50c020}} 
+\index{ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac@{ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac}!Do\+Slot\+Indication@{Do\+Slot\+Indication}}
+\index{Do\+Slot\+Indication@{Do\+Slot\+Indication}!ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac@{ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac}}
+\subsubsection{\texorpdfstring{Do\+Slot\+Indication()}{DoSlotIndication()}}
+{\footnotesize\ttfamily void ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac\+::\+Do\+Slot\+Indication (\begin{DoxyParamCaption}\item[{mmwave\+::\+Sfn\+Sf}]{timing\+Info }\end{DoxyParamCaption})}
+
+
+
+trigger the start of a new slot with all the necessary information 
+
+
+\begin{DoxyParams}{Parameters}
+{\em timing\+Info} & the structure containing the timing information \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classns3_1_1millicar_1_1MmWaveSidelinkMac_a9ac166a4e4d5e2449cb0e69a165719cb}\label{classns3_1_1millicar_1_1MmWaveSidelinkMac_a9ac166a4e4d5e2449cb0e69a165719cb}} 
+\index{ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac@{ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac}!Get\+Mac\+Sap\+Provider@{Get\+Mac\+Sap\+Provider}}
+\index{Get\+Mac\+Sap\+Provider@{Get\+Mac\+Sap\+Provider}!ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac@{ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac}}
+\subsubsection{\texorpdfstring{Get\+Mac\+Sap\+Provider()}{GetMacSapProvider()}}
+{\footnotesize\ttfamily Lte\+Mac\+Sap\+Provider $\ast$ ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac\+::\+Get\+Mac\+Sap\+Provider (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+
+
+return the M\+AC S\+AP provider 
+
+\begin{DoxyReturn}{Returns}
+the Mac\+Sap\+Provider 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classns3_1_1millicar_1_1MmWaveSidelinkMac_ae6a8f2b11ed7ac5d33dc0629937695e6}\label{classns3_1_1millicar_1_1MmWaveSidelinkMac_ae6a8f2b11ed7ac5d33dc0629937695e6}} 
+\index{ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac@{ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac}!Get\+Phy\+Sap\+User@{Get\+Phy\+Sap\+User}}
+\index{Get\+Phy\+Sap\+User@{Get\+Phy\+Sap\+User}!ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac@{ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac}}
+\subsubsection{\texorpdfstring{Get\+Phy\+Sap\+User()}{GetPhySapUser()}}
+{\footnotesize\ttfamily \hyperlink{classns3_1_1millicar_1_1MmWaveSidelinkPhySapUser}{Mm\+Wave\+Sidelink\+Phy\+Sap\+User} $\ast$ ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac\+::\+Get\+Phy\+Sap\+User (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+
+
+Get the P\+HY S\+AP user. 
+
+\begin{DoxyReturn}{Returns}
+a pointer to the S\+AP user 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classns3_1_1millicar_1_1MmWaveSidelinkMac_a229809ca241dc9416dfb8ec82d8e48f6}\label{classns3_1_1millicar_1_1MmWaveSidelinkMac_a229809ca241dc9416dfb8ec82d8e48f6}} 
+\index{ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac@{ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac}!Get\+Rnti@{Get\+Rnti}}
+\index{Get\+Rnti@{Get\+Rnti}!ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac@{ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac}}
+\subsubsection{\texorpdfstring{Get\+Rnti()}{GetRnti()}}
+{\footnotesize\ttfamily uint16\+\_\+t ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac\+::\+Get\+Rnti (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption}) const}
+
+
+
+return the R\+N\+TI associated to a specific user 
+
+\begin{DoxyReturn}{Returns}
+the R\+N\+TI 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classns3_1_1millicar_1_1MmWaveSidelinkMac_a97fdea26e60baec2ab5f082da054e18e}\label{classns3_1_1millicar_1_1MmWaveSidelinkMac_a97fdea26e60baec2ab5f082da054e18e}} 
+\index{ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac@{ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac}!Get\+Type\+Id@{Get\+Type\+Id}}
+\index{Get\+Type\+Id@{Get\+Type\+Id}!ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac@{ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac}}
+\subsubsection{\texorpdfstring{Get\+Type\+Id()}{GetTypeId()}}
+{\footnotesize\ttfamily Type\+Id ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac\+::\+Get\+Type\+Id (\begin{DoxyParamCaption}\item[{void}]{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [static]}}
+
+
+
+Get the type ID. 
+
+\begin{DoxyReturn}{Returns}
+the object Type\+Id 
+\end{DoxyReturn}
+\mbox{\Hypertarget{classns3_1_1millicar_1_1MmWaveSidelinkMac_af303cc45866c7094f9f2c36bbaa0a66c}\label{classns3_1_1millicar_1_1MmWaveSidelinkMac_af303cc45866c7094f9f2c36bbaa0a66c}} 
+\index{ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac@{ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac}!Set\+Forward\+Up\+Callback@{Set\+Forward\+Up\+Callback}}
+\index{Set\+Forward\+Up\+Callback@{Set\+Forward\+Up\+Callback}!ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac@{ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac}}
+\subsubsection{\texorpdfstring{Set\+Forward\+Up\+Callback()}{SetForwardUpCallback()}}
+{\footnotesize\ttfamily void ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac\+::\+Set\+Forward\+Up\+Callback (\begin{DoxyParamCaption}\item[{Callback$<$ void, Ptr$<$ Packet $>$ $>$}]{cb }\end{DoxyParamCaption})}
+
+
+
+set the callback used to forward data packets up to the Net\+Device 
+
+
+\begin{DoxyParams}{Parameters}
+{\em cb} & the callback \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classns3_1_1millicar_1_1MmWaveSidelinkMac_a42acefcfc918c3500669e32e40bf42a0}\label{classns3_1_1millicar_1_1MmWaveSidelinkMac_a42acefcfc918c3500669e32e40bf42a0}} 
+\index{ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac@{ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac}!Set\+Phy\+Sap\+Provider@{Set\+Phy\+Sap\+Provider}}
+\index{Set\+Phy\+Sap\+Provider@{Set\+Phy\+Sap\+Provider}!ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac@{ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac}}
+\subsubsection{\texorpdfstring{Set\+Phy\+Sap\+Provider()}{SetPhySapProvider()}}
+{\footnotesize\ttfamily void ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac\+::\+Set\+Phy\+Sap\+Provider (\begin{DoxyParamCaption}\item[{\hyperlink{classns3_1_1millicar_1_1MmWaveSidelinkPhySapProvider}{Mm\+Wave\+Sidelink\+Phy\+Sap\+Provider} $\ast$}]{sap }\end{DoxyParamCaption})}
+
+
+
+Set the P\+HY S\+AP provider. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em sap} & the P\+HY S\+AP provider \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classns3_1_1millicar_1_1MmWaveSidelinkMac_af1686c0688c1bafeccb463ea2bc6f828}\label{classns3_1_1millicar_1_1MmWaveSidelinkMac_af1686c0688c1bafeccb463ea2bc6f828}} 
+\index{ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac@{ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac}!Set\+Rnti@{Set\+Rnti}}
+\index{Set\+Rnti@{Set\+Rnti}!ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac@{ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac}}
+\subsubsection{\texorpdfstring{Set\+Rnti()}{SetRnti()}}
+{\footnotesize\ttfamily void ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac\+::\+Set\+Rnti (\begin{DoxyParamCaption}\item[{uint16\+\_\+t}]{rnti }\end{DoxyParamCaption})}
+
+
+
+assign a proper value to the R\+N\+TI associated to a specific user 
+
+
+\begin{DoxyParams}{Parameters}
+{\em rnti} & value of the rnti \\
+\hline
+\end{DoxyParams}
+\mbox{\Hypertarget{classns3_1_1millicar_1_1MmWaveSidelinkMac_a3862171847195f4cf9122fb8f05ed3eb}\label{classns3_1_1millicar_1_1MmWaveSidelinkMac_a3862171847195f4cf9122fb8f05ed3eb}} 
+\index{ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac@{ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac}!Set\+Sf\+Allocation\+Info@{Set\+Sf\+Allocation\+Info}}
+\index{Set\+Sf\+Allocation\+Info@{Set\+Sf\+Allocation\+Info}!ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac@{ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac}}
+\subsubsection{\texorpdfstring{Set\+Sf\+Allocation\+Info()}{SetSfAllocationInfo()}}
+{\footnotesize\ttfamily void ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Mac\+::\+Set\+Sf\+Allocation\+Info (\begin{DoxyParamCaption}\item[{std\+::vector$<$ uint16\+\_\+t $>$}]{pattern }\end{DoxyParamCaption})}
+
+
+
+set the subframe allocation pattern 
+
+
+\begin{DoxyParams}{Parameters}
+{\em pattern} & the allocation pattern. The number of element must be equal to number of slots per subframe. Each element represents the R\+N\+TI of the device scheduled in the corresponding slot. \\
+\hline
+\end{DoxyParams}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+model/mmwave-\/sidelink-\/mac.\+h\item 
+model/mmwave-\/sidelink-\/mac.\+cc\end{DoxyCompactItemize}
