@@ -1,0 +1,67 @@
+\hypertarget{classns3_1_1millicar_1_1MmWaveSidelinkPhySapProvider}{}\section{ns3\+:\+:millicar\+:\+:Mm\+Wave\+Sidelink\+Phy\+Sap\+Provider Class Reference}
+\label{classns3_1_1millicar_1_1MmWaveSidelinkPhySapProvider}\index{ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Phy\+Sap\+Provider@{ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Phy\+Sap\+Provider}}
+
+
+Inheritance diagram for ns3\+:\+:millicar\+:\+:Mm\+Wave\+Sidelink\+Phy\+Sap\+Provider\+:
+\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=232pt]{classns3_1_1millicar_1_1MmWaveSidelinkPhySapProvider__inherit__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+virtual void \hyperlink{classns3_1_1millicar_1_1MmWaveSidelinkPhySapProvider_acba80cb123b9eb0fcacefde35a91909d}{Add\+Transport\+Block} (Ptr$<$ Packet\+Burst $>$ pb, mmwave\+::\+Tti\+Alloc\+Info info)=0
+\begin{DoxyCompactList}\small\item\em Called by the upper layers to fill P\+HY\textquotesingle{}s buffer. \end{DoxyCompactList}\item 
+virtual void \hyperlink{classns3_1_1millicar_1_1MmWaveSidelinkPhySapProvider_a1c791fea7b4457a39428f3da49eaf6b8}{Prepare\+For\+Reception} (uint16\+\_\+t rnti)=0
+\begin{DoxyCompactList}\small\item\em Called by the upper layer to prepare the P\+HY for the reception from another device. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Member Function Documentation}
+\mbox{\Hypertarget{classns3_1_1millicar_1_1MmWaveSidelinkPhySapProvider_acba80cb123b9eb0fcacefde35a91909d}\label{classns3_1_1millicar_1_1MmWaveSidelinkPhySapProvider_acba80cb123b9eb0fcacefde35a91909d}} 
+\index{ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Phy\+Sap\+Provider@{ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Phy\+Sap\+Provider}!Add\+Transport\+Block@{Add\+Transport\+Block}}
+\index{Add\+Transport\+Block@{Add\+Transport\+Block}!ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Phy\+Sap\+Provider@{ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Phy\+Sap\+Provider}}
+\subsubsection{\texorpdfstring{Add\+Transport\+Block()}{AddTransportBlock()}}
+{\footnotesize\ttfamily virtual void ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Phy\+Sap\+Provider\+::\+Add\+Transport\+Block (\begin{DoxyParamCaption}\item[{Ptr$<$ Packet\+Burst $>$}]{pb,  }\item[{mmwave\+::\+Tti\+Alloc\+Info}]{info }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Called by the upper layers to fill P\+HY\textquotesingle{}s buffer. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em pb} & burst of packets to be forwarded to the P\+HY layer \\
+\hline
+{\em info} & information about slot allocation necessary to determine the transmission parameters \\
+\hline
+\end{DoxyParams}
+
+
+Implemented in \hyperlink{classns3_1_1millicar_1_1MacSidelinkMemberPhySapProvider_ad6a8a2b3021363432e870d4051448b15}{ns3\+::millicar\+::\+Mac\+Sidelink\+Member\+Phy\+Sap\+Provider}.
+
+\mbox{\Hypertarget{classns3_1_1millicar_1_1MmWaveSidelinkPhySapProvider_a1c791fea7b4457a39428f3da49eaf6b8}\label{classns3_1_1millicar_1_1MmWaveSidelinkPhySapProvider_a1c791fea7b4457a39428f3da49eaf6b8}} 
+\index{ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Phy\+Sap\+Provider@{ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Phy\+Sap\+Provider}!Prepare\+For\+Reception@{Prepare\+For\+Reception}}
+\index{Prepare\+For\+Reception@{Prepare\+For\+Reception}!ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Phy\+Sap\+Provider@{ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Phy\+Sap\+Provider}}
+\subsubsection{\texorpdfstring{Prepare\+For\+Reception()}{PrepareForReception()}}
+{\footnotesize\ttfamily virtual void ns3\+::millicar\+::\+Mm\+Wave\+Sidelink\+Phy\+Sap\+Provider\+::\+Prepare\+For\+Reception (\begin{DoxyParamCaption}\item[{uint16\+\_\+t}]{rnti }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [pure virtual]}}
+
+
+
+Called by the upper layer to prepare the P\+HY for the reception from another device. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em rnti} & the rnti of the transmitting device \\
+\hline
+\end{DoxyParams}
+
+
+Implemented in \hyperlink{classns3_1_1millicar_1_1MacSidelinkMemberPhySapProvider_afe0a87706052aabc88e7c4fbd4cc7a02}{ns3\+::millicar\+::\+Mac\+Sidelink\+Member\+Phy\+Sap\+Provider}.
+
+
+
+The documentation for this class was generated from the following file\+:\begin{DoxyCompactItemize}
+\item 
+model/mmwave-\/sidelink-\/sap.\+h\end{DoxyCompactItemize}
