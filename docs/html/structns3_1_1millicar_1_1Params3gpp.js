@@ -1,0 +1,26 @@
+var structns3_1_1millicar_1_1Params3gpp =
+[
+    [ "m_allLongTermMap", "structns3_1_1millicar_1_1Params3gpp.html#a4482c840103df226ec88d870475c2813", null ],
+    [ "m_angle", "structns3_1_1millicar_1_1Params3gpp.html#a5d64ae0ddc01657a8032ea044f504d3f", null ],
+    [ "m_channel", "structns3_1_1millicar_1_1Params3gpp.html#a9b81111656b981abbfe1ac21dfa74b63", null ],
+    [ "m_clusterPhase", "structns3_1_1millicar_1_1Params3gpp.html#a1f46df64fcee50c779ad55d720fa24fa", null ],
+    [ "m_condition", "structns3_1_1millicar_1_1Params3gpp.html#afcf3e98c34a14297b2139c9418e78903", null ],
+    [ "m_delay", "structns3_1_1millicar_1_1Params3gpp.html#a5237e209e7d842da89f797136f80e0f1", null ],
+    [ "m_dis2D", "structns3_1_1millicar_1_1Params3gpp.html#aff84718a12b5a5a6a946509b86308265", null ],
+    [ "m_dis3D", "structns3_1_1millicar_1_1Params3gpp.html#abb16b534aee82802771ab2dd478f9a71", null ],
+    [ "m_DS", "structns3_1_1millicar_1_1Params3gpp.html#a4b035a27176a2e5c7372610278bf2488", null ],
+    [ "m_generatedTime", "structns3_1_1millicar_1_1Params3gpp.html#a7203d21e53c36c311e1e4ea29a586ed9", null ],
+    [ "m_K", "structns3_1_1millicar_1_1Params3gpp.html#a2a98454b7730778cac396c2c4fbf0f5d", null ],
+    [ "m_locUT", "structns3_1_1millicar_1_1Params3gpp.html#a801d48451a22db6f9a60ef679fef6dfc", null ],
+    [ "m_longTerm", "structns3_1_1millicar_1_1Params3gpp.html#a933a29498ab43074972cd1cddf380f98", null ],
+    [ "m_losPhase", "structns3_1_1millicar_1_1Params3gpp.html#aa193c4d585689000b41e7bebaaf9674d", null ],
+    [ "m_nonSelfBlocking", "structns3_1_1millicar_1_1Params3gpp.html#a21d33af11e31ecc89ca22efc4b966e6c", null ],
+    [ "m_norRvAngles", "structns3_1_1millicar_1_1Params3gpp.html#a8fc89b906602a260bd0ca96a29fd2a0d", null ],
+    [ "m_numCluster", "structns3_1_1millicar_1_1Params3gpp.html#a899410f59c2adee760c17a262e696929", null ],
+    [ "m_o2i", "structns3_1_1millicar_1_1Params3gpp.html#af78134fbc5a3bbc3bd0f7c305dfc33ea", null ],
+    [ "m_preLocUT", "structns3_1_1millicar_1_1Params3gpp.html#ac237cf83dc199cda6b78cda843294ce5", null ],
+    [ "m_rxW", "structns3_1_1millicar_1_1Params3gpp.html#a038c9030a2fb388d03646279804045e4", null ],
+    [ "m_speed", "structns3_1_1millicar_1_1Params3gpp.html#a929cb38183705e922ab980df470baf5b", null ],
+    [ "m_tauDelta", "structns3_1_1millicar_1_1Params3gpp.html#a6ce25c8d9b9baacbdac0e9887b87e0fb", null ],
+    [ "m_txW", "structns3_1_1millicar_1_1Params3gpp.html#aa672aff42743f756af3de779e2af4a05", null ]
+];
