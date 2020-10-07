@@ -1,26 +1,4 @@
 var searchData=
 [
-  ['generatesinrreport',['GenerateSinrReport',['../classns3_1_1millicar_1_1MmWaveSidelinkPhy.html#aa58a85f3e170a5ede36af9eb16604460',1,'ns3::millicar::MmWaveSidelinkPhy']]],
-  ['getaddress',['GetAddress',['../classns3_1_1millicar_1_1MmWaveVehicularNetDevice.html#a387893f7a3fe0eb9db5505d0ade5c583',1,'ns3::millicar::MmWaveVehicularNetDevice']]],
-  ['getconfigurationparameters',['GetConfigurationParameters',['../classns3_1_1millicar_1_1MmWaveVehicularHelper.html#aa1ab3205ac126fabac48608c0bbf8dcd',1,'ns3::millicar::MmWaveVehicularHelper::GetConfigurationParameters()'],['../classns3_1_1millicar_1_1MmWaveSidelinkPhy.html#aa774d38f7f3597cf79b2d55f16a1d2ba',1,'ns3::millicar::MmWaveSidelinkPhy::GetConfigurationParameters()']]],
-  ['getdevice',['GetDevice',['../classns3_1_1millicar_1_1MmWaveSidelinkSpectrumPhy.html#ace3f5a3bf2de94bb325ad37c1738dfa3',1,'ns3::millicar::MmWaveSidelinkSpectrumPhy']]],
-  ['getfrequency',['GetFrequency',['../classns3_1_1millicar_1_1MmWaveVehicularPropagationLossModel.html#a4f36d3834b45b62a214acb976e2ae41a',1,'ns3::millicar::MmWaveVehicularPropagationLossModel::GetFrequency()'],['../classns3_1_1millicar_1_1MmWaveVehicularSpectrumPropagationLossModel.html#ad9fb12c1bb96aa3bbd3eb676cdfa855f',1,'ns3::millicar::MmWaveVehicularSpectrumPropagationLossModel::GetFrequency()']]],
-  ['getmac',['GetMac',['../classns3_1_1millicar_1_1MmWaveVehicularNetDevice.html#a840697a126197bbbc7d71ac4250fb39c',1,'ns3::millicar::MmWaveVehicularNetDevice']]],
-  ['getmacsapprovider',['GetMacSapProvider',['../classns3_1_1millicar_1_1MmWaveSidelinkMac.html#a9ac166a4e4d5e2449cb0e69a165719cb',1,'ns3::millicar::MmWaveSidelinkMac']]],
-  ['getminloss',['GetMinLoss',['../classns3_1_1millicar_1_1MmWaveVehicularPropagationLossModel.html#a1f9733beb4afa3cea41bb64d105c6d75',1,'ns3::millicar::MmWaveVehicularPropagationLossModel']]],
-  ['getmobility',['GetMobility',['../classns3_1_1millicar_1_1MmWaveSidelinkSpectrumPhy.html#a32642929c3eafdf82ae27e6b9ece29cf',1,'ns3::millicar::MmWaveSidelinkSpectrumPhy']]],
-  ['getmtu',['GetMtu',['../classns3_1_1millicar_1_1MmWaveVehicularNetDevice.html#a706437862864c4c34c6b2beb88b3b307',1,'ns3::millicar::MmWaveVehicularNetDevice']]],
-  ['getnoisefigure',['GetNoiseFigure',['../classns3_1_1millicar_1_1MmWaveSidelinkPhy.html#adcc119b8134bc2ee18088a0ef7c298e3',1,'ns3::millicar::MmWaveSidelinkPhy']]],
-  ['getphy',['GetPhy',['../classns3_1_1millicar_1_1MmWaveVehicularNetDevice.html#aec2c2afec33925b2186204d2bae3d080',1,'ns3::millicar::MmWaveVehicularNetDevice']]],
-  ['getphysapprovider',['GetPhySapProvider',['../classns3_1_1millicar_1_1MmWaveSidelinkPhy.html#ab8df82d08b89cfa181a548ca935409bf',1,'ns3::millicar::MmWaveSidelinkPhy']]],
-  ['getphysapuser',['GetPhySapUser',['../classns3_1_1millicar_1_1MmWaveSidelinkMac.html#ae6a8f2b11ed7ac5d33dc0629937695e6',1,'ns3::millicar::MmWaveSidelinkMac']]],
-  ['getrlctype',['GetRlcType',['../classns3_1_1millicar_1_1MmWaveVehicularNetDevice.html#a203a3fd59d76d45088f1921aff413549',1,'ns3::millicar::MmWaveVehicularNetDevice']]],
-  ['getrnti',['GetRnti',['../classns3_1_1millicar_1_1MmWaveSidelinkMac.html#a229809ca241dc9416dfb8ec82d8e48f6',1,'ns3::millicar::MmWaveSidelinkMac']]],
-  ['getrxantenna',['GetRxAntenna',['../classns3_1_1millicar_1_1MmWaveSidelinkSpectrumPhy.html#a1a7c251de6b22c5afbafcf5937a12082',1,'ns3::millicar::MmWaveSidelinkSpectrumPhy']]],
-  ['getrxspectrummodel',['GetRxSpectrumModel',['../classns3_1_1millicar_1_1MmWaveSidelinkSpectrumPhy.html#adf0968d0659b5790d71a1b41df56c221',1,'ns3::millicar::MmWaveSidelinkSpectrumPhy']]],
-  ['getschedulingpatternoptiontype',['GetSchedulingPatternOptionType',['../classns3_1_1millicar_1_1MmWaveVehicularHelper.html#a6d6431806df6b60f555880c26c21ce5e',1,'ns3::millicar::MmWaveVehicularHelper']]],
-  ['getspectrumchannel',['GetSpectrumChannel',['../classns3_1_1millicar_1_1MmWaveSidelinkSpectrumPhy.html#a831e25da1a41abd432e7e412abdb2e90',1,'ns3::millicar::MmWaveSidelinkSpectrumPhy']]],
-  ['getspectrumphy',['GetSpectrumPhy',['../classns3_1_1millicar_1_1MmWaveSidelinkPhy.html#ad351ad92c46d2250c1848cc6f45d3de9',1,'ns3::millicar::MmWaveSidelinkPhy']]],
-  ['gettxpower',['GetTxPower',['../classns3_1_1millicar_1_1MmWaveSidelinkPhy.html#ae1c99f95c48cbdaf4066f1a4310ffff2',1,'ns3::millicar::MmWaveSidelinkPhy']]],
-  ['gettypeid',['GetTypeId',['../classns3_1_1millicar_1_1MmWaveSidelinkMac.html#a97fdea26e60baec2ab5f082da054e18e',1,'ns3::millicar::MmWaveSidelinkMac::GetTypeId()'],['../classns3_1_1millicar_1_1MmWaveSidelinkSpectrumPhy.html#a751fd1b25b484a1a8d32d62d2545069c',1,'ns3::millicar::MmWaveSidelinkSpectrumPhy::GetTypeId()'],['../classns3_1_1millicar_1_1MmWaveVehicularNetDevice.html#a5d96b39b9b59c2daa4068b6a302358fd',1,'ns3::millicar::MmWaveVehicularNetDevice::GetTypeId()']]]
+  ['frame',['frame',['../structns3_1_1millicar_1_1SlSchedulingCallback.html#a1831e165e5378c4dc2e066795ff74028',1,'ns3::millicar::SlSchedulingCallback']]]
 ];
