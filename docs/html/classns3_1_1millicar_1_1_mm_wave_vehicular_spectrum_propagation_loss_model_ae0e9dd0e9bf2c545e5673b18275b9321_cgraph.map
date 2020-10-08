@@ -1,0 +1,4 @@
+<map id="ns3::millicar::MmWaveVehicularSpectrumPropagationLossModel::GetTypeId" name="ns3::millicar::MmWaveVehicularSpectrumPropagationLossModel::GetTypeId">
+<area shape="rect" id="node2" href="$classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model.html#ad9fb12c1bb96aa3bbd3eb676cdfa855f" title="ns3::millicar::MmWaveVehicular\lSpectrumPropagationLossModel\l::GetFrequency" alt="" coords="264,5,475,61"/>
+<area shape="rect" id="node3" href="$classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model.html#a0f59e8c2b0fa28ae37e2f239b6abaa1b" title="ns3::millicar::MmWaveVehicular\lSpectrumPropagationLossModel\l::SetFrequency" alt="" coords="264,85,475,141"/>
+</map>

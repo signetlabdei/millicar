@@ -1,0 +1,6 @@
+<map id="ns3::millicar::MmWaveVehicularPropagationLossModel::GetTypeId" name="ns3::millicar::MmWaveVehicularPropagationLossModel::GetTypeId">
+<area shape="rect" id="node2" href="$classns3_1_1millicar_1_1_mm_wave_vehicular_propagation_loss_model.html#a4f36d3834b45b62a214acb976e2ae41a" title="ns3::millicar::MmWaveVehicular\lPropagationLossModel::GetFrequency" alt="" coords="276,5,520,47"/>
+<area shape="rect" id="node3" href="$classns3_1_1millicar_1_1_mm_wave_vehicular_propagation_loss_model.html#a1f9733beb4afa3cea41bb64d105c6d75" title="ns3::millicar::MmWaveVehicular\lPropagationLossModel::GetMinLoss" alt="" coords="282,71,514,112"/>
+<area shape="rect" id="node4" href="$classns3_1_1millicar_1_1_mm_wave_vehicular_propagation_loss_model.html#a893c89bb8594342511ef88e4acca3dfe" title="ns3::millicar::MmWaveVehicular\lPropagationLossModel::SetFrequency" alt="" coords="277,136,519,177"/>
+<area shape="rect" id="node5" href="$classns3_1_1millicar_1_1_mm_wave_vehicular_propagation_loss_model.html#a25532b53a7b9552b09af5a083a17034f" title="ns3::millicar::MmWaveVehicular\lPropagationLossModel::SetMinLoss" alt="" coords="283,201,513,243"/>
+</map>

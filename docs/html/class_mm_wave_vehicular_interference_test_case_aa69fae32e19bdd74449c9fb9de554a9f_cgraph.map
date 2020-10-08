@@ -1,0 +1,5 @@
+<map id="MmWaveVehicularInterferenceTestCase::DoRun" name="MmWaveVehicularInterferenceTestCase::DoRun">
+<area shape="rect" id="node2" href="$class_mm_wave_vehicular_interference_test_case.html#a0a52ef59129cd60bee461c7b63df69a7" title="MmWaveVehicularInterference\lTestCase::StartTest" alt="" coords="255,39,456,80"/>
+<area shape="rect" id="node3" href="$class_mm_wave_vehicular_interference_test_case.html#a2020e58e14a69d0618b7c729f090f38b" title="Callback sink to keep track of the SINR evaluated by the devices associated to GROUP 1..." alt="" coords="504,5,727,47"/>
+<area shape="rect" id="node4" href="$class_mm_wave_vehicular_interference_test_case.html#a9f4dbca6cc5b71c5413c2590cfd40c21" title="Callback sink to keep track of the SINR evaluated by the devices associated to GROUP 2..." alt="" coords="504,71,727,112"/>
+</map>

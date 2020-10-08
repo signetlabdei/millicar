@@ -1,0 +1,5 @@
+<map id="ns3::millicar::MmWaveSidelinkSpectrumPhy::StartRx" name="ns3::millicar::MmWaveSidelinkSpectrumPhy::StartRx">
+<area shape="rect" id="node2" href="$classns3_1_1millicar_1_1_mm_wave_sidelink_spectrum_phy.html#a22f0761f08f5f08dda1de1c778832f5a" title="Start receive data function. " alt="" coords="256,39,459,80"/>
+<area shape="rect" id="node3" href="$classns3_1_1millicar_1_1_mm_wave_sidelink_spectrum_phy.html#a236094ab0bd0048edfb91c0b90a53d91" title="End receive data function. " alt="" coords="507,5,709,47"/>
+<area shape="rect" id="node4" href="$classns3_1_1millicar_1_1_mm_wave_sidelink_spectrum_phy.html#a3983f3ca1257d4a5dff72cb92b8bb7d5" title="Change state function. " alt="" coords="507,71,709,112"/>
+</map>

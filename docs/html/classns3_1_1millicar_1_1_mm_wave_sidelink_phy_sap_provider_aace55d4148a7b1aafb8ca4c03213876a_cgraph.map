@@ -1,0 +1,4 @@
+<map id="ns3::millicar::MmWaveSidelinkPhySapProvider::~MmWaveSidelinkPhySapProvider" name="ns3::millicar::MmWaveSidelinkPhySapProvider::~MmWaveSidelinkPhySapProvider">
+<area shape="rect" id="node2" href="$classns3_1_1millicar_1_1_mm_wave_sidelink_phy_sap_provider.html#acba80cb123b9eb0fcacefde35a91909d" title="Called by the upper layers to fill PHY&#39;s buffer. " alt="" coords="317,5,551,47"/>
+<area shape="rect" id="node3" href="$classns3_1_1millicar_1_1_mm_wave_sidelink_phy_sap_provider.html#a1c791fea7b4457a39428f3da49eaf6b8" title="Called by the upper layer to prepare the PHY for the reception from another device. " alt="" coords="311,71,557,112"/>
+</map>

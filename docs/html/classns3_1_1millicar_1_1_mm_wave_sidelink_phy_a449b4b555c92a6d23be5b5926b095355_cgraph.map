@@ -1,0 +1,6 @@
+<map id="ns3::millicar::MmWaveSidelinkPhy::GetTypeId" name="ns3::millicar::MmWaveSidelinkPhy::GetTypeId">
+<area shape="rect" id="node2" href="$classns3_1_1millicar_1_1_mm_wave_sidelink_phy.html#adcc119b8134bc2ee18088a0ef7c298e3" title="Returns the noise figure. " alt="" coords="256,5,459,47"/>
+<area shape="rect" id="node3" href="$classns3_1_1millicar_1_1_mm_wave_sidelink_phy.html#ae1c99f95c48cbdaf4066f1a4310ffff2" title="Returns the tx power. " alt="" coords="256,71,459,112"/>
+<area shape="rect" id="node4" href="$classns3_1_1millicar_1_1_mm_wave_sidelink_phy.html#a3003041c8b2124b9c527b0bfe516c9ee" title="Set the noise figure. " alt="" coords="256,136,459,177"/>
+<area shape="rect" id="node5" href="$classns3_1_1millicar_1_1_mm_wave_sidelink_phy.html#a58cf1b6bffacbf29abec6feb0cb35253" title="Set the tx power. " alt="" coords="256,201,459,243"/>
+</map>

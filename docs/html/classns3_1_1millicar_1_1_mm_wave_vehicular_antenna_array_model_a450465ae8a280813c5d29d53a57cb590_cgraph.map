@@ -1,0 +1,5 @@
+<map id="ns3::millicar::MmWaveVehicularAntennaArrayModel::GetTypeId" name="ns3::millicar::MmWaveVehicularAntennaArrayModel::GetTypeId">
+<area shape="rect" id="node2" href="$classns3_1_1millicar_1_1_mm_wave_vehicular_antenna_array_model.html#a673379bcc08edd4e4a5087cc98bde535" title="ns3::millicar::MmWaveVehicular\lAntennaArrayModel::GetTotNoArray\lElements" alt="" coords="273,5,505,61"/>
+<area shape="rect" id="node3" href="$classns3_1_1millicar_1_1_mm_wave_vehicular_antenna_array_model.html#aad67935b04563306cbb4e28fcd075758" title="ns3::millicar::MmWaveVehicular\lAntennaArrayModel::SetPlanesNumber" alt="" coords="264,86,515,127"/>
+<area shape="rect" id="node4" href="$classns3_1_1millicar_1_1_mm_wave_vehicular_antenna_array_model.html#aa570481367e2f3677f1ea4eedd37be40" title="ns3::millicar::MmWaveVehicular\lAntennaArrayModel::SetTotNoArray\lElements" alt="" coords="274,152,505,208"/>
+</map>

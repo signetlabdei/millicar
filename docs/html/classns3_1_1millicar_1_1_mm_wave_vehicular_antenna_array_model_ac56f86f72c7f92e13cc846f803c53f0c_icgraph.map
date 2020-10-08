@@ -1,0 +1,4 @@
+<map id="ns3::millicar::MmWaveVehicularAntennaArrayModel::GetAntennaLocation" name="ns3::millicar::MmWaveVehicularAntennaArrayModel::GetAntennaLocation">
+<area shape="rect" id="node2" href="$classns3_1_1millicar_1_1_mm_wave_vehicular_antenna_array_model.html#a11638107e20004a64b705d065836efa4" title="ns3::millicar::MmWaveVehicular\lAntennaArrayModel::SetBeamforming\lVectorPanelDevices" alt="" coords="316,5,557,61"/>
+<area shape="rect" id="node3" href="$classns3_1_1millicar_1_1_mm_wave_vehicular_antenna_array_model.html#a18cb8824e341b7d80d1fd9a011604a8d" title="ns3::millicar::MmWaveVehicular\lAntennaArrayModel::SetSector" alt="" coords="331,86,542,127"/>
+</map>

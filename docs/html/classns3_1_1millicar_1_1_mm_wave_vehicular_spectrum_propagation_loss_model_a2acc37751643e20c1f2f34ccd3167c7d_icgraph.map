@@ -1,0 +1,4 @@
+<map id="ns3::millicar::MmWaveVehicularSpectrumPropagationLossModel::GetOxygenLoss" name="ns3::millicar::MmWaveVehicularSpectrumPropagationLossModel::GetOxygenLoss">
+<area shape="rect" id="node2" href="$classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model.html#a941200314c689b92cec1e37e96b9642e" title="Compute the BF gain, apply frequency selectivity by phase&#45;shifting with the cluster delays and scale ..." alt="" coords="264,5,475,61"/>
+<area shape="rect" id="node3" href="$classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model.html#ad4b12bbb003fe17d35474738a4f42d82" title="Inherited from SpectrumPropagationLossModel, it returns the PSD at the receiver &#160;the transmitted PSD ..." alt="" coords="523,5,744,61"/>
+</map>

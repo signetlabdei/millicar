@@ -1,0 +1,8 @@
+<map id="ns3::millicar::MmWaveVehicularHelper::GetTypeId" name="ns3::millicar::MmWaveVehicularHelper::GetTypeId">
+<area shape="rect" id="node2" href="$classns3_1_1millicar_1_1_mm_wave_vehicular_helper.html#a6d6431806df6b60f555880c26c21ce5e" title="Returns the adopted scheduling pattern policy. " alt="" coords="264,5,527,47"/>
+<area shape="rect" id="node3" href="$classns3_1_1millicar_1_1_mm_wave_vehicular_helper.html#a8653a3225aa1df7ef17eb9ed3d6ebab9" title="Configure the numerology index. " alt="" coords="290,71,501,112"/>
+<area shape="rect" id="node4" href="$classns3_1_1millicar_1_1_mm_wave_vehicular_helper.html#a065bd56895c9de5e3df2e8e733a29f3b" title="Set the propagation delay model type. " alt="" coords="268,136,523,177"/>
+<area shape="rect" id="node5" href="$classns3_1_1millicar_1_1_mm_wave_vehicular_helper.html#a0bd9a7da6f128d5cf4411e8757d9c884" title="Set the propagation loss model type. " alt="" coords="271,201,520,243"/>
+<area shape="rect" id="node6" href="$classns3_1_1millicar_1_1_mm_wave_vehicular_helper.html#a909144ad73428efd96a27612757ec08a" title="Set the scheduling pattern option type. " alt="" coords="265,267,526,308"/>
+<area shape="rect" id="node7" href="$classns3_1_1millicar_1_1_mm_wave_vehicular_helper.html#ae03289dc88f603994c8ec5649756878f" title="Set the spectrum propagation loss model type. " alt="" coords="275,333,516,389"/>
+</map>

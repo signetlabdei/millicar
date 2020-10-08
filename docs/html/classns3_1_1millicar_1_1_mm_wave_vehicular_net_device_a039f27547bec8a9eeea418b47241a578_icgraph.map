@@ -1,0 +1,4 @@
+<map id="ns3::millicar::MmWaveVehicularNetDevice::Receive" name="ns3::millicar::MmWaveVehicularNetDevice::Receive">
+<area shape="rect" id="node2" href="$classns3_1_1millicar_1_1_mm_wave_vehicular_helper.html#a43af64d478e1f20df7c254ef43ec0a66" title="Install a MmWaveVehicularNetDevice on the node. " alt="" coords="264,5,513,61"/>
+<area shape="rect" id="node3" href="$classns3_1_1millicar_1_1_mm_wave_vehicular_helper.html#adb23c9d4f13972fd3bac3b35a23582c4" title="Install a MmWaveVehicularNetDevice on each node in the container. " alt="" coords="561,5,796,61"/>
+</map>

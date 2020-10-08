@@ -1,0 +1,7 @@
+<map id="ns3::millicar::MmWaveSidelinkMac" name="ns3::millicar::MmWaveSidelinkMac">
+<area shape="rect" id="node4" title="STL class. " alt="" coords="149,108,265,135"/>
+<area shape="rect" id="node10" title="STL class. " alt="" coords="509,232,631,259"/>
+<area shape="rect" id="node14" title="STL class. " alt="" coords="159,304,256,331"/>
+<area shape="rect" id="node6" href="$classns3_1_1millicar_1_1_mm_wave_sidelink_phy_sap_provider.html" title="ns3::millicar::MmWaveSidelink\lPhySapProvider" alt="" coords="919,411,1121,453"/>
+<area shape="rect" id="node7" href="$classns3_1_1millicar_1_1_mm_wave_sidelink_phy_sap_user.html" title="ns3::millicar::MmWaveSidelink\lPhySapUser" alt="" coords="919,477,1121,518"/>
+</map>

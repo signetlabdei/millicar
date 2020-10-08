@@ -1,0 +1,4 @@
+<map id="ns3::millicar::MmWaveVehicularNetDevice::GetTypeId" name="ns3::millicar::MmWaveVehicularNetDevice::GetTypeId">
+<area shape="rect" id="node2" href="$classns3_1_1millicar_1_1_mm_wave_vehicular_net_device.html#a706437862864c4c34c6b2beb88b3b307" title="Returns MTU associated to the NetDevice. " alt="" coords="264,5,475,47"/>
+<area shape="rect" id="node3" href="$classns3_1_1millicar_1_1_mm_wave_vehicular_net_device.html#a5e381e54c479300f0f4180227d810bae" title="Set MTU associated to the NetDevice. " alt="" coords="264,71,475,112"/>
+</map>

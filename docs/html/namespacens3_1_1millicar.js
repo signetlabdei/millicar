@@ -1,0 +1,25 @@
+var namespacens3_1_1millicar =
+[
+    [ "channelCondition", "structns3_1_1millicar_1_1channel_condition.html", "structns3_1_1millicar_1_1channel_condition" ],
+    [ "MacSidelinkMemberPhySapProvider", "classns3_1_1millicar_1_1_mac_sidelink_member_phy_sap_provider.html", "classns3_1_1millicar_1_1_mac_sidelink_member_phy_sap_provider" ],
+    [ "MacSidelinkMemberPhySapUser", "classns3_1_1millicar_1_1_mac_sidelink_member_phy_sap_user.html", "classns3_1_1millicar_1_1_mac_sidelink_member_phy_sap_user" ],
+    [ "MmWaveSidelinkMac", "classns3_1_1millicar_1_1_mm_wave_sidelink_mac.html", "classns3_1_1millicar_1_1_mm_wave_sidelink_mac" ],
+    [ "MmWaveSidelinkPhy", "classns3_1_1millicar_1_1_mm_wave_sidelink_phy.html", "classns3_1_1millicar_1_1_mm_wave_sidelink_phy" ],
+    [ "MmWaveSidelinkPhySapProvider", "classns3_1_1millicar_1_1_mm_wave_sidelink_phy_sap_provider.html", "classns3_1_1millicar_1_1_mm_wave_sidelink_phy_sap_provider" ],
+    [ "MmWaveSidelinkPhySapUser", "classns3_1_1millicar_1_1_mm_wave_sidelink_phy_sap_user.html", "classns3_1_1millicar_1_1_mm_wave_sidelink_phy_sap_user" ],
+    [ "MmWaveSidelinkSpectrumPhy", "classns3_1_1millicar_1_1_mm_wave_sidelink_spectrum_phy.html", "classns3_1_1millicar_1_1_mm_wave_sidelink_spectrum_phy" ],
+    [ "MmWaveSidelinkSpectrumSignalParameters", "structns3_1_1millicar_1_1_mm_wave_sidelink_spectrum_signal_parameters.html", "structns3_1_1millicar_1_1_mm_wave_sidelink_spectrum_signal_parameters" ],
+    [ "MmWaveVehicularAntennaArrayModel", "classns3_1_1millicar_1_1_mm_wave_vehicular_antenna_array_model.html", "classns3_1_1millicar_1_1_mm_wave_vehicular_antenna_array_model" ],
+    [ "MmWaveVehicularHelper", "classns3_1_1millicar_1_1_mm_wave_vehicular_helper.html", "classns3_1_1millicar_1_1_mm_wave_vehicular_helper" ],
+    [ "MmWaveVehicularNetDevice", "classns3_1_1millicar_1_1_mm_wave_vehicular_net_device.html", "classns3_1_1millicar_1_1_mm_wave_vehicular_net_device" ],
+    [ "MmWaveVehicularPropagationLossModel", "classns3_1_1millicar_1_1_mm_wave_vehicular_propagation_loss_model.html", "classns3_1_1millicar_1_1_mm_wave_vehicular_propagation_loss_model" ],
+    [ "MmWaveVehicularSpectrumPropagationLossModel", "classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model.html", "classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model" ],
+    [ "MmWaveVehicularTracesHelper", "classns3_1_1millicar_1_1_mm_wave_vehicular_traces_helper.html", "classns3_1_1millicar_1_1_mm_wave_vehicular_traces_helper" ],
+    [ "Params3gpp", "structns3_1_1millicar_1_1_params3gpp.html", "structns3_1_1millicar_1_1_params3gpp" ],
+    [ "ParamsTable", "structns3_1_1millicar_1_1_params_table.html", "structns3_1_1millicar_1_1_params_table" ],
+    [ "PdcpSpecificSidelinkPdcpSapUser", "classns3_1_1millicar_1_1_pdcp_specific_sidelink_pdcp_sap_user.html", "classns3_1_1millicar_1_1_pdcp_specific_sidelink_pdcp_sap_user" ],
+    [ "RlcSidelinkMemberMacSapProvider", "classns3_1_1millicar_1_1_rlc_sidelink_member_mac_sap_provider.html", "classns3_1_1millicar_1_1_rlc_sidelink_member_mac_sap_provider" ],
+    [ "SidelinkRadioBearerInfo", "classns3_1_1millicar_1_1_sidelink_radio_bearer_info.html", "classns3_1_1millicar_1_1_sidelink_radio_bearer_info" ],
+    [ "SlSchedulingCallback", "structns3_1_1millicar_1_1_sl_scheduling_callback.html", "structns3_1_1millicar_1_1_sl_scheduling_callback" ],
+    [ "TbInfo_t", "structns3_1_1millicar_1_1_tb_info__t.html", "structns3_1_1millicar_1_1_tb_info__t" ]
+];

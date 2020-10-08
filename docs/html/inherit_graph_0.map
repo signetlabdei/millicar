@@ -1,5 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node2" href="$classMmWaveVehicularInterferenceTestCase.html" title="MmWaveVehicularInterference\lTestCase" alt="" coords="140,5,341,47"/>
-<area shape="rect" id="node3" href="$classMmWaveVehicularRateTestCase.html" title="MmWaveVehicularRateTestCase" alt="" coords="132,71,349,98"/>
-<area shape="rect" id="node4" href="$classMmWaveVehicularSpectrumPhyTestCase1.html" title="MmWaveVehicularSpectrumPhy\lTestCase1" alt="" coords="135,123,346,164"/>
+<area shape="rect" id="node2" href="$class_mm_wave_vehicular_interference_test_case.html" title="The aim of this test is to check whether the interference was evaluated correctly when different grou..." alt="" coords="140,5,341,47"/>
+<area shape="rect" id="node3" href="$class_mm_wave_vehicular_rate_test_case.html" title="This is a test to check if the designed vehicular stack (MAC and PHY) is able to run on a basic scena..." alt="" coords="132,71,349,98"/>
+<area shape="rect" id="node4" href="$class_mm_wave_vehicular_spectrum_phy_test_case1.html" title="This is a test to check if the class MmWaveSidelinkSpectrumPhy correctly computes the SNR..." alt="" coords="135,123,346,164"/>
 </map>

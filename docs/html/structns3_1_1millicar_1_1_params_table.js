@@ -1,0 +1,27 @@
+var structns3_1_1millicar_1_1_params_table =
+[
+    [ "ParamsTable", "structns3_1_1millicar_1_1_params_table.html#a2de0be69cac1730f99998380a2250283", null ],
+    [ "SetParams", "structns3_1_1millicar_1_1_params_table.html#a530c30ffafcba89117eba9fb42c91f58", null ],
+    [ "m_cASA", "structns3_1_1millicar_1_1_params_table.html#a4b366af107100981ce630cb8e9cea756", null ],
+    [ "m_cASD", "structns3_1_1millicar_1_1_params_table.html#a27e9604955e0bac42e4a3a6b363e8cd0", null ],
+    [ "m_cDS", "structns3_1_1millicar_1_1_params_table.html#a20a16108beb2fcc7500bf4422e8b775f", null ],
+    [ "m_cZSA", "structns3_1_1millicar_1_1_params_table.html#aa42795fc412a22da3338f911ba1c0790", null ],
+    [ "m_numOfCluster", "structns3_1_1millicar_1_1_params_table.html#ae1d4d1ee3e8170cc6f8f65aa12b6cbfb", null ],
+    [ "m_offsetZOD", "structns3_1_1millicar_1_1_params_table.html#a6b620d2150b7451f617db798de11cf02", null ],
+    [ "m_raysPerCluster", "structns3_1_1millicar_1_1_params_table.html#aa8922cdc3faec15053ec6877521f6f7b", null ],
+    [ "m_rTau", "structns3_1_1millicar_1_1_params_table.html#a69070ca57b3c78c2dd94712c3f6b32af", null ],
+    [ "m_shadowingStd", "structns3_1_1millicar_1_1_params_table.html#afefbe1da3cc2cad794d5812ba6023261", null ],
+    [ "m_sigK", "structns3_1_1millicar_1_1_params_table.html#a5825528eeaf7ca7657e5462c9b9e6558", null ],
+    [ "m_sigLgASA", "structns3_1_1millicar_1_1_params_table.html#ad8b3773ed38f423e15ad490c2448d9c1", null ],
+    [ "m_sigLgASD", "structns3_1_1millicar_1_1_params_table.html#a7d6008f3854251ace7e554a7bdd0a733", null ],
+    [ "m_sigLgDS", "structns3_1_1millicar_1_1_params_table.html#a1802ba8a755153b0ee57f042077930f4", null ],
+    [ "m_sigLgZSA", "structns3_1_1millicar_1_1_params_table.html#a77bfbd263875c753541e91ee65e7a7e3", null ],
+    [ "m_sigLgZSD", "structns3_1_1millicar_1_1_params_table.html#a31b09651d904e999d44c8c41992fbfd1", null ],
+    [ "m_sqrtC", "structns3_1_1millicar_1_1_params_table.html#a49c997b83dfc2bedeea7a9971bc50f41", null ],
+    [ "m_uK", "structns3_1_1millicar_1_1_params_table.html#a28f1d95964ed530448cc2f9954a2649d", null ],
+    [ "m_uLgASA", "structns3_1_1millicar_1_1_params_table.html#ab85d7c820732e853d66fb074cab526c4", null ],
+    [ "m_uLgASD", "structns3_1_1millicar_1_1_params_table.html#abd231b80321b6d14c3313c0deebd5438", null ],
+    [ "m_uLgDS", "structns3_1_1millicar_1_1_params_table.html#a684f5945b3da6252c6c710ddbe9e4b63", null ],
+    [ "m_uLgZSA", "structns3_1_1millicar_1_1_params_table.html#ac2d5eb10c32e32b23a44378416b6a747", null ],
+    [ "m_uLgZSD", "structns3_1_1millicar_1_1_params_table.html#ae2b1cd3e760c51fd0a6e2c58ab6cfe56", null ]
+];

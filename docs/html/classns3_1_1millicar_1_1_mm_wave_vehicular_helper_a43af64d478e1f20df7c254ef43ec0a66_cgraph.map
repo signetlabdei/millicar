@@ -1,0 +1,7 @@
+<map id="ns3::millicar::MmWaveVehicularHelper::InstallSingleMmWaveVehicularNetDevice" name="ns3::millicar::MmWaveVehicularHelper::InstallSingleMmWaveVehicularNetDevice">
+<area shape="rect" id="node2" href="$classns3_1_1millicar_1_1_mm_wave_sidelink_phy.html#aa58a85f3e170a5ede36af9eb16604460" title="This method generates a new SINR report and sends it to the MAC layer. " alt="" coords="317,5,520,47"/>
+<area shape="rect" id="node3" href="$classns3_1_1millicar_1_1_mm_wave_vehicular_traces_helper.html#a8f438f5c50ef9bf2c9dd10a9cb731845" title="Method to be attached to the callback in the MmWaveSidelinkSpectrumPhy. " alt="" coords="313,71,524,112"/>
+<area shape="rect" id="node4" href="$classns3_1_1millicar_1_1_mm_wave_sidelink_phy.html#a5721f99acca7de2ee5c9ae8e926eb48a" title="Receive the packet from SpectrumPhy and forward it up to the MAC. " alt="" coords="317,136,520,177"/>
+<area shape="rect" id="node5" href="$classns3_1_1millicar_1_1_mm_wave_vehicular_net_device.html#a039f27547bec8a9eeea418b47241a578" title="Packet forwarding to the MAC layer by calling DoTransmitPdu. " alt="" coords="313,201,524,243"/>
+<area shape="rect" id="node6" href="$classns3_1_1millicar_1_1_mm_wave_sidelink_spectrum_phy.html#a504ec60aaf6a7115b78013e1e3d18c8c" title="ns3::millicar::MmWaveSidelink\lSpectrumPhy::UpdateSinrPerceived" alt="" coords="303,267,535,308"/>
+</map>

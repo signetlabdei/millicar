@@ -1,0 +1,13 @@
+var searchData=
+[
+  ['packetburst',['packetBurst',['../structns3_1_1millicar_1_1_tb_info__t.html#a5b908b8d39f67299cc7fb0a8fa49eaab',1,'ns3::millicar::TbInfo_t::packetBurst()'],['../structns3_1_1millicar_1_1_mm_wave_sidelink_spectrum_signal_parameters.html#a873326282f3503a6bc088013ef75bced',1,'ns3::millicar::MmWaveSidelinkSpectrumSignalParameters::packetBurst()']]],
+  ['pairdevices',['PairDevices',['../classns3_1_1millicar_1_1_mm_wave_vehicular_helper.html#ad534c932d9a9ff86e41fa6f09377001f',1,'ns3::millicar::MmWaveVehicularHelper']]],
+  ['params3gpp',['Params3gpp',['../structns3_1_1millicar_1_1_params3gpp.html',1,'ns3::millicar']]],
+  ['paramstable',['ParamsTable',['../structns3_1_1millicar_1_1_params_table.html',1,'ns3::millicar::ParamsTable'],['../structns3_1_1millicar_1_1_params_table.html#a2de0be69cac1730f99998380a2250283',1,'ns3::millicar::ParamsTable::ParamsTable()']]],
+  ['pdcpspecificsidelinkpdcpsapuser',['PdcpSpecificSidelinkPdcpSapUser',['../classns3_1_1millicar_1_1_pdcp_specific_sidelink_pdcp_sap_user.html',1,'ns3::millicar::PdcpSpecificSidelinkPdcpSapUser'],['../classns3_1_1millicar_1_1_pdcp_specific_sidelink_pdcp_sap_user.html#a010c7015eba9f2c373951760934ba8d9',1,'ns3::millicar::PdcpSpecificSidelinkPdcpSapUser::PdcpSpecificSidelinkPdcpSapUser(Ptr&lt; MmWaveVehicularNetDevice &gt; netDevice)'],['../classns3_1_1millicar_1_1_pdcp_specific_sidelink_pdcp_sap_user.html#a6d766ac114dff4c3b26160cdf664c731',1,'ns3::millicar::PdcpSpecificSidelinkPdcpSapUser::PdcpSpecificSidelinkPdcpSapUser()']]],
+  ['phi_5findex',['PHI_INDEX',['../mmwave-vehicular-spectrum-propagation-loss-model_8h.html#aac1933f496abe567e4380fc99112f6dc',1,'mmwave-vehicular-spectrum-propagation-loss-model.h']]],
+  ['phybufferentry',['PhyBufferEntry',['../classns3_1_1millicar_1_1_mm_wave_sidelink_phy.html#a00da4aa5e34716176f97dbdca05cca29',1,'ns3::millicar::MmWaveSidelinkPhy']]],
+  ['prepareforreception',['PrepareForReception',['../classns3_1_1millicar_1_1_mac_sidelink_member_phy_sap_provider.html#afe0a87706052aabc88e7c4fbd4cc7a02',1,'ns3::millicar::MacSidelinkMemberPhySapProvider::PrepareForReception()'],['../classns3_1_1millicar_1_1_mm_wave_sidelink_phy_sap_provider.html#a1c791fea7b4457a39428f3da49eaf6b8',1,'ns3::millicar::MmWaveSidelinkPhySapProvider::PrepareForReception()']]],
+  ['printgnuplottablenodelisttofile',['PrintGnuplottableNodeListToFile',['../vehicular-simple-two_8cc.html#a4615c3355accd48c1761fe36e6ee007e',1,'vehicular-simple-two.cc']]],
+  ['pss',['pss',['../structns3_1_1millicar_1_1_mm_wave_sidelink_spectrum_signal_parameters.html#a15bd0c3e1ff3ab2fd3008eda2d242c23',1,'ns3::millicar::MmWaveSidelinkSpectrumSignalParameters']]]
+];

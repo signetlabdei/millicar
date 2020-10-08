@@ -1,0 +1,4 @@
+<map id="ns3::millicar::MmWaveVehicularPropagationLossModel::GetLoss" name="ns3::millicar::MmWaveVehicularPropagationLossModel::GetLoss">
+<area shape="rect" id="node2" href="$classns3_1_1millicar_1_1_mm_wave_vehicular_propagation_loss_model.html#a5dba079be96d350d602a133ea7e47830" title="ns3::millicar::MmWaveVehicular\lPropagationLossModel::GetAdditional\lNlosVLoss" alt="" coords="286,5,526,61"/>
+<area shape="rect" id="node3" href="$classns3_1_1millicar_1_1_mm_wave_vehicular_propagation_loss_model.html#a829ff584e79862139bf500b68f7f603e" title="ns3::millicar::MmWaveVehicular\lPropagationLossModel::UpdateConditionMap" alt="" coords="264,86,548,127"/>
+</map>

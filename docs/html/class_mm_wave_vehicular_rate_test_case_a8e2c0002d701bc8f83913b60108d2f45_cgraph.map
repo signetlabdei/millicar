@@ -1,0 +1,4 @@
+<map id="MmWaveVehicularRateTestCase::StartTest" name="MmWaveVehicularRateTestCase::StartTest">
+<area shape="rect" id="node2" href="$class_mm_wave_vehicular_rate_test_case.html#a35a8b93c932ddd9a275e57f19a945217" title="Callback sink fired when the rx receives a packet. " alt="" coords="271,5,513,32"/>
+<area shape="rect" id="node3" href="$class_mm_wave_vehicular_rate_test_case.html#a0b9241440b26d99db3620e4d98c984ae" title="Callback sink fired when the tx transmits a packet. " alt="" coords="272,56,512,83"/>
+</map>
