@@ -23,12 +23,10 @@
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
   <link href="doxygen.css" rel="stylesheet" type="text/css" />
-  <link href="ns3_stylesheet.css" rel="stylesheet" type="text/css"/>
+  <link href="stylesheet.css" rel="stylesheet" type="text/css"/>
   <link href="favicon.ico" rel="shortcut icon" type="image/ico">
   </link>
   <script type="text/javascript" src="drop-down-menu.js"></script>
-  <script type="text/javascript" src="ns3_version.js"></script>
-  <script type="text/javascript" src="ns3_links.js"></script>
 </head>
 <body>
   <div id="top">
@@ -38,8 +36,8 @@
         <tbody>
           <tr style="height: 56px;">
             <td id="projectlogo">
-              <a id="ns3_home1" href="http://http://signet.dei.unipd.it//">
-                <img alt="ns-3 Logo" src="logo_signet.png" />
+              <a id="home" href="http://signet.dei.unipd.it/" target="_blank">
+                <img alt="signet logo" src="logo_signet.png" />
               </a>
             </td>
             <td id="projecttext">
@@ -119,6 +117,8 @@ $(document).ready(function(){initNavTree('classns3_1_1millicar_1_1_mm_wave_sidel
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classns3_1_1millicar_1_1_mm_wave_sidelink_mac__inherit__graph.png" border="0" usemap="#ns3_1_1millicar_1_1_mm_wave_sidelink_mac_inherit__map" alt="Inheritance graph"/></div>
+<map name="ns3_1_1millicar_1_1_mm_wave_sidelink_mac_inherit__map" id="ns3_1_1millicar_1_1_mm_wave_sidelink_mac_inherit__map">
+</map>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-1-trigger" src="closed.png" alt="+"/> Collaboration diagram for ns3::millicar::MmWaveSidelinkMac:</div>
@@ -201,16 +201,16 @@ Private Member Functions</h2></td></tr>
 <tr class="memdesc:acc4ace5cc716ee66fe1434502d7b4346"><td class="mdescLeft">&#160;</td><td class="mdescRight">Implements <a class="el" href="classns3_1_1millicar_1_1_rlc_sidelink_member_mac_sap_provider.html#ac15e814e840c8b50cbfa7c60eef287dd">RlcSidelinkMemberMacSapProvider::ReportBufferStatus</a>, reports the RLC buffer status to the MAC.  <a href="#acc4ace5cc716ee66fe1434502d7b4346">More...</a><br /></td></tr>
 <tr class="separator:acc4ace5cc716ee66fe1434502d7b4346"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3f08eb574db4cc92b29130d0027b44ca"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classns3_1_1millicar_1_1_mm_wave_sidelink_mac.html#a3f08eb574db4cc92b29130d0027b44ca">DoSlSinrReport</a> (const SpectrumValue &amp;sinr, uint16_t rnti, uint8_t numSym, uint32_t tbSize)</td></tr>
-<tr class="memdesc:a3f08eb574db4cc92b29130d0027b44ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Based on the SINR reported, the CQI is evaluated and pushed to the CQIs history with the latest SINR information  sinr SpectrumValue instance representing the SINR measured on all the spectrum chunks  rnti RNTI of the transmitting device  numSym size of the transport block that generated the report in number of OFDM symbols  tbSize size of the transport block that generated the report in bytes.  <a href="#a3f08eb574db4cc92b29130d0027b44ca">More...</a><br /></td></tr>
+<tr class="memdesc:a3f08eb574db4cc92b29130d0027b44ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">Based on the SINR reported, the CQI is evaluated and pushed to the CQIs history with the latest SINR information.  <a href="#a3f08eb574db4cc92b29130d0027b44ca">More...</a><br /></td></tr>
 <tr class="separator:a3f08eb574db4cc92b29130d0027b44ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5b655c0cec3c9919fc7c8609d6e70e29"><td class="memItemLeft" align="right" valign="top">uint8_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classns3_1_1millicar_1_1_mm_wave_sidelink_mac.html#a5b655c0cec3c9919fc7c8609d6e70e29">GetMcs</a> (uint16_t rnti)</td></tr>
-<tr class="memdesc:a5b655c0cec3c9919fc7c8609d6e70e29"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate the MCS of the link towards a specific device  rnti the RNTI that identifies the device we want to communicate with.  <a href="#a5b655c0cec3c9919fc7c8609d6e70e29">More...</a><br /></td></tr>
+<tr class="memdesc:a5b655c0cec3c9919fc7c8609d6e70e29"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate the MCS of the link towards a specific device.  <a href="#a5b655c0cec3c9919fc7c8609d6e70e29">More...</a><br /></td></tr>
 <tr class="separator:a5b655c0cec3c9919fc7c8609d6e70e29"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac53acfff4c1460aa47e1a3a7f295bf89"><td class="memItemLeft" align="right" valign="top">mmwave::SlotAllocInfo&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classns3_1_1millicar_1_1_mm_wave_sidelink_mac.html#ac53acfff4c1460aa47e1a3a7f295bf89">ScheduleResources</a> (mmwave::SfnSf timingInfo)</td></tr>
-<tr class="memdesc:ac53acfff4c1460aa47e1a3a7f295bf89"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decides how to allocate the available resources to the active logical channels  timingInfo the SfnSf object containing the frame, subframe and slot index.  <a href="#ac53acfff4c1460aa47e1a3a7f295bf89">More...</a><br /></td></tr>
+<tr class="memdesc:ac53acfff4c1460aa47e1a3a7f295bf89"><td class="mdescLeft">&#160;</td><td class="mdescRight">Decides how to allocate the available resources to the active logical channels.  <a href="#ac53acfff4c1460aa47e1a3a7f295bf89">More...</a><br /></td></tr>
 <tr class="separator:ac53acfff4c1460aa47e1a3a7f295bf89"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7c4b22c8a1c6f7d71bdce5ae490647a2"><td class="memItemLeft" align="right" valign="top">std::map&lt; uint8_t, LteMacSapProvider::ReportBufferStatusParameters &gt;::iterator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classns3_1_1millicar_1_1_mm_wave_sidelink_mac.html#a7c4b22c8a1c6f7d71bdce5ae490647a2">UpdateBufferStatusReport</a> (uint8_t lcid, uint32_t assignedBytes)</td></tr>
-<tr class="memdesc:a7c4b22c8a1c6f7d71bdce5ae490647a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Updates the BSR corresponding to the specified LC by subtracting the assigned grant  lcid the logical channel ID  assignedBytes the assigned grant in bytes.  <a href="#a7c4b22c8a1c6f7d71bdce5ae490647a2">More...</a><br /></td></tr>
+<tr class="memdesc:a7c4b22c8a1c6f7d71bdce5ae490647a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">Updates the BSR corresponding to the specified LC by subtracting the assigned grant.  <a href="#a7c4b22c8a1c6f7d71bdce5ae490647a2">More...</a><br /></td></tr>
 <tr class="separator:a7c4b22c8a1c6f7d71bdce5ae490647a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
@@ -603,7 +603,16 @@ Friends</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Based on the SINR reported, the CQI is evaluated and pushed to the CQIs history with the latest SINR information  sinr SpectrumValue instance representing the SINR measured on all the spectrum chunks  rnti RNTI of the transmitting device  numSym size of the transport block that generated the report in number of OFDM symbols  tbSize size of the transport block that generated the report in bytes. </p>
+<p>Based on the SINR reported, the CQI is evaluated and pushed to the CQIs history with the latest SINR information. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">sinr</td><td>SpectrumValue instance representing the SINR measured on all the spectrum chunks </td></tr>
+    <tr><td class="paramname">rnti</td><td>RNTI of the transmitting device </td></tr>
+    <tr><td class="paramname">numSym</td><td>size of the transport block that generated the report in number of OFDM symbols </td></tr>
+    <tr><td class="paramname">tbSize</td><td>size of the transport block that generated the report in bytes </td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p class="definition">Definition at line <a class="el" href="mmwave-sidelink-mac_8cc_source.html#l00479">479</a> of file <a class="el" href="mmwave-sidelink-mac_8cc_source.html">mmwave-sidelink-mac.cc</a>.</p>
 
@@ -677,7 +686,13 @@ Friends</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Evaluate the MCS of the link towards a specific device  rnti the RNTI that identifies the device we want to communicate with. </p>
+<p>Evaluate the MCS of the link towards a specific device. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">rnti</td><td>the RNTI that identifies the device we want to communicate with </td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p class="definition">Definition at line <a class="el" href="mmwave-sidelink-mac_8cc_source.html#l00500">500</a> of file <a class="el" href="mmwave-sidelink-mac_8cc_source.html">mmwave-sidelink-mac.cc</a>.</p>
 
@@ -784,7 +799,13 @@ Friends</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Decides how to allocate the available resources to the active logical channels  timingInfo the SfnSf object containing the frame, subframe and slot index. </p>
+<p>Decides how to allocate the available resources to the active logical channels. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">timingInfo</td><td>the SfnSf object containing the frame, subframe and slot index </td></tr>
+  </table>
+  </dd>
+</dl>
 <dl class="section return"><dt>Returns</dt><dd>SlotAllocInfo object containing the scheduling information </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="mmwave-sidelink-mac_8cc_source.html#l00185">185</a> of file <a class="el" href="mmwave-sidelink-mac_8cc_source.html">mmwave-sidelink-mac.cc</a>.</p>
@@ -939,7 +960,14 @@ Friends</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Updates the BSR corresponding to the specified LC by subtracting the assigned grant  lcid the logical channel ID  assignedBytes the assigned grant in bytes. </p>
+<p>Updates the BSR corresponding to the specified LC by subtracting the assigned grant. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">lcid</td><td>the logical channel ID </td></tr>
+    <tr><td class="paramname">assignedBytes</td><td>the assigned grant in bytes </td></tr>
+  </table>
+  </dd>
+</dl>
 <dl class="section return"><dt>Returns</dt><dd>updated iterator to the Buffer Status Report map </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="mmwave-sidelink-mac_8cc_source.html#l00313">313</a> of file <a class="el" href="mmwave-sidelink-mac_8cc_source.html">mmwave-sidelink-mac.cc</a>.</p>
@@ -1406,7 +1434,7 @@ Friends</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="namespacens3.html">ns3</a></li><li class="navelem"><a class="el" href="namespacens3_1_1millicar.html">millicar</a></li><li class="navelem"><a class="el" href="classns3_1_1millicar_1_1_mm_wave_sidelink_mac.html">MmWaveSidelinkMac</a></li>
-    <li class="footer">Generated on Thu Oct 8 2020 15:35:23 for MilliCar by
+    <li class="footer">Generated on Fri Oct 9 2020 16:39:27 for MilliCar by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>

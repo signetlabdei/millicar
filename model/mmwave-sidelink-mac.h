@@ -158,12 +158,12 @@ private:
   /**
   * \brief Based on the SINR reported, the CQI is evaluated and pushed to the
            CQIs history with the latest SINR information
-  * \params sinr SpectrumValue instance representing the SINR measured on all
+  * \param sinr SpectrumValue instance representing the SINR measured on all
             the spectrum chunks
-  * \params rnti RNTI of the transmitting device
-  * \params numSym size of the transport block that generated the report in
+  * \param rnti RNTI of the transmitting device
+  * \param numSym size of the transport block that generated the report in
             number of OFDM symbols
-  * \params tbSize size of the transport block that generated the report in bytes
+  * \param tbSize size of the transport block that generated the report in bytes
   */
   void DoSlSinrReport (const SpectrumValue& sinr, uint16_t rnti, uint8_t numSym, uint32_t tbSize);
 
@@ -178,14 +178,14 @@ private:
 
   /**
   * \brief Evaluate the MCS of the link towards a specific device
-  * \params rnti the RNTI that identifies the device we want to communicate with
+  * \param rnti the RNTI that identifies the device we want to communicate with
   */
   uint8_t GetMcs (uint16_t rnti);
 
   /**
   * \brief Decides how to allocate the available resources to the active
   *        logical channels
-  * \params timingInfo the SfnSf object containing the frame, subframe and slot
+  * \param timingInfo the SfnSf object containing the frame, subframe and slot
   *         index
   * \returns SlotAllocInfo object containing the scheduling information
   */
@@ -194,8 +194,8 @@ private:
   /**
   * \brief Updates the BSR corresponding to the specified LC by subtracting the
   *        assigned grant
-  * \params lcid the logical channel ID
-  * \params assignedBytes the assigned grant in bytes
+  * \param lcid the logical channel ID
+  * \param assignedBytes the assigned grant in bytes
   * \returns updated iterator to the Buffer Status Report map
   */
   std::map<uint8_t, LteMacSapProvider::ReportBufferStatusParameters>::iterator UpdateBufferStatusReport (uint8_t lcid, uint32_t assignedBytes);

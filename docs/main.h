@@ -11,19 +11,7 @@
  * Doxygen is typically used for 
  * API documentation, and organizes such documentation across different
  * modules.   This project uses Doxygen for building the definitive
- * maintained API documentation.  Additional ns-3 project documentation 
- * can be found at the
- * <a href="http://www.nsnam.org/documentation/latest">project web site</a>.
- *
- * \section install-sec Building the Documentation
- * 
- * ns-3 requires Doxygen version 1.8.3.1 or greater.
- * 
- * Type "./waf --doxygen" or "./waf --doxygen-no-build" to build the 
- *  documentation.  The doc/ directory contains
- * configuration for Doxygen (doxygen.conf) and main.h.  The Doxygen 
- * build process puts html files into the doc/html/ directory, and latex 
- * filex into the doc/latex/ directory.
+ * maintained API documentation.  
  * 
  */
 /**

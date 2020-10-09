@@ -1,6 +1,5 @@
 var NAVTREEINDEX2 =
 {
-"mmwave-vehicular-spectrum-phy-test_8cc.html":[3,0,4,2],
 "mmwave-vehicular-spectrum-phy-test_8cc.html#a50683c8c614b9896bf28b8120c19b5b7":[3,0,4,2,2],
 "mmwave-vehicular-spectrum-phy-test_8cc_source.html":[3,0,4,2],
 "mmwave-vehicular-spectrum-propagation-loss-model_8cc.html":[3,0,3,15],
@@ -33,8 +32,6 @@ var NAVTREEINDEX2 =
 "mmwave-vehicular_8cc_source.html":[3,0,3,17],
 "mmwave-vehicular_8h.html":[3,0,3,18],
 "mmwave-vehicular_8h_source.html":[3,0,3,18],
-"modules.html":[3,0,0,1],
-"modules_source.html":[3,0,0,1],
 "namespacemembers.html":[1,0],
 "namespacemembers_type.html":[1,2],
 "namespacemembers_vars.html":[1,1],

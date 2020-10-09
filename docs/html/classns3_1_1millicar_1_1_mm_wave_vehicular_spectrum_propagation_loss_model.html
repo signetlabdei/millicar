@@ -23,12 +23,10 @@
 <script type="text/javascript" src="search/searchdata.js"></script>
 <script type="text/javascript" src="search/search.js"></script>
   <link href="doxygen.css" rel="stylesheet" type="text/css" />
-  <link href="ns3_stylesheet.css" rel="stylesheet" type="text/css"/>
+  <link href="stylesheet.css" rel="stylesheet" type="text/css"/>
   <link href="favicon.ico" rel="shortcut icon" type="image/ico">
   </link>
   <script type="text/javascript" src="drop-down-menu.js"></script>
-  <script type="text/javascript" src="ns3_version.js"></script>
-  <script type="text/javascript" src="ns3_links.js"></script>
 </head>
 <body>
   <div id="top">
@@ -38,8 +36,8 @@
         <tbody>
           <tr style="height: 56px;">
             <td id="projectlogo">
-              <a id="ns3_home1" href="http://http://signet.dei.unipd.it//">
-                <img alt="ns-3 Logo" src="logo_signet.png" />
+              <a id="home" href="http://signet.dei.unipd.it/" target="_blank">
+                <img alt="signet logo" src="logo_signet.png" />
               </a>
             </td>
             <td id="projecttext">
@@ -120,6 +118,8 @@ $(document).ready(function(){initNavTree('classns3_1_1millicar_1_1_mm_wave_vehic
 </div>
 <div id="dynsection-0-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model__inherit__graph.png" border="0" usemap="#ns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model_inherit__map" alt="Inheritance graph"/></div>
+<map name="ns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model_inherit__map" id="ns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model_inherit__map">
+</map>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <div id="dynsection-1" onclick="return toggleVisibility(this)" class="dynheader closed" style="cursor:pointer;">
   <img id="dynsection-1-trigger" src="closed.png" alt="+"/> Collaboration diagram for ns3::millicar::MmWaveVehicularSpectrumPropagationLossModel:</div>
@@ -165,22 +165,22 @@ Private Member Functions</h2></td></tr>
 <tr class="memitem:ac41e36c24b741639642e9bcae35ef9c2"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacens3_1_1millicar.html#af788bdbc018233ec48d06915e718d522">doubleVector_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model.html#ac41e36c24b741639642e9bcae35ef9c2">CalAttenuationOfBlockage</a> (Ptr&lt; <a class="el" href="structns3_1_1millicar_1_1_params3gpp.html">Params3gpp</a> &gt; params, <a class="el" href="namespacens3_1_1millicar.html#af788bdbc018233ec48d06915e718d522">doubleVector_t</a> clusterAOA, <a class="el" href="namespacens3_1_1millicar.html#af788bdbc018233ec48d06915e718d522">doubleVector_t</a> clusterZOA) const</td></tr>
 <tr class="separator:ac41e36c24b741639642e9bcae35ef9c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a941200314c689b92cec1e37e96b9642e"><td class="memItemLeft" align="right" valign="top">Ptr&lt; SpectrumValue &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model.html#a941200314c689b92cec1e37e96b9642e">CalBeamformingGain</a> (Ptr&lt; const SpectrumValue &gt; txPsd, Ptr&lt; <a class="el" href="structns3_1_1millicar_1_1_params3gpp.html">Params3gpp</a> &gt; params, <a class="el" href="namespacens3_1_1millicar.html#add0635c95bb7071713fa1491eb5b6bbf">complexVector_t</a> longTerm, Vector rxSpeed, Vector txSpeed) const</td></tr>
-<tr class="memdesc:a941200314c689b92cec1e37e96b9642e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute the BF gain, apply frequency selectivity by phase-shifting with the cluster delays and scale the txPsd to get the rxPsd  the tx PSD  the channel realizationin as a <a class="el" href="structns3_1_1millicar_1_1_params3gpp.html" title="Data structure that stores a channel realization. ">Params3gpp</a> object  the longTerm component (i.e., with the BF vectors already applied)  the speed of the receivers  the speed of the transmitter (for example in case of vehicular communication)  <a href="#a941200314c689b92cec1e37e96b9642e">More...</a><br /></td></tr>
+<tr class="memdesc:a941200314c689b92cec1e37e96b9642e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute the BF gain, apply frequency selectivity by phase-shifting with the cluster delays and scale the txPsd to get the rxPsd.  <a href="#a941200314c689b92cec1e37e96b9642e">More...</a><br /></td></tr>
 <tr class="separator:a941200314c689b92cec1e37e96b9642e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1a622ae8949ee4a07881d5afc960b4fa"><td class="memItemLeft" align="right" valign="top"><a class="el" href="namespacens3_1_1millicar.html#add0635c95bb7071713fa1491eb5b6bbf">complexVector_t</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model.html#a1a622ae8949ee4a07881d5afc960b4fa">CalLongTerm</a> (Ptr&lt; <a class="el" href="structns3_1_1millicar_1_1_params3gpp.html">Params3gpp</a> &gt; params) const</td></tr>
-<tr class="memdesc:a1a622ae8949ee4a07881d5afc960b4fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute and return the long term fading params in order to decrease the computational load  the channel realizationin as a <a class="el" href="structns3_1_1millicar_1_1_params3gpp.html" title="Data structure that stores a channel realization. ">Params3gpp</a> object.  <a href="#a1a622ae8949ee4a07881d5afc960b4fa">More...</a><br /></td></tr>
+<tr class="memdesc:a1a622ae8949ee4a07881d5afc960b4fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compute and return the long term fading params in order to decrease the computational load.  <a href="#a1a622ae8949ee4a07881d5afc960b4fa">More...</a><br /></td></tr>
 <tr class="separator:a1a622ae8949ee4a07881d5afc960b4fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5d94006c357d5469d5ac24c1796f919a"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model.html#a5d94006c357d5469d5ac24c1796f919a">DeleteChannel</a> (Ptr&lt; const MobilityModel &gt; a, Ptr&lt; const MobilityModel &gt; b) const</td></tr>
-<tr class="memdesc:a5d94006c357d5469d5ac24c1796f919a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Delete the m_channel entry associated to the <a class="el" href="structns3_1_1millicar_1_1_params3gpp.html" title="Data structure that stores a channel realization. ">Params3gpp</a> object of pair (a,b) but keep the other parameters, so that the spatial consistency procedure can be used  the mobility model of the transmitter  the mobility model of the receiver.  <a href="#a5d94006c357d5469d5ac24c1796f919a">More...</a><br /></td></tr>
+<tr class="memdesc:a5d94006c357d5469d5ac24c1796f919a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Delete the m_channel entry associated to the <a class="el" href="structns3_1_1millicar_1_1_params3gpp.html" title="Data structure that stores a channel realization. ">Params3gpp</a> object of pair (a,b) but keep the other parameters, so that the spatial consistency procedure can be used.  <a href="#a5d94006c357d5469d5ac24c1796f919a">More...</a><br /></td></tr>
 <tr class="separator:a5d94006c357d5469d5ac24c1796f919a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad4b12bbb003fe17d35474738a4f42d82"><td class="memItemLeft" align="right" valign="top">Ptr&lt; SpectrumValue &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model.html#ad4b12bbb003fe17d35474738a4f42d82">DoCalcRxPowerSpectralDensity</a> (Ptr&lt; const SpectrumValue &gt; txPsd, Ptr&lt; const MobilityModel &gt; a, Ptr&lt; const MobilityModel &gt; b) const</td></tr>
-<tr class="memdesc:ad4b12bbb003fe17d35474738a4f42d82"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inherited from SpectrumPropagationLossModel, it returns the PSD at the receiver  the transmitted PSD  the mobility model of the transmitter  the mobility model of the receiver.  <a href="#ad4b12bbb003fe17d35474738a4f42d82">More...</a><br /></td></tr>
+<tr class="memdesc:ad4b12bbb003fe17d35474738a4f42d82"><td class="mdescLeft">&#160;</td><td class="mdescRight">Inherited from SpectrumPropagationLossModel, it returns the PSD at the receiver.  <a href="#ad4b12bbb003fe17d35474738a4f42d82">More...</a><br /></td></tr>
 <tr class="separator:ad4b12bbb003fe17d35474738a4f42d82"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad52c589c90a8cb399316c69f189c054e"><td class="memItemLeft" align="right" valign="top">Ptr&lt; <a class="el" href="structns3_1_1millicar_1_1_params_table.html">ParamsTable</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model.html#ad52c589c90a8cb399316c69f189c054e">Get3gppTable</a> (char condition, bool o2i, double hBS, double hUT, double distance2D) const</td></tr>
-<tr class="memdesc:ad52c589c90a8cb399316c69f189c054e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the <a class="el" href="structns3_1_1millicar_1_1_params_table.html" title="Data structure that stores the parameters of 3GPP TR 38.900, Table 7.5-6, for a certain scenario...">ParamsTable</a> with the parameters of TR 38.900 Table 7.5-6 that apply to a certain scenario  the channel condition  the o2i condition  the BS height (i.e., eNB)  the UT height (i.e., UE)  the 2D distance.  <a href="#ad52c589c90a8cb399316c69f189c054e">More...</a><br /></td></tr>
+<tr class="memdesc:ad52c589c90a8cb399316c69f189c054e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the <a class="el" href="structns3_1_1millicar_1_1_params_table.html" title="Data structure that stores the parameters of 3GPP TR 38.900, Table 7.5-6, for a certain scenario...">ParamsTable</a> with the parameters of TR 38.900 Table 7.5-6 that apply to a certain scenario.  <a href="#ad52c589c90a8cb399316c69f189c054e">More...</a><br /></td></tr>
 <tr class="separator:ad52c589c90a8cb399316c69f189c054e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a96792d5f699d7d1b86739cdb823c898f"><td class="memItemLeft" align="right" valign="top">Ptr&lt; <a class="el" href="structns3_1_1millicar_1_1_params3gpp.html">Params3gpp</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model.html#a96792d5f699d7d1b86739cdb823c898f">GetNewChannel</a> (Ptr&lt; <a class="el" href="structns3_1_1millicar_1_1_params_table.html">ParamsTable</a> &gt; table3gpp, Vector locUT, char condition, bool o2i, Ptr&lt; <a class="el" href="classns3_1_1millicar_1_1_mm_wave_vehicular_antenna_array_model.html">MmWaveVehicularAntennaArrayModel</a> &gt; txAntenna, Ptr&lt; <a class="el" href="classns3_1_1millicar_1_1_mm_wave_vehicular_antenna_array_model.html">MmWaveVehicularAntennaArrayModel</a> &gt; rxAntenna, uint16_t *txAntennaNum, uint16_t *rxAntennaNum, Angles &amp;rxAngle, Angles &amp;txAngle, Vector speed, double dis2D, double dis3D) const</td></tr>
-<tr class="memdesc:a96792d5f699d7d1b86739cdb823c898f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a new realization of the channel  the <a class="el" href="structns3_1_1millicar_1_1_params_table.html" title="Data structure that stores the parameters of 3GPP TR 38.900, Table 7.5-6, for a certain scenario...">ParamsTable</a> for the specific scenario  the location of UT  the channel condition  the o2i condition  the ArrayAntennaModel for the txAntenna  the ArrayAntennaModel for the rxAntenna  the number of txAntenna per row  the number of rxAntenna per row  the rxAngle  the txAngle  the relative speed between tx and rx  the 2D distance between tx and rx  the 3D distance between tx and rx.  <a href="#a96792d5f699d7d1b86739cdb823c898f">More...</a><br /></td></tr>
+<tr class="memdesc:a96792d5f699d7d1b86739cdb823c898f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get a new realization of the channel.  <a href="#a96792d5f699d7d1b86739cdb823c898f">More...</a><br /></td></tr>
 <tr class="separator:a96792d5f699d7d1b86739cdb823c898f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2acc37751643e20c1f2f34ccd3167c7d"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model.html#a2acc37751643e20c1f2f34ccd3167c7d">GetOxygenLoss</a> (double frequency, double dist3D, double tau, double tauDelta) const</td></tr>
 <tr class="memdesc:a2acc37751643e20c1f2f34ccd3167c7d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the loss associated to the oxygen absorption as described in p.  <a href="#a2acc37751643e20c1f2f34ccd3167c7d">More...</a><br /></td></tr>
@@ -189,7 +189,7 @@ Private Member Functions</h2></td></tr>
 <tr class="memdesc:a97ff1111a505dc5d74f4d28266a77865"><td class="mdescLeft">&#160;</td><td class="mdescRight">Returns the bandwidth used in a scenario.  <a href="#a97ff1111a505dc5d74f4d28266a77865">More...</a><br /></td></tr>
 <tr class="separator:a97ff1111a505dc5d74f4d28266a77865"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaddcd856c8a98280eea9b628315a5f87"><td class="memItemLeft" align="right" valign="top">Ptr&lt; <a class="el" href="structns3_1_1millicar_1_1_params3gpp.html">Params3gpp</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model.html#aaddcd856c8a98280eea9b628315a5f87">UpdateChannel</a> (Ptr&lt; <a class="el" href="structns3_1_1millicar_1_1_params3gpp.html">Params3gpp</a> &gt; params3gpp, Ptr&lt; <a class="el" href="structns3_1_1millicar_1_1_params_table.html">ParamsTable</a> &gt; table3gpp, Ptr&lt; <a class="el" href="classns3_1_1millicar_1_1_mm_wave_vehicular_antenna_array_model.html">MmWaveVehicularAntennaArrayModel</a> &gt; txAntenna, Ptr&lt; <a class="el" href="classns3_1_1millicar_1_1_mm_wave_vehicular_antenna_array_model.html">MmWaveVehicularAntennaArrayModel</a> &gt; rxAntenna, uint16_t *txAntennaNum, uint16_t *rxAntennaNum, Angles &amp;rxAngle, Angles &amp;txAngle) const</td></tr>
-<tr class="memdesc:aaddcd856c8a98280eea9b628315a5f87"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the channel realization with procedure A of TR 38.900 Sec 7.6.3.2 for the spatial consistency  the previous channel realization in a <a class="el" href="structns3_1_1millicar_1_1_params3gpp.html" title="Data structure that stores a channel realization. ">Params3gpp</a> object  the <a class="el" href="structns3_1_1millicar_1_1_params_table.html" title="Data structure that stores the parameters of 3GPP TR 38.900, Table 7.5-6, for a certain scenario...">ParamsTable</a> for the specific scenario  the ArrayAntennaModel for the txAntenna  the ArrayAntennaModel for the rxAntenna  the number of txAntenna per row  the number of rxAntenna per row  the rxAngle  the txAngle.  <a href="#aaddcd856c8a98280eea9b628315a5f87">More...</a><br /></td></tr>
+<tr class="memdesc:aaddcd856c8a98280eea9b628315a5f87"><td class="mdescLeft">&#160;</td><td class="mdescRight">Update the channel realization with procedure A of TR 38.900 Sec 7.6.3.2 for the spatial consistency.  <a href="#aaddcd856c8a98280eea9b628315a5f87">More...</a><br /></td></tr>
 <tr class="separator:aaddcd856c8a98280eea9b628315a5f87"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-attribs"></a>
@@ -385,9 +385,9 @@ Private Attributes</h2></td></tr>
 <div id="dynsection-2-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model_ac41e36c24b741639642e9bcae35ef9c2_icgraph.png" border="0" usemap="#classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model_ac41e36c24b741639642e9bcae35ef9c2_icgraph" alt=""/></div>
 <map name="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model_ac41e36c24b741639642e9bcae35ef9c2_icgraph" id="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model_ac41e36c24b741639642e9bcae35ef9c2_icgraph">
-<area shape="rect" id="node2" href="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model.html#a96792d5f699d7d1b86739cdb823c898f" title="Get a new realization of the channel &#160;the ParamsTable for the specific scenario &#160;the location of UT &#160;..." alt="" coords="264,5,475,61"/>
-<area shape="rect" id="node4" href="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model.html#aaddcd856c8a98280eea9b628315a5f87" title="Update the channel realization with procedure A of TR 38.900 Sec 7.6.3.2 for the spatial consistency ..." alt="" coords="264,85,475,141"/>
-<area shape="rect" id="node3" href="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model.html#ad4b12bbb003fe17d35474738a4f42d82" title="Inherited from SpectrumPropagationLossModel, it returns the PSD at the receiver &#160;the transmitted PSD ..." alt="" coords="523,45,744,101"/>
+<area shape="rect" id="node2" href="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model.html#a96792d5f699d7d1b86739cdb823c898f" title="Get a new realization of the channel. " alt="" coords="264,5,475,61"/>
+<area shape="rect" id="node4" href="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model.html#aaddcd856c8a98280eea9b628315a5f87" title="Update the channel realization with procedure A of TR 38.900 Sec 7.6.3.2 for the spatial consistency..." alt="" coords="264,85,475,141"/>
+<area shape="rect" id="node3" href="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model.html#ad4b12bbb003fe17d35474738a4f42d82" title="Inherited from SpectrumPropagationLossModel, it returns the PSD at the receiver. " alt="" coords="523,45,744,101"/>
 </map>
 </div>
 
@@ -445,7 +445,17 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Compute the BF gain, apply frequency selectivity by phase-shifting with the cluster delays and scale the txPsd to get the rxPsd  the tx PSD  the channel realizationin as a <a class="el" href="structns3_1_1millicar_1_1_params3gpp.html" title="Data structure that stores a channel realization. ">Params3gpp</a> object  the longTerm component (i.e., with the BF vectors already applied)  the speed of the receivers  the speed of the transmitter (for example in case of vehicular communication) </p>
+<p>Compute the BF gain, apply frequency selectivity by phase-shifting with the cluster delays and scale the txPsd to get the rxPsd. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">the</td><td>tx PSD </td></tr>
+    <tr><td class="paramname">the</td><td>channel realizationin as a <a class="el" href="structns3_1_1millicar_1_1_params3gpp.html" title="Data structure that stores a channel realization. ">Params3gpp</a> object </td></tr>
+    <tr><td class="paramname">the</td><td>longTerm component (i.e., with the BF vectors already applied) </td></tr>
+    <tr><td class="paramname">the</td><td>speed of the receivers </td></tr>
+    <tr><td class="paramname">the</td><td>speed of the transmitter (for example in case of vehicular communication) </td></tr>
+  </table>
+  </dd>
+</dl>
 <dl class="section return"><dt>Returns</dt><dd>the rx PSD </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="mmwave-vehicular-spectrum-propagation-loss-model_8cc_source.html#l00382">382</a> of file <a class="el" href="mmwave-vehicular-spectrum-propagation-loss-model_8cc_source.html">mmwave-vehicular-spectrum-propagation-loss-model.cc</a>.</p>
@@ -470,7 +480,7 @@ Private Attributes</h2></td></tr>
 <div id="dynsection-4-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model_a941200314c689b92cec1e37e96b9642e_icgraph.png" border="0" usemap="#classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model_a941200314c689b92cec1e37e96b9642e_icgraph" alt=""/></div>
 <map name="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model_a941200314c689b92cec1e37e96b9642e_icgraph" id="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model_a941200314c689b92cec1e37e96b9642e_icgraph">
-<area shape="rect" id="node2" href="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model.html#ad4b12bbb003fe17d35474738a4f42d82" title="Inherited from SpectrumPropagationLossModel, it returns the PSD at the receiver &#160;the transmitted PSD ..." alt="" coords="264,5,485,61"/>
+<area shape="rect" id="node2" href="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model.html#ad4b12bbb003fe17d35474738a4f42d82" title="Inherited from SpectrumPropagationLossModel, it returns the PSD at the receiver. " alt="" coords="264,5,485,61"/>
 </map>
 </div>
 
@@ -500,7 +510,13 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Compute and return the long term fading params in order to decrease the computational load  the channel realizationin as a <a class="el" href="structns3_1_1millicar_1_1_params3gpp.html" title="Data structure that stores a channel realization. ">Params3gpp</a> object. </p>
+<p>Compute and return the long term fading params in order to decrease the computational load. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">the</td><td>channel realizationin as a <a class="el" href="structns3_1_1millicar_1_1_params3gpp.html" title="Data structure that stores a channel realization. ">Params3gpp</a> object </td></tr>
+  </table>
+  </dd>
+</dl>
 <dl class="section return"><dt>Returns</dt><dd>the complexVector_t with the BF applied to the channel </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="mmwave-vehicular-spectrum-propagation-loss-model_8cc_source.html#l00517">517</a> of file <a class="el" href="mmwave-vehicular-spectrum-propagation-loss-model_8cc_source.html">mmwave-vehicular-spectrum-propagation-loss-model.cc</a>.</p>
@@ -513,7 +529,7 @@ Private Attributes</h2></td></tr>
 <div id="dynsection-5-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model_a1a622ae8949ee4a07881d5afc960b4fa_icgraph.png" border="0" usemap="#classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model_a1a622ae8949ee4a07881d5afc960b4fa_icgraph" alt=""/></div>
 <map name="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model_a1a622ae8949ee4a07881d5afc960b4fa_icgraph" id="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model_a1a622ae8949ee4a07881d5afc960b4fa_icgraph">
-<area shape="rect" id="node2" href="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model.html#ad4b12bbb003fe17d35474738a4f42d82" title="Inherited from SpectrumPropagationLossModel, it returns the PSD at the receiver &#160;the transmitted PSD ..." alt="" coords="264,5,485,61"/>
+<area shape="rect" id="node2" href="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model.html#ad4b12bbb003fe17d35474738a4f42d82" title="Inherited from SpectrumPropagationLossModel, it returns the PSD at the receiver. " alt="" coords="264,5,485,61"/>
 </map>
 </div>
 
@@ -553,7 +569,14 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Delete the m_channel entry associated to the <a class="el" href="structns3_1_1millicar_1_1_params3gpp.html" title="Data structure that stores a channel realization. ">Params3gpp</a> object of pair (a,b) but keep the other parameters, so that the spatial consistency procedure can be used  the mobility model of the transmitter  the mobility model of the receiver. </p>
+<p>Delete the m_channel entry associated to the <a class="el" href="structns3_1_1millicar_1_1_params3gpp.html" title="Data structure that stores a channel realization. ">Params3gpp</a> object of pair (a,b) but keep the other parameters, so that the spatial consistency procedure can be used. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">the</td><td>mobility model of the transmitter </td></tr>
+    <tr><td class="paramname">the</td><td>mobility model of the receiver </td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p class="definition">Definition at line <a class="el" href="mmwave-vehicular-spectrum-propagation-loss-model_8cc_source.html#l00776">776</a> of file <a class="el" href="mmwave-vehicular-spectrum-propagation-loss-model_8cc_source.html">mmwave-vehicular-spectrum-propagation-loss-model.cc</a>.</p>
 
@@ -567,7 +590,7 @@ Private Attributes</h2></td></tr>
 <div id="dynsection-6-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model_a5d94006c357d5469d5ac24c1796f919a_icgraph.png" border="0" usemap="#classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model_a5d94006c357d5469d5ac24c1796f919a_icgraph" alt=""/></div>
 <map name="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model_a5d94006c357d5469d5ac24c1796f919a_icgraph" id="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model_a5d94006c357d5469d5ac24c1796f919a_icgraph">
-<area shape="rect" id="node2" href="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model.html#ad4b12bbb003fe17d35474738a4f42d82" title="Inherited from SpectrumPropagationLossModel, it returns the PSD at the receiver &#160;the transmitted PSD ..." alt="" coords="264,5,485,61"/>
+<area shape="rect" id="node2" href="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model.html#ad4b12bbb003fe17d35474738a4f42d82" title="Inherited from SpectrumPropagationLossModel, it returns the PSD at the receiver. " alt="" coords="264,5,485,61"/>
 </map>
 </div>
 
@@ -613,7 +636,15 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Inherited from SpectrumPropagationLossModel, it returns the PSD at the receiver  the transmitted PSD  the mobility model of the transmitter  the mobility model of the receiver. </p>
+<p>Inherited from SpectrumPropagationLossModel, it returns the PSD at the receiver. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">the</td><td>transmitted PSD </td></tr>
+    <tr><td class="paramname">the</td><td>mobility model of the transmitter </td></tr>
+    <tr><td class="paramname">the</td><td>mobility model of the receiver </td></tr>
+  </table>
+  </dd>
+</dl>
 <dl class="section return"><dt>Returns</dt><dd>the received PSD </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="mmwave-vehicular-spectrum-propagation-loss-model_8cc_source.html#l00178">178</a> of file <a class="el" href="mmwave-vehicular-spectrum-propagation-loss-model_8cc_source.html">mmwave-vehicular-spectrum-propagation-loss-model.cc</a>.</p>
@@ -627,11 +658,11 @@ Private Attributes</h2></td></tr>
 <div class="center"><img src="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model_ad4b12bbb003fe17d35474738a4f42d82_cgraph.png" border="0" usemap="#classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model_ad4b12bbb003fe17d35474738a4f42d82_cgraph" alt=""/></div>
 <map name="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model_ad4b12bbb003fe17d35474738a4f42d82_cgraph" id="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model_ad4b12bbb003fe17d35474738a4f42d82_cgraph">
 <area shape="rect" id="node2" href="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model.html#a941200314c689b92cec1e37e96b9642e" title="Compute the BF gain, apply frequency selectivity by phase&#45;shifting with the cluster delays and scale ..." alt="" coords="275,5,485,61"/>
-<area shape="rect" id="node4" href="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model.html#a1a622ae8949ee4a07881d5afc960b4fa" title="Compute and return the long term fading params in order to decrease the computational load &#160;the chann..." alt="" coords="275,85,485,141"/>
+<area shape="rect" id="node4" href="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model.html#a1a622ae8949ee4a07881d5afc960b4fa" title="Compute and return the long term fading params in order to decrease the computational load..." alt="" coords="275,85,485,141"/>
 <area shape="rect" id="node5" href="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model.html#a5d94006c357d5469d5ac24c1796f919a" title="Delete the m_channel entry associated to the Params3gpp object of pair (a,b) but keep the other param..." alt="" coords="275,165,485,221"/>
 <area shape="rect" id="node6" href="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model.html#ad52c589c90a8cb399316c69f189c054e" title="Returns the ParamsTable with the parameters of TR 38.900 Table 7.5&#45;6 that apply to a certain scenario..." alt="" coords="275,245,485,301"/>
-<area shape="rect" id="node7" href="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model.html#a96792d5f699d7d1b86739cdb823c898f" title="Get a new realization of the channel &#160;the ParamsTable for the specific scenario &#160;the location of UT &#160;..." alt="" coords="275,325,485,381"/>
-<area shape="rect" id="node9" href="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model.html#aaddcd856c8a98280eea9b628315a5f87" title="Update the channel realization with procedure A of TR 38.900 Sec 7.6.3.2 for the spatial consistency ..." alt="" coords="275,405,485,461"/>
+<area shape="rect" id="node7" href="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model.html#a96792d5f699d7d1b86739cdb823c898f" title="Get a new realization of the channel. " alt="" coords="275,325,485,381"/>
+<area shape="rect" id="node9" href="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model.html#aaddcd856c8a98280eea9b628315a5f87" title="Update the channel realization with procedure A of TR 38.900 Sec 7.6.3.2 for the spatial consistency..." alt="" coords="275,405,485,461"/>
 <area shape="rect" id="node3" href="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model.html#a2acc37751643e20c1f2f34ccd3167c7d" title="Returns the loss associated to the oxygen absorption as described in p. " alt="" coords="533,5,744,61"/>
 <area shape="rect" id="node8" href="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model.html#ac41e36c24b741639642e9bcae35ef9c2" title="ns3::millicar::MmWaveVehicular\lSpectrumPropagationLossModel\l::CalAttenuationOfBlockage" alt="" coords="533,365,744,421"/>
 </map>
@@ -711,7 +742,17 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Returns the <a class="el" href="structns3_1_1millicar_1_1_params_table.html" title="Data structure that stores the parameters of 3GPP TR 38.900, Table 7.5-6, for a certain scenario...">ParamsTable</a> with the parameters of TR 38.900 Table 7.5-6 that apply to a certain scenario  the channel condition  the o2i condition  the BS height (i.e., eNB)  the UT height (i.e., UE)  the 2D distance. </p>
+<p>Returns the <a class="el" href="structns3_1_1millicar_1_1_params_table.html" title="Data structure that stores the parameters of 3GPP TR 38.900, Table 7.5-6, for a certain scenario...">ParamsTable</a> with the parameters of TR 38.900 Table 7.5-6 that apply to a certain scenario. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">the</td><td>channel condition </td></tr>
+    <tr><td class="paramname">the</td><td>o2i condition </td></tr>
+    <tr><td class="paramname">the</td><td>BS height (i.e., eNB) </td></tr>
+    <tr><td class="paramname">the</td><td>UT height (i.e., UE) </td></tr>
+    <tr><td class="paramname">the</td><td>2D distance </td></tr>
+  </table>
+  </dd>
+</dl>
 <dl class="section return"><dt>Returns</dt><dd>the <a class="el" href="structns3_1_1millicar_1_1_params_table.html" title="Data structure that stores the parameters of 3GPP TR 38.900, Table 7.5-6, for a certain scenario...">ParamsTable</a> structure </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="mmwave-vehicular-spectrum-propagation-loss-model_8cc_source.html#l00547">547</a> of file <a class="el" href="mmwave-vehicular-spectrum-propagation-loss-model_8cc_source.html">mmwave-vehicular-spectrum-propagation-loss-model.cc</a>.</p>
@@ -726,7 +767,7 @@ Private Attributes</h2></td></tr>
 <div id="dynsection-8-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model_ad52c589c90a8cb399316c69f189c054e_icgraph.png" border="0" usemap="#classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model_ad52c589c90a8cb399316c69f189c054e_icgraph" alt=""/></div>
 <map name="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model_ad52c589c90a8cb399316c69f189c054e_icgraph" id="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model_ad52c589c90a8cb399316c69f189c054e_icgraph">
-<area shape="rect" id="node2" href="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model.html#ad4b12bbb003fe17d35474738a4f42d82" title="Inherited from SpectrumPropagationLossModel, it returns the PSD at the receiver &#160;the transmitted PSD ..." alt="" coords="264,5,485,61"/>
+<area shape="rect" id="node2" href="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model.html#ad4b12bbb003fe17d35474738a4f42d82" title="Inherited from SpectrumPropagationLossModel, it returns the PSD at the receiver. " alt="" coords="264,5,485,61"/>
 </map>
 </div>
 
@@ -867,7 +908,25 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Get a new realization of the channel  the <a class="el" href="structns3_1_1millicar_1_1_params_table.html" title="Data structure that stores the parameters of 3GPP TR 38.900, Table 7.5-6, for a certain scenario...">ParamsTable</a> for the specific scenario  the location of UT  the channel condition  the o2i condition  the ArrayAntennaModel for the txAntenna  the ArrayAntennaModel for the rxAntenna  the number of txAntenna per row  the number of rxAntenna per row  the rxAngle  the txAngle  the relative speed between tx and rx  the 2D distance between tx and rx  the 3D distance between tx and rx. </p>
+<p>Get a new realization of the channel. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">the</td><td><a class="el" href="structns3_1_1millicar_1_1_params_table.html" title="Data structure that stores the parameters of 3GPP TR 38.900, Table 7.5-6, for a certain scenario...">ParamsTable</a> for the specific scenario </td></tr>
+    <tr><td class="paramname">the</td><td>location of UT </td></tr>
+    <tr><td class="paramname">the</td><td>channel condition </td></tr>
+    <tr><td class="paramname">the</td><td>o2i condition </td></tr>
+    <tr><td class="paramname">the</td><td>ArrayAntennaModel for the txAntenna </td></tr>
+    <tr><td class="paramname">the</td><td>ArrayAntennaModel for the rxAntenna </td></tr>
+    <tr><td class="paramname">the</td><td>number of txAntenna per row </td></tr>
+    <tr><td class="paramname">the</td><td>number of rxAntenna per row </td></tr>
+    <tr><td class="paramname">the</td><td>rxAngle </td></tr>
+    <tr><td class="paramname">the</td><td>txAngle </td></tr>
+    <tr><td class="paramname">the</td><td>relative speed between tx and rx </td></tr>
+    <tr><td class="paramname">the</td><td>2D distance between tx and rx </td></tr>
+    <tr><td class="paramname">the</td><td>3D distance between tx and rx </td></tr>
+  </table>
+  </dd>
+</dl>
 <dl class="section return"><dt>Returns</dt><dd>the channel realization in a <a class="el" href="structns3_1_1millicar_1_1_params3gpp.html" title="Data structure that stores a channel realization. ">Params3gpp</a> object </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="mmwave-vehicular-spectrum-propagation-loss-model_8cc_source.html#l00791">791</a> of file <a class="el" href="mmwave-vehicular-spectrum-propagation-loss-model_8cc_source.html">mmwave-vehicular-spectrum-propagation-loss-model.cc</a>.</p>
@@ -892,7 +951,7 @@ Private Attributes</h2></td></tr>
 <div id="dynsection-11-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model_a96792d5f699d7d1b86739cdb823c898f_icgraph.png" border="0" usemap="#classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model_a96792d5f699d7d1b86739cdb823c898f_icgraph" alt=""/></div>
 <map name="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model_a96792d5f699d7d1b86739cdb823c898f_icgraph" id="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model_a96792d5f699d7d1b86739cdb823c898f_icgraph">
-<area shape="rect" id="node2" href="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model.html#ad4b12bbb003fe17d35474738a4f42d82" title="Inherited from SpectrumPropagationLossModel, it returns the PSD at the receiver &#160;the transmitted PSD ..." alt="" coords="264,5,485,61"/>
+<area shape="rect" id="node2" href="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model.html#ad4b12bbb003fe17d35474738a4f42d82" title="Inherited from SpectrumPropagationLossModel, it returns the PSD at the receiver. " alt="" coords="264,5,485,61"/>
 </map>
 </div>
 
@@ -945,7 +1004,16 @@ Private Attributes</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Returns the loss associated to the oxygen absorption as described in p. </p>
-<p>43 of TR 38.901 </p><dl class="section return"><dt>Returns</dt><dd>a double corresponding to the loss associated to the oxygen absorption  frequency of the subcarrier  3D distance between the communicating terminals  delay associated to the cluster for which we are evaluating the loss  0 if in LOS condition and, if not, minimum delay among all clusters </dd></dl>
+<p>43 of TR 38.901 </p><dl class="section return"><dt>Returns</dt><dd>a double corresponding to the loss associated to the oxygen absorption </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">frequency</td><td>of the subcarrier </td></tr>
+    <tr><td class="paramname">3D</td><td>distance between the communicating terminals </td></tr>
+    <tr><td class="paramname">delay</td><td>associated to the cluster for which we are evaluating the loss </td></tr>
+    <tr><td class="paramname">0</td><td>if in LOS condition and, if not, minimum delay among all clusters </td></tr>
+  </table>
+  </dd>
+</dl>
 
 <p class="definition">Definition at line <a class="el" href="mmwave-vehicular-spectrum-propagation-loss-model_8cc_source.html#l00474">474</a> of file <a class="el" href="mmwave-vehicular-spectrum-propagation-loss-model_8cc_source.html">mmwave-vehicular-spectrum-propagation-loss-model.cc</a>.</p>
 
@@ -958,7 +1026,7 @@ Private Attributes</h2></td></tr>
 <div class="center"><img src="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model_a2acc37751643e20c1f2f34ccd3167c7d_icgraph.png" border="0" usemap="#classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model_a2acc37751643e20c1f2f34ccd3167c7d_icgraph" alt=""/></div>
 <map name="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model_a2acc37751643e20c1f2f34ccd3167c7d_icgraph" id="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model_a2acc37751643e20c1f2f34ccd3167c7d_icgraph">
 <area shape="rect" id="node2" href="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model.html#a941200314c689b92cec1e37e96b9642e" title="Compute the BF gain, apply frequency selectivity by phase&#45;shifting with the cluster delays and scale ..." alt="" coords="264,5,475,61"/>
-<area shape="rect" id="node3" href="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model.html#ad4b12bbb003fe17d35474738a4f42d82" title="Inherited from SpectrumPropagationLossModel, it returns the PSD at the receiver &#160;the transmitted PSD ..." alt="" coords="523,5,744,61"/>
+<area shape="rect" id="node3" href="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model.html#ad4b12bbb003fe17d35474738a4f42d82" title="Inherited from SpectrumPropagationLossModel, it returns the PSD at the receiver. " alt="" coords="523,5,744,61"/>
 </map>
 </div>
 
@@ -1173,7 +1241,20 @@ Private Attributes</h2></td></tr>
 </table>
 </div><div class="memdoc">
 
-<p>Update the channel realization with procedure A of TR 38.900 Sec 7.6.3.2 for the spatial consistency  the previous channel realization in a <a class="el" href="structns3_1_1millicar_1_1_params3gpp.html" title="Data structure that stores a channel realization. ">Params3gpp</a> object  the <a class="el" href="structns3_1_1millicar_1_1_params_table.html" title="Data structure that stores the parameters of 3GPP TR 38.900, Table 7.5-6, for a certain scenario...">ParamsTable</a> for the specific scenario  the ArrayAntennaModel for the txAntenna  the ArrayAntennaModel for the rxAntenna  the number of txAntenna per row  the number of rxAntenna per row  the rxAngle  the txAngle. </p>
+<p>Update the channel realization with procedure A of TR 38.900 Sec 7.6.3.2 for the spatial consistency. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">the</td><td>previous channel realization in a <a class="el" href="structns3_1_1millicar_1_1_params3gpp.html" title="Data structure that stores a channel realization. ">Params3gpp</a> object </td></tr>
+    <tr><td class="paramname">the</td><td><a class="el" href="structns3_1_1millicar_1_1_params_table.html" title="Data structure that stores the parameters of 3GPP TR 38.900, Table 7.5-6, for a certain scenario...">ParamsTable</a> for the specific scenario </td></tr>
+    <tr><td class="paramname">the</td><td>ArrayAntennaModel for the txAntenna </td></tr>
+    <tr><td class="paramname">the</td><td>ArrayAntennaModel for the rxAntenna </td></tr>
+    <tr><td class="paramname">the</td><td>number of txAntenna per row </td></tr>
+    <tr><td class="paramname">the</td><td>number of rxAntenna per row </td></tr>
+    <tr><td class="paramname">the</td><td>rxAngle </td></tr>
+    <tr><td class="paramname">the</td><td>txAngle </td></tr>
+  </table>
+  </dd>
+</dl>
 <dl class="section return"><dt>Returns</dt><dd>the channel realization in a <a class="el" href="structns3_1_1millicar_1_1_params3gpp.html" title="Data structure that stores a channel realization. ">Params3gpp</a> object </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="mmwave-vehicular-spectrum-propagation-loss-model_8cc_source.html#l01632">1632</a> of file <a class="el" href="mmwave-vehicular-spectrum-propagation-loss-model_8cc_source.html">mmwave-vehicular-spectrum-propagation-loss-model.cc</a>.</p>
@@ -1198,7 +1279,7 @@ Private Attributes</h2></td></tr>
 <div id="dynsection-16-content" class="dyncontent" style="display:none;">
 <div class="center"><img src="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model_aaddcd856c8a98280eea9b628315a5f87_icgraph.png" border="0" usemap="#classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model_aaddcd856c8a98280eea9b628315a5f87_icgraph" alt=""/></div>
 <map name="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model_aaddcd856c8a98280eea9b628315a5f87_icgraph" id="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model_aaddcd856c8a98280eea9b628315a5f87_icgraph">
-<area shape="rect" id="node2" href="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model.html#ad4b12bbb003fe17d35474738a4f42d82" title="Inherited from SpectrumPropagationLossModel, it returns the PSD at the receiver &#160;the transmitted PSD ..." alt="" coords="264,5,485,61"/>
+<area shape="rect" id="node2" href="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model.html#ad4b12bbb003fe17d35474738a4f42d82" title="Inherited from SpectrumPropagationLossModel, it returns the PSD at the receiver. " alt="" coords="264,5,485,61"/>
 </map>
 </div>
 
@@ -1709,7 +1790,7 @@ Private Attributes</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="namespacens3.html">ns3</a></li><li class="navelem"><a class="el" href="namespacens3_1_1millicar.html">millicar</a></li><li class="navelem"><a class="el" href="classns3_1_1millicar_1_1_mm_wave_vehicular_spectrum_propagation_loss_model.html">MmWaveVehicularSpectrumPropagationLossModel</a></li>
-    <li class="footer">Generated on Thu Oct 8 2020 15:35:23 for MilliCar by
+    <li class="footer">Generated on Fri Oct 9 2020 16:39:27 for MilliCar by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>

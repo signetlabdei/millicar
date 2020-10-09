@@ -209,9 +209,9 @@ public:
 private:
   /**
    * Inherited from SpectrumPropagationLossModel, it returns the PSD at the receiver
-   * @params the transmitted PSD
-   * @params the mobility model of the transmitter
-   * @params the mobility model of the receiver
+   * @param the transmitted PSD
+   * @param the mobility model of the transmitter
+   * @param the mobility model of the receiver
    * @returns the received PSD
    */
   Ptr<SpectrumValue> DoCalcRxPowerSpectralDensity (Ptr<const SpectrumValue> txPsd,
@@ -220,19 +220,19 @@ private:
 
   /**
    * Get a new realization of the channel
-   * @params the ParamsTable for the specific scenario
-   * @params the location of UT
-   * @params the channel condition
-   * @params the o2i condition
-   * @params the ArrayAntennaModel for the txAntenna
-   * @params the ArrayAntennaModel for the rxAntenna
-   * @params the number of txAntenna per row
-   * @params the number of rxAntenna per row
-   * @params the rxAngle
-   * @params the txAngle
-   * @params the relative speed between tx and rx
-   * @params the 2D distance between tx and rx
-   * @params the 3D distance between tx and rx
+   * @param the ParamsTable for the specific scenario
+   * @param the location of UT
+   * @param the channel condition
+   * @param the o2i condition
+   * @param the ArrayAntennaModel for the txAntenna
+   * @param the ArrayAntennaModel for the rxAntenna
+   * @param the number of txAntenna per row
+   * @param the number of rxAntenna per row
+   * @param the rxAngle
+   * @param the txAngle
+   * @param the relative speed between tx and rx
+   * @param the 2D distance between tx and rx
+   * @param the 3D distance between tx and rx
    * @returns the channel realization in a Params3gpp object
    */
   Ptr<Params3gpp> GetNewChannel (Ptr<ParamsTable> table3gpp, Vector locUT, char condition, bool o2i,
@@ -243,14 +243,14 @@ private:
   /**
    * Update the channel realization with procedure A of TR 38.900 Sec 7.6.3.2
    * for the spatial consistency
-   * @params the previous channel realization in a Params3gpp object
-   * @params the ParamsTable for the specific scenario
-   * @params the ArrayAntennaModel for the txAntenna
-   * @params the ArrayAntennaModel for the rxAntenna
-   * @params the number of txAntenna per row
-   * @params the number of rxAntenna per row
-   * @params the rxAngle
-   * @params the txAngle
+   * @param the previous channel realization in a Params3gpp object
+   * @param the ParamsTable for the specific scenario
+   * @param the ArrayAntennaModel for the txAntenna
+   * @param the ArrayAntennaModel for the rxAntenna
+   * @param the number of txAntenna per row
+   * @param the number of rxAntenna per row
+   * @param the rxAngle
+   * @param the txAngle
    * @returns the channel realization in a Params3gpp object
    */
   Ptr<Params3gpp> UpdateChannel (Ptr<Params3gpp> params3gpp, Ptr<ParamsTable> table3gpp,
@@ -259,7 +259,7 @@ private:
 
   /**
    * Compute and return the long term fading params in order to decrease the computational load
-   * @params the channel realizationin as a Params3gpp object
+   * @param the channel realizationin as a Params3gpp object
    * @return the complexVector_t with the BF applied to the channel
    */
   complexVector_t CalLongTerm (Ptr<Params3gpp> params) const;
@@ -267,11 +267,11 @@ private:
   /**
    * Compute the BF gain, apply frequency selectivity by phase-shifting with the cluster delays
    * and scale the txPsd to get the rxPsd
-   * @params the tx PSD
-   * @params the channel realizationin as a Params3gpp object
-   * @params the longTerm component (i.e., with the BF vectors already applied)
-   * @params the speed of the receivers
-   * @params the speed of the transmitter (for example in case of vehicular communication)
+   * @param the tx PSD
+   * @param the channel realizationin as a Params3gpp object
+   * @param the longTerm component (i.e., with the BF vectors already applied)
+   * @param the speed of the receivers
+   * @param the speed of the transmitter (for example in case of vehicular communication)
    * @returns the rx PSD
    */
   Ptr<SpectrumValue> CalBeamformingGain (Ptr<const SpectrumValue> txPsd,
@@ -283,10 +283,10 @@ private:
   /**
    * Returns the loss associated to the oxygen absorption as described in p. 43 of TR 38.901
    * @returns a double corresponding to the loss associated to the oxygen absorption
-   * @params frequency of the subcarrier
-   * @params 3D distance between the communicating terminals
-   * @params delay associated to the cluster for which we are evaluating the loss
-   * @params 0 if in LOS condition and, if not, minimum delay among all clusters
+   * @param frequency of the subcarrier
+   * @param 3D distance between the communicating terminals
+   * @param delay associated to the cluster for which we are evaluating the loss
+   * @param 0 if in LOS condition and, if not, minimum delay among all clusters
    */
   double GetOxygenLoss (double frequency,
                         double dist3D,
@@ -302,11 +302,11 @@ private:
   /**
    * Returns the ParamsTable with the parameters of TR 38.900 Table 7.5-6
    * that apply to a certain scenario
-   * @params the channel condition
-   * @params the o2i condition
-   * @params the BS height (i.e., eNB)
-   * @params the UT height (i.e., UE)
-   * @params the 2D distance
+   * @param the channel condition
+   * @param the o2i condition
+   * @param the BS height (i.e., eNB)
+   * @param the UT height (i.e., UE)
+   * @param the 2D distance
    * @return the ParamsTable structure
    */
   Ptr<ParamsTable> Get3gppTable (char condition, bool o2i,
@@ -315,16 +315,16 @@ private:
   /**
    * Delete the m_channel entry associated to the Params3gpp object of pair (a,b)
    * but keep the other parameters, so that the spatial consistency procedure can be used
-   * @params the mobility model of the transmitter
-   * @params the mobility model of the receiver
+   * @param the mobility model of the transmitter
+   * @param the mobility model of the receiver
    */
   void DeleteChannel (Ptr<const MobilityModel> a,
                       Ptr<const MobilityModel> b) const;
   /*
    * Returns the attenuation of each cluster in dB after applying blockage model
-   * @params the channel realizationin as a Params3gpp object
-   * @params cluster azimuth angle of arrival
-   * @params cluster zenith angle of arrival
+   * @param the channel realizationin as a Params3gpp object
+   * @param cluster azimuth angle of arrival
+   * @param cluster zenith angle of arrival
    */
   doubleVector_t CalAttenuationOfBlockage (Ptr<Params3gpp> params,
                                            doubleVector_t clusterAOA, doubleVector_t clusterZOA) const;

@@ -157,8 +157,8 @@ var NAVTREEINDEX1 =
 "functions_enum.html":[2,3,4],
 "functions_eval.html":[2,3,5],
 "functions_f.html":[2,3,0,5],
-"functions_func.html":[2,3,1],
 "functions_func.html":[2,3,1,0],
+"functions_func.html":[2,3,1],
 "functions_func_0x7e.html":[2,3,1,15],
 "functions_func_b.html":[2,3,1,1],
 "functions_func_c.html":[2,3,1,2],
@@ -194,7 +194,6 @@ var NAVTREEINDEX1 =
 "hierarchy.html":[2,2],
 "index.html":[],
 "index.html":[0],
-"index.html#install-sec":[0,1],
 "index.html#intro-sec":[0,0],
 "main_8h.html":[3,0,0,0],
 "main_8h.html#a50e47e5a69c052f296a39f5dd56c2d8f":[3,0,0,0,1],
@@ -249,5 +248,6 @@ var NAVTREEINDEX1 =
 "mmwave-vehicular-propagation-loss-model_8h_source.html":[3,0,3,14],
 "mmwave-vehicular-rate-test_8cc.html":[3,0,4,1],
 "mmwave-vehicular-rate-test_8cc.html#a92d255d0855e2f7ccaa3701022d2d8f6":[3,0,4,1,2],
-"mmwave-vehicular-rate-test_8cc_source.html":[3,0,4,1]
+"mmwave-vehicular-rate-test_8cc_source.html":[3,0,4,1],
+"mmwave-vehicular-spectrum-phy-test_8cc.html":[3,0,4,2]
 };

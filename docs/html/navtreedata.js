@@ -2,8 +2,7 @@ var NAVTREE =
 [
   [ "MilliCar", "index.html", [
     [ "MilliCar Documentation", "index.html", [
-      [ "Introduction", "index.html#intro-sec", null ],
-      [ "Building the Documentation", "index.html#install-sec", null ]
+      [ "Introduction", "index.html#intro-sec", null ]
     ] ],
     [ "Namespace Members", "namespacemembers.html", [
       [ "All", "namespacemembers.html", null ],
@@ -40,7 +39,7 @@ var NAVTREEINDEX =
 [
 "annotated.html",
 "classns3_1_1millicar_1_1_mm_wave_vehicular_helper.html#ad534c932d9a9ff86e41fa6f09377001f",
-"mmwave-vehicular-spectrum-phy-test_8cc.html"
+"mmwave-vehicular-spectrum-phy-test_8cc.html#a50683c8c614b9896bf28b8120c19b5b7"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

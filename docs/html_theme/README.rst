@@ -81,5 +81,5 @@ Shared Files
 ``static/ns-3-inverted-notext-small.png``
     Logo used in the top bar, taken from the ns-3 media kit.
 
-``static/ns3_stylesheet.css``
+``static/stylesheet.css``
     Style customizations for both Doxygen and Sphinx.

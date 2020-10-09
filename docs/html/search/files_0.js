@@ -27,6 +27,5 @@ var searchData=
   ['mmwave_2dvehicular_2dtraces_2dhelper_2ecc',['mmwave-vehicular-traces-helper.cc',['../mmwave-vehicular-traces-helper_8cc.html',1,'']]],
   ['mmwave_2dvehicular_2dtraces_2dhelper_2eh',['mmwave-vehicular-traces-helper.h',['../mmwave-vehicular-traces-helper_8h.html',1,'']]],
   ['mmwave_2dvehicular_2ecc',['mmwave-vehicular.cc',['../mmwave-vehicular_8cc.html',1,'']]],
-  ['mmwave_2dvehicular_2eh',['mmwave-vehicular.h',['../mmwave-vehicular_8h.html',1,'']]],
-  ['modules',['modules',['../modules.html',1,'']]]
+  ['mmwave_2dvehicular_2eh',['mmwave-vehicular.h',['../mmwave-vehicular_8h.html',1,'']]]
 ];
