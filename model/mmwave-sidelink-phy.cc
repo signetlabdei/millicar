@@ -274,7 +274,7 @@ std::vector<int>
 MmWaveSidelinkPhy::SetSubChannelsForTransmission ()
   {
     // create the transmission mask, use all the available subchannels
-    std::vector<int> subChannelsForTx (m_phyMacConfig->GetNumChunks ());
+    std::vector<int> subChannelsForTx (m_phyMacConfig->GetNumRb ());
     for (uint32_t i = 0; i < subChannelsForTx.size (); i++)
     {
       subChannelsForTx.at(i) = i;

@@ -207,13 +207,13 @@ MmWaveVehicularRateTestCase::StartTest (uint8_t mcs)
   // The user is assigned to a single slot per subframe.
   // Each slot has 14 OFDM symbols, hence the theoretical available rate is:
   // bitPerSymbol * 14 / 1 ms
-  uint32_t availableBitsPerSlot = m_amc->GetTbSizeFromMcsSymbols(mcs, 14);
-  double availableRate =  availableBitsPerSlot * 1e3; // bps
+  uint32_t availableBytesPerSlot = m_amc->CalculateTbSize(mcs, 14);
+  double availableRate =  availableBytesPerSlot * 8 * 1e3; // bps
 
   // Configure the application to send a single packet per subframe, which has
   // to occupy all the available resources in the slot
   uint32_t headerSize = 30; // header sizes (UDP, IP, PDCP, RLC)
-  uint32_t packetSize = (availableBitsPerSlot / 8) - headerSize; // TB size - header sizes (UDP, IP, PDCP, RLC)
+  uint32_t packetSize = availableBytesPerSlot - headerSize; // TB size - header sizes (UDP, IP, PDCP, RLC)
   TimeValue interPacketInterval =  MilliSeconds (1);
   UdpEchoClientHelper client (n.Get (1)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal (), port);
   client.SetAttribute ("MaxPackets", UintegerValue (0xFFFFFFFF));

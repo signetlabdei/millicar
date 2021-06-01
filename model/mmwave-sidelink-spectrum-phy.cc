@@ -31,15 +31,15 @@
 #include "mmwave-sidelink-spectrum-signal-parameters.h"
 #include <stdio.h>
 #include <ns3/double.h>
-#include <ns3/mmwave-mi-error-model.h>
+#include <ns3/mmwave-lte-mi-error-model.h>
 #include <ns3/mmwave-vehicular-net-device.h>
 #include <ns3/mmwave-vehicular-antenna-array-model.h>
 
-namespace ns3 {
+using namespace ns3;
+using namespace mmwave;
+using namespace millicar;
 
 NS_LOG_COMPONENT_DEFINE ("MmWaveSidelinkSpectrumPhy");
-
-namespace millicar {
 
 NS_OBJECT_ENSURE_REGISTERED (MmWaveSidelinkSpectrumPhy);
 
@@ -79,7 +79,7 @@ MmWaveSidelinkSpectrumPhy::MmWaveSidelinkSpectrumPhy ()
   : m_state (IDLE),
     m_componentCarrierId (0)
 {
-  m_interferenceData = CreateObject<mmwave::mmWaveInterference> ();
+  m_interferenceData = CreateObject<mmWaveInterference> ();
   m_random = CreateObject<UniformRandomVariable> ();
   m_random->SetAttribute ("Min", DoubleValue (0.0));
   m_random->SetAttribute ("Max", DoubleValue (1.0));
@@ -102,6 +102,11 @@ MmWaveSidelinkSpectrumPhy::GetTypeId (void)
                    BooleanValue (true),
                    MakeBooleanAccessor (&MmWaveSidelinkSpectrumPhy::m_dataErrorModelEnabled),
                    MakeBooleanChecker ())
+    .AddAttribute ("ErrorModelType",
+                   "Type of the Error Model to apply to TBs of PSSCH",
+                   TypeIdValue (MmWaveLteMiErrorModel::GetTypeId ()),
+                   MakeTypeIdAccessor (&MmWaveSidelinkSpectrumPhy::SetErrorModelType),
+                   MakeTypeIdChecker ())
   ;
 
   return tid;
@@ -383,11 +388,20 @@ MmWaveSidelinkSpectrumPhy::EndRxData ()
          i != m_rxTransportBlock.end (); ++i)
      {
        // Here we need to initialize an empty harqInfoList since it is mandatory input
-       // for the method. Since the vector is empty, no harq procedures are triggeres (as we want)
-       std::vector <mmwave::MmWaveHarqProcessInfoElement_t> harqInfoList;
+       // for the method. Since the vector is empty, no harq procedures are triggered (as we want)
+       const MmWaveErrorModel::MmWaveErrorModelHistory& harqInfoList {};
 
+       // create the error model
+       ObjectFactory emFactory;
+       emFactory.SetTypeId (m_errorModelType);
+       Ptr<MmWaveErrorModel> errorModel = DynamicCast<MmWaveErrorModel> (emFactory.Create ());
+       
        NS_LOG_DEBUG ("average sinr " << 10*log10 (sinrAvg) << " MCS " <<  (uint16_t)(*i).mcs);
-       mmwave::MmWaveTbStats_t tbStats = mmwave::MmWaveMiErrorModel::GetTbDecodificationStats (m_sinrPerceived, (*i).rbBitmap, (*i).size, (*i).mcs, harqInfoList);
+       Ptr<MmWaveErrorModelOutput> tbStats = errorModel->GetTbDecodificationStats (m_sinrPerceived, 
+                                                                                     (*i).rbBitmap, 
+                                                                                     (*i).size, 
+                                                                                     (*i).mcs, 
+                                                                                     harqInfoList);
 
        // trigger callbacks
        for (auto& it : m_slSinrReportCallback)
@@ -395,7 +409,7 @@ MmWaveSidelinkSpectrumPhy::EndRxData ()
           it(m_sinrPerceived, (*i).rnti, (*i).numSym, (*i).size, (*i).mcs); // TODO also export corrupt and tbler)
         }
 
-       bool corrupt = m_random->GetValue () > tbStats.tbler ? false : true;
+       bool corrupt = m_random->GetValue () > tbStats->m_tbler ? false : true;
        if(!corrupt)
        {
          Ptr<PacketBurst> burst = (*i).packetBurst;
@@ -561,13 +575,13 @@ MmWaveSidelinkSpectrumPhy::GetSpectrumChannel ()
 // }
 
 void
-MmWaveSidelinkSpectrumPhy::AddDataPowerChunkProcessor (Ptr<mmwave::mmWaveChunkProcessor> p)
+MmWaveSidelinkSpectrumPhy::AddDataPowerChunkProcessor (Ptr<mmWaveChunkProcessor> p)
 {
   m_interferenceData->AddPowerChunkProcessor (p);
 }
 
 void
-MmWaveSidelinkSpectrumPhy::AddDataSinrChunkProcessor (Ptr<mmwave::mmWaveChunkProcessor> p)
+MmWaveSidelinkSpectrumPhy::AddDataSinrChunkProcessor (Ptr<mmWaveChunkProcessor> p)
 {
   m_interferenceData->AddSinrChunkProcessor (p);
 }
@@ -596,6 +610,10 @@ MmWaveSidelinkSpectrumPhy::ConfigureBeamforming (Ptr<NetDevice> dev)
   }
 }
 
-}
-
+void
+MmWaveSidelinkSpectrumPhy::SetErrorModelType (TypeId errorModelType)
+{
+  NS_ABORT_MSG_IF (!errorModelType.IsChildOf (MmWaveErrorModel::GetTypeId ()),
+                   "The error model must be a subclass of MmWaveErrorModel!");
+  m_errorModelType = errorModelType;
 }

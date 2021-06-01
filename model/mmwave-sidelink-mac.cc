@@ -221,25 +221,24 @@ MmWaveSidelinkMac::ScheduleResources (mmwave::SfnSf timingInfo)
 
     NS_LOG_DEBUG("rnti " << rntiDest << " mcs = " << uint16_t(mcs));
     // compute the number of bits for this LC
-    uint32_t availableBitsPerLc = m_amc->GetTbSizeFromMcsSymbols(mcs, availableSymbolsPerLc);
+    uint32_t availableBytesPerLc = m_amc->CalculateTbSize(mcs, availableSymbolsPerLc);
 
     // compute the number of bits required by this LC
-    uint32_t requiredBits = (bsrIt->second.txQueueSize + bsrIt->second.retxQueueSize + bsrIt->second.statusPduSize) * 8;
+    uint32_t requiredBytes = (bsrIt->second.txQueueSize + bsrIt->second.retxQueueSize + bsrIt->second.statusPduSize);
 
     // assign a number of bits which is less or equal to the available bits
-    uint32_t assignedBits = 0;
-    if (requiredBits <= availableBitsPerLc)
+    uint32_t assignedBytes = 0;
+    if (requiredBytes <= availableBytesPerLc)
     {
-      assignedBits = requiredBits;
+      assignedBytes = requiredBytes;
     }
     else
     {
-      assignedBits = availableBitsPerLc;
+      assignedBytes = availableBytesPerLc;
     }
 
     // compute the number of symbols assigned to this LC
-    uint32_t assignedSymbols = m_amc->GetNumSymbolsFromTbsMcs (assignedBits, mcs);
-    NS_LOG_DEBUG("assignedSymbols =\t" << assignedSymbols);
+    uint32_t assignedSymbols = m_amc->GetMinNumSymForTbSize (assignedBytes, mcs);
 
     //if (assignedSymbols <= availableSymbols) // TODO check if needed
     //{
@@ -251,7 +250,7 @@ MmWaveSidelinkMac::ScheduleResources (mmwave::SfnSf timingInfo)
     info.m_dci.m_numSym = assignedSymbols; // the number of symbols required to tx the packet
     info.m_dci.m_symStart = symStart; // index of the first available symbol
     info.m_dci.m_mcs = mcs;
-    info.m_dci.m_tbSize = assignedBits / 8; // the TB size in bytes
+    info.m_dci.m_tbSize = assignedBytes; // the TB size in bytes
     info.m_ttiType = mmwave::TtiAllocInfo::TddTtiType::DATA; // the TB carries data
 
     NS_LOG_DEBUG("info.m_dci.m_tbSize =\t" << info.m_dci.m_tbSize);
@@ -267,7 +266,7 @@ MmWaveSidelinkMac::ScheduleResources (mmwave::SfnSf timingInfo)
     traceInfo.symStart = symStart;
     traceInfo.numSym = assignedSymbols;
     traceInfo.mcs = mcs;
-    traceInfo.tbSize = assignedBits / 8;
+    traceInfo.tbSize = assignedBytes;
     traceInfo.txRnti = m_rnti;
     traceInfo.rxRnti = rntiDest;
     m_schedulingTrace (traceInfo);
@@ -275,7 +274,7 @@ MmWaveSidelinkMac::ScheduleResources (mmwave::SfnSf timingInfo)
     // notify the RLC
     LteMacSapUser* macSapUser = m_lcidToMacSap.find (bsrIt->second.lcid)->second;
     LteMacSapUser::TxOpportunityParameters params;
-    params.bytes = assignedBits / 8;  // the number of bytes to transmit
+    params.bytes = assignedBytes;  // the number of bytes to transmit
     params.layer = 0;  // the layer of transmission (MIMO) (NOT USED)
     params.harqId = 0; // the HARQ ID (NOT USED)
     params.componentCarrierId = 0; // the component carrier id (NOT USED)
@@ -285,7 +284,7 @@ MmWaveSidelinkMac::ScheduleResources (mmwave::SfnSf timingInfo)
 
     // update the entry in the m_bufferStatusReportMap (delete it if no
     // further resources are needed)
-    bsrIt = UpdateBufferStatusReport (bsrIt->second.lcid, assignedBits / 8);
+    bsrIt = UpdateBufferStatusReport (bsrIt->second.lcid, assignedBytes);
 
     // update the number of available symbols
     availableSymbols -= assignedSymbols;
@@ -483,15 +482,15 @@ MmWaveSidelinkMac::DoSlSinrReport (const SpectrumValue& sinr, uint16_t rnti, uin
   // check if the m_slCqiReported already contains the CQI history for the device
   // with RNTI = rnti. If so, add the new CQI report, otherwise create a new
   // entry.
-  int mcs; // the selected MCS will be stored in this variable
+  uint8_t mcs; // the selected MCS will be stored in this variable
   if (m_slCqiReported.find (rnti) != m_slCqiReported.end () )
   {
-    m_slCqiReported.at (rnti).push_back (m_amc->CreateCqiFeedbackWbTdma (sinr, numSym, tbSize, mcs));
+    m_slCqiReported.at (rnti).push_back (m_amc->CreateCqiFeedbackWbTdma (sinr, mcs));
   }
   else
   {
     std::vector<int> cqiTemp;
-    cqiTemp.push_back (m_amc->CreateCqiFeedbackWbTdma (sinr, numSym, tbSize, mcs));
+    cqiTemp.push_back (m_amc->CreateCqiFeedbackWbTdma (sinr, mcs));
     m_slCqiReported.insert (std::make_pair(rnti, cqiTemp));
   }
 }

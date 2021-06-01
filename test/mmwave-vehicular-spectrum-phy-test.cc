@@ -165,7 +165,7 @@ MmWaveVehicularSpectrumPhyTestCase1::StartTest (double dist)
   // create the tx psd
   Ptr<mmwave::MmWavePhyMacCommon> pmc = CreateObject<mmwave::MmWavePhyMacCommon> ();
   double txp = 30.0; // transmission power in dBm
-  std::vector<int> subChannelsForTx (pmc->GetNumChunks ());
+  std::vector<int> subChannelsForTx (pmc->GetNumRb ());
   
   // create the transmission mask, use all the available subchannels
   uint32_t i = 0;

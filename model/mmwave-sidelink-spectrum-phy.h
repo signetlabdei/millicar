@@ -40,6 +40,7 @@
 #include "ns3/random-variable-stream.h"
 #include "ns3/mmwave-interference.h"
 #include "ns3/mmwave-control-messages.h"
+#include <ns3/mmwave-error-model.h>
 
 namespace ns3 {
 
@@ -252,6 +253,12 @@ public:
   * \param dev the device we want to communicate with
   */
   void ConfigureBeamforming (Ptr<NetDevice> dev);
+  
+  /**
+  * Set the type of error model to be used.
+  * \param errorModelType type id of the error model to be used
+  */
+  void SetErrorModelType (TypeId errorModelType);
 
 private:
   /**
@@ -302,6 +309,8 @@ private:
   EventId m_endTxEvent; ///< end transmit event
   EventId m_endRxDataEvent; ///< end receive data event
   //EventId m_endRxCtrlEvent;
+  
+  TypeId m_errorModelType; //!< the type id of the error model
 
 };
 

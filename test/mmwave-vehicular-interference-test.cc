@@ -205,12 +205,7 @@ MmWaveVehicularInterferenceTestCase::StartTest (double txPower)
   NS_LOG_DEBUG("IPv4 Address node 0 group 2: " << group2.Get (0)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal ());
   NS_LOG_DEBUG("IPv4 Address node 1 group 2: " << group2.Get (1)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal ());
 
-  Ptr<MmWaveAmc> m_amc = CreateObject <MmWaveAmc> (helper->GetConfigurationParameters());
-  double availableRate = m_amc->GetTbSizeFromMcsSymbols(mcs, 14) / 0.001; // bps
   uint16_t port = 4000;  // well-known echo port number
-  uint32_t maxPacketCount = 1;
-  packetSize = m_amc->GetTbSizeFromMcsSymbols(mcs, 14) / 8 - 28;
-  Time interPacketInterval =  Seconds(double((packetSize * 8) / availableRate));
 
   NS_LOG_INFO ("Create applications for group number 1.");
 
@@ -221,9 +216,9 @@ MmWaveVehicularInterferenceTestCase::StartTest (double txPower)
   apps1.Stop (Seconds(4.0));
 
   UdpEchoClientHelper client1 (group1.Get (1)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal (), port);
-  client1.SetAttribute ("MaxPackets", UintegerValue (maxPacketCount));
-  client1.SetAttribute ("Interval", TimeValue (interPacketInterval));
-  client1.SetAttribute ("PacketSize", UintegerValue (packetSize));
+  client1.SetAttribute ("MaxPackets", UintegerValue (1));
+  client1.SetAttribute ("Interval", TimeValue (MilliSeconds (1)));
+  client1.SetAttribute ("PacketSize", UintegerValue (1024));
   apps1 = client1.Install (group1.Get (0));
   apps1.Start (startTime);
   apps1.Stop (endTime);
@@ -237,8 +232,8 @@ MmWaveVehicularInterferenceTestCase::StartTest (double txPower)
   apps2.Stop (Seconds(4.0));
 
   UdpEchoClientHelper client2 (group2.Get (1)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal (), port);
-  client2.SetAttribute ("MaxPackets", UintegerValue (maxPacketCount));
-  client2.SetAttribute ("Interval", TimeValue (interPacketInterval));
+  client2.SetAttribute ("MaxPackets", UintegerValue (1));
+  client2.SetAttribute ("Interval", TimeValue (MilliSeconds (1)));
   client2.SetAttribute ("PacketSize", UintegerValue (packetSize));
   apps2 = client2.Install (group2.Get (0));
   apps2.Start (startTime);

@@ -120,7 +120,7 @@ int main (int argc, char *argv[])
   NS_LOG_DEBUG("IPv4 Address node 2: " << group.Get (2)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal ());
 
   Ptr<mmwave::MmWaveAmc> m_amc = CreateObject <mmwave::MmWaveAmc> (helper->GetConfigurationParameters());
-  double availableRate = m_amc->GetTbSizeFromMcsSymbols(28, 14) / 0.001; // bps
+  double availableRate = m_amc->CalculateTbSize (28, 14) * 8 / 0.001; // bps
   uint16_t port_1 = 4000;  // well-known echo port number
   uint16_t port_2 = 4001;
 
