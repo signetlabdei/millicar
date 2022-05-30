@@ -208,7 +208,7 @@ MmWaveVehicularAntennaArrayModel::SetBeamformingVectorPanelDevices (Ptr<NetDevic
       panelId = floor (fmod (phiAngle + M_PI / m_noPlane,2 * M_PI) * m_noPlane / (2 * M_PI));         // panel id into the interval [0,N-1]
 
       double hAngleRadian = fmod ((phiAngle + (M_PI / m_noPlane)),2 * M_PI / m_noPlane) - (M_PI / m_noPlane);
-      double vAngleRadian = completeAngle.theta;
+      double vAngleRadian = completeAngle.GetInclination ();
       double power = 1 / sqrt (m_totNoArrayElements);
       uint16_t antennaNum [2];
       antennaNum[0] = sqrt (m_totNoArrayElements);

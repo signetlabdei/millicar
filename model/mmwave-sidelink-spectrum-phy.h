@@ -139,7 +139,7 @@ public:
    *
    * @return a Ptr to the associated MobilityModel instance
    */
-  Ptr<MobilityModel> GetMobility ();
+  Ptr<MobilityModel> GetMobility () const;
 
   /**
    * Set the channel attached to this device.
@@ -161,7 +161,7 @@ public:
    *
    * @return a Ptr to the AntennaModel used by the NetDevice for reception
    */
-  Ptr<AntennaModel> GetRxAntenna ();
+  Ptr<AntennaModel> GetRxAntenna () const;
 
   /**
    * set the AntennaModel to be used

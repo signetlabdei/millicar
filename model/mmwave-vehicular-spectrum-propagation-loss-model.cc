@@ -276,13 +276,13 @@ MmWaveVehicularSpectrumPropagationLossModel::DoCalcRxPowerSpectralDensity (Ptr<c
       /*make sure txAngle rxAngle exist, i.e., the position of tx and rx cannot be the same*/
       Angles txAngle (b->GetPosition (), a->GetPosition ());
       Angles rxAngle (a->GetPosition (), b->GetPosition ());
-      NS_LOG_DEBUG ("txAngle  " << txAngle.phi << " " << txAngle.theta);
-      NS_LOG_DEBUG ("rxAngle " << rxAngle.phi << " " << rxAngle.theta);
+      NS_LOG_DEBUG ("txAngle  " << txAngle.GetAzimuth () << " " << txAngle.GetInclination ());
+      NS_LOG_DEBUG ("rxAngle " << rxAngle.GetAzimuth () << " " << rxAngle.GetInclination ());
 
-      txAngle.phi = txAngle.phi - txAntennaArray->GetOffset ();          //adjustment of the angles due to multi-sector consideration
-      NS_LOG_DEBUG ("txAngle with offset PHI " << txAngle.phi);
-      rxAngle.phi = rxAngle.phi - rxAntennaArray->GetOffset ();
-      NS_LOG_DEBUG ("rxAngle with offset PHI " << rxAngle.phi);
+      txAngle.SetAzimuth (txAngle.GetAzimuth () - txAntennaArray->GetOffset ());          //adjustment of the angles due to multi-sector consideration
+      NS_LOG_DEBUG ("txAngle with offset PHI " << txAngle.GetAzimuth ());
+      rxAngle.SetAzimuth (rxAngle.GetAzimuth () - rxAntennaArray->GetOffset ());
+      NS_LOG_DEBUG ("rxAngle with offset PHI " << rxAngle.GetAzimuth ());
 
       //Step 2: Assign propagation condition (LOS/NLOS).
       //los, o2i condition is computed above.
@@ -1101,17 +1101,17 @@ MmWaveVehicularSpectrumPropagationLossModel::GetNewChannel (Ptr<ParamsTable>  ta
         {
           Xn = -1;
         }
-      clusterAoa.at (cIndex) = clusterAoa.at (cIndex) * Xn + (m_normalRv->GetValue () * ASA / 7) + rxAngle.phi * 180 / M_PI;        //(7.5-11)
-      clusterAod.at (cIndex) = clusterAod.at (cIndex) * Xn + (m_normalRv->GetValue () * ASD / 7) + txAngle.phi * 180 / M_PI;
+      clusterAoa.at (cIndex) = clusterAoa.at (cIndex) * Xn + (m_normalRv->GetValue () * ASA / 7) + rxAngle.GetAzimuth () * 180 / M_PI;        //(7.5-11)
+      clusterAod.at (cIndex) = clusterAod.at (cIndex) * Xn + (m_normalRv->GetValue () * ASD / 7) + txAngle.GetAzimuth () * 180 / M_PI;
       if (o2i)
         {
           clusterZoa.at (cIndex) = clusterZoa.at (cIndex) * Xn + (m_normalRv->GetValue () * ZSA / 7) + 90;            //(7.5-16)
         }
       else
         {
-          clusterZoa.at (cIndex) = clusterZoa.at (cIndex) * Xn + (m_normalRv->GetValue () * ZSA / 7) + rxAngle.theta * 180 / M_PI;            //(7.5-16)
+          clusterZoa.at (cIndex) = clusterZoa.at (cIndex) * Xn + (m_normalRv->GetValue () * ZSA / 7) + rxAngle.GetInclination () * 180 / M_PI;            //(7.5-16)
         }
-      clusterZod.at (cIndex) = clusterZod.at (cIndex) * Xn + (m_normalRv->GetValue () * ZSD / 7) + txAngle.theta * 180 / M_PI + table3gpp->m_offsetZOD;        //(7.5-19)
+      clusterZod.at (cIndex) = clusterZod.at (cIndex) * Xn + (m_normalRv->GetValue () * ZSD / 7) + txAngle.GetInclination () * 180 / M_PI + table3gpp->m_offsetZOD;        //(7.5-19)
 
     }
 
@@ -1119,10 +1119,10 @@ MmWaveVehicularSpectrumPropagationLossModel::GetNewChannel (Ptr<ParamsTable>  ta
     {
       //The 7.5-12 can be rewrite as Theta_n,ZOA = Theta_n,ZOA - (Theta_1,ZOA - Theta_LOS,ZOA) = Theta_n,ZOA - diffZOA,
       //Similar as AOD, ZSA and ZSD.
-      double diffAoa = clusterAoa.at (0) - rxAngle.phi * 180 / M_PI;
-      double diffAod = clusterAod.at (0) - txAngle.phi * 180 / M_PI;
-      double diffZsa = clusterZoa.at (0) - rxAngle.theta * 180 / M_PI;
-      double diffZsd = clusterZod.at (0) - txAngle.theta * 180 / M_PI;
+      double diffAoa = clusterAoa.at (0) - rxAngle.GetAzimuth () * 180 / M_PI;
+      double diffAod = clusterAod.at (0) - txAngle.GetAzimuth () * 180 / M_PI;
+      double diffZsa = clusterZoa.at (0) - rxAngle.GetInclination () * 180 / M_PI;
+      double diffZsd = clusterZod.at (0) - txAngle.GetInclination () * 180 / M_PI;
 
       for (uint8_t cIndex = 0; cIndex < numReducedCluster; cIndex++)
         {
@@ -1517,19 +1517,19 @@ MmWaveVehicularSpectrumPropagationLossModel::GetNewChannel (Ptr<ParamsTable>  ta
           if (condition == 'l')               //(7.5-29) && (7.5-30)
             {
               std::complex<double> ray (0,0);
-              double rxPhaseDiff = 2 * M_PI * (sin (rxAngle.theta) * cos (rxAngle.phi) * uLoc.x
-                                               + sin (rxAngle.theta) * sin (rxAngle.phi) * uLoc.y
-                                               + cos (rxAngle.theta) * uLoc.z);
-              double txPhaseDiff = 2 * M_PI * (sin (txAngle.theta) * cos (txAngle.phi) * sLoc.x
-                                               + sin (txAngle.theta) * sin (txAngle.phi) * sLoc.y
-                                               + cos (txAngle.theta) * sLoc.z);
-              //double doppler = 2*M_PI*(sin(rxAngle.theta)*cos(rxAngle.phi)*relativeSpeed.x
-              //		+ sin(rxAngle.theta)*sin(rxAngle.phi)*relativeSpeed.y
-              //		+ cos(rxAngle.theta)*relativeSpeed.z)*slotTime*m_phyMacConfig->GetCenterFrequency ()/3e8;
+              double rxPhaseDiff = 2 * M_PI * (sin (rxAngle.GetInclination ()) * cos (rxAngle.GetAzimuth ()) * uLoc.x
+                                               + sin (rxAngle.GetInclination ()) * sin (rxAngle.GetAzimuth ()) * uLoc.y
+                                               + cos (rxAngle.GetInclination ()) * uLoc.z);
+              double txPhaseDiff = 2 * M_PI * (sin (txAngle.GetInclination ()) * cos (txAngle.GetAzimuth ()) * sLoc.x
+                                               + sin (txAngle.GetInclination ()) * sin (txAngle.GetAzimuth ()) * sLoc.y
+                                               + cos (txAngle.GetInclination ()) * sLoc.z);
+              //double doppler = 2*M_PI*(sin(rxAngle.GetInclination ())*cos(rxAngle.GetAzimuth ())*relativeSpeed.x
+              //		+ sin(rxAngle.GetInclination ())*sin(rxAngle.GetAzimuth ())*relativeSpeed.y
+              //		+ cos(rxAngle.GetInclination ())*relativeSpeed.z)*slotTime*m_phyMacConfig->GetCenterFrequency ()/3e8;
 
               ray = exp (std::complex<double> (0, losPhase))
-                * (rxAntenna->GetRadiationPattern (rxAngle.theta,rxAngle.phi)
-                   * txAntenna->GetRadiationPattern (txAngle.theta,rxAngle.phi))
+                * (rxAntenna->GetRadiationPattern (rxAngle.GetInclination (),rxAngle.GetAzimuth ())
+                   * txAntenna->GetRadiationPattern (txAngle.GetInclination (),rxAngle.GetAzimuth ()))
                 * exp (std::complex<double> (0, rxPhaseDiff))
                 * exp (std::complex<double> (0, txPhaseDiff));
               //*exp(std::complex<double>(0, doppler));
@@ -2171,19 +2171,19 @@ MmWaveVehicularSpectrumPropagationLossModel::UpdateChannel (Ptr<Params3gpp> para
           if (params->m_condition == 'l')               //(7.5-29) && (7.5-30)
             {
               std::complex<double> ray (0,0);
-              double rxPhaseDiff = 2 * M_PI * (sin (rxAngle.theta) * cos (rxAngle.phi) * uLoc.x
-                                               + sin (rxAngle.theta) * sin (rxAngle.phi) * uLoc.y
-                                               + cos (rxAngle.theta) * uLoc.z);
-              double txPhaseDiff = 2 * M_PI * (sin (txAngle.theta) * cos (txAngle.phi) * sLoc.x
-                                               + sin (txAngle.theta) * sin (txAngle.phi) * sLoc.y
-                                               + cos (txAngle.theta) * sLoc.z);
-              //double doppler = 2*M_PI*(sin(rxAngle.theta)*cos(rxAngle.phi)*relativeSpeed.x
-              //		+ sin(rxAngle.theta)*sin(rxAngle.phi)*relativeSpeed.y
-              //		+ cos(rxAngle.theta)*relativeSpeed.z)*slotTime*m_phyMacConfig->GetCenterFrequency ()/3e8;
+              double rxPhaseDiff = 2 * M_PI * (sin (rxAngle.GetInclination ()) * cos (rxAngle.GetAzimuth ()) * uLoc.x
+                                               + sin (rxAngle.GetInclination ()) * sin (rxAngle.GetAzimuth ()) * uLoc.y
+                                               + cos (rxAngle.GetInclination ()) * uLoc.z);
+              double txPhaseDiff = 2 * M_PI * (sin (txAngle.GetInclination ()) * cos (txAngle.GetAzimuth ()) * sLoc.x
+                                               + sin (txAngle.GetInclination ()) * sin (txAngle.GetAzimuth ()) * sLoc.y
+                                               + cos (txAngle.GetInclination ()) * sLoc.z);
+              //double doppler = 2*M_PI*(sin(rxAngle.GetInclination ())*cos(rxAngle.GetAzimuth ())*relativeSpeed.x
+              //		+ sin(rxAngle.GetInclination ())*sin(rxAngle.GetAzimuth ())*relativeSpeed.y
+              //		+ cos(rxAngle.GetInclination ())*relativeSpeed.z)*slotTime*m_phyMacConfig->GetCenterFrequency ()/3e8;
 
               ray = exp (std::complex<double> (0, losPhase))
-                * (rxAntenna->GetRadiationPattern (rxAngle.theta,rxAngle.phi)
-                   * txAntenna->GetRadiationPattern (txAngle.theta,txAngle.phi))
+                * (rxAntenna->GetRadiationPattern (rxAngle.GetInclination (),rxAngle.GetAzimuth ())
+                   * txAntenna->GetRadiationPattern (txAngle.GetInclination (),txAngle.GetAzimuth ()))
                 * exp (std::complex<double> (0, rxPhaseDiff))
                 * exp (std::complex<double> (0, txPhaseDiff));
               //*exp(std::complex<double>(0, doppler));

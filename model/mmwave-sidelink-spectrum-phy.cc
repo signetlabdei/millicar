@@ -156,7 +156,7 @@ MmWaveSidelinkSpectrumPhy::SetMobility (Ptr<MobilityModel> m)
 }
 
 Ptr<MobilityModel>
-MmWaveSidelinkSpectrumPhy::GetMobility ()
+MmWaveSidelinkSpectrumPhy::GetMobility () const
 {
   return m_mobility;
 }
@@ -174,7 +174,7 @@ MmWaveSidelinkSpectrumPhy::GetRxSpectrumModel () const
 }
 
 Ptr<AntennaModel>
-MmWaveSidelinkSpectrumPhy::GetRxAntenna ()
+MmWaveSidelinkSpectrumPhy::GetRxAntenna () const
 {
   return m_antenna;
 }
