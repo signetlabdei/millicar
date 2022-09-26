@@ -24,6 +24,7 @@
 #include "ns3/lte-pdcp.h"
 #include "ns3/lte-radio-bearer-info.h"
 #include "ns3/epc-tft-classifier.h"
+#include <ns3/uniform-planar-array.h>
 #include "mmwave-sidelink-phy.h"
 #include "mmwave-sidelink-mac.h"
 
@@ -179,6 +180,18 @@ public:
    * \param dest IP destination address
   */
   void ActivateBearer (const uint8_t bearerId, const uint16_t destRnti, const Address& dest);
+  
+  /**
+   * \brief Set UniformPlanarArray object 
+   * \param antenna antenna to mount on the device 
+   */
+  void SetAntennaArray (Ptr<UniformPlanarArray> antenna);
+  
+  /**
+   * \brief Get a UniformPlanarArray object
+   * \return the antenna mounted on the devide
+   */
+  Ptr<UniformPlanarArray> GetAntennaArray () const;
 
 protected:
   NetDevice::ReceiveCallback m_rxCallback; //!< callback that is fired when a packet is received
@@ -197,6 +210,8 @@ private:
   Ptr<Node> m_node; //!< pointer to the node associated to the NetDevice
   EpcTftClassifier m_tftClassifier;
   std::string m_rlcType;
+  
+  Ptr<UniformPlanarArray> m_antenna; //!< antenna mounted on the device
 
   /**
    * Return the LCID associated to a certain bearer

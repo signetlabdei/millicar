@@ -41,6 +41,7 @@
 #include "ns3/mmwave-interference.h"
 #include "ns3/mmwave-control-messages.h"
 #include <ns3/mmwave-error-model.h>
+#include "ns3/mmwave-beamforming-model.h"
 
 namespace ns3 {
 
@@ -157,18 +158,18 @@ public:
   Ptr<const SpectrumModel> GetRxSpectrumModel () const;
 
   /**
-   * Get the AntennaModel used by the NetDevice for reception
+   * Get the antenna used by the NetDevice for reception
    *
-   * @return a Ptr to the AntennaModel used by the NetDevice for reception
+   * @return a Ptr to the antenna used by the NetDevice for reception
    */
-  Ptr<AntennaModel> GetRxAntenna () const;
+  Ptr<Object> GetAntenna () const;
 
   /**
    * set the AntennaModel to be used
    *
    * \param a the Antenna Model
    */
-  void SetAntenna (Ptr<AntennaModel> a);
+  void SetAntenna (Ptr<PhasedArrayModel> a);
 
   void SetNoisePowerSpectralDensity (Ptr<const SpectrumValue> noisePsd);
   void SetTxPowerSpectralDensity (Ptr<SpectrumValue> TxPsd);
@@ -260,6 +261,13 @@ public:
   */
   void SetErrorModelType (TypeId errorModelType);
 
+  /**
+  * Configure the beamforming model to use
+  * \param beamformingModel object associated to the mmwave beamforming model
+  */
+  void SetBeamformingModel (Ptr<mmwave::MmWaveBeamformingModel> beamformingModel);
+
+
 private:
   /**
   * \brief Change state function
@@ -289,7 +297,8 @@ private:
   Time m_firstRxStart; ///< the first receive start
   Time m_firstRxDuration; ///< the first receive duration
 
-  Ptr<AntennaModel> m_antenna; ///< the antenna model
+  Ptr<PhasedArrayModel> m_antenna; ///< the antenna model
+  Ptr<mmwave::MmWaveBeamformingModel> m_beamforming; //!< used to compute the beamforming vector
 
   State m_state; ///< the state
 

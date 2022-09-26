@@ -26,9 +26,10 @@
 #include "ns3/spectrum-helper.h"
 #include "ns3/mmwave-spectrum-value-helper.h"
 #include "ns3/test.h"
+#include "ns3/buildings-module.h"
 #include "ns3/applications-module.h"
 #include "ns3/internet-module.h"
-#include "ns3/core-module.h"
+#include "ns3/config.h"
 
 NS_LOG_COMPONENT_DEFINE ("MmWaveVehicularRateTestSuite");
 
@@ -164,6 +165,7 @@ MmWaveVehicularRateTestCase::StartTest (uint8_t mcs)
   // create and configure the helper
   Ptr<MmWaveVehicularHelper> helper = CreateObject<MmWaveVehicularHelper> ();
   helper->SetNumerology (3);
+  helper->SetChannelModelType ("V2V-Urban");
   NetDeviceContainer devs = helper->InstallMmWaveVehicularNetDevices (n);
 
   // Install the TCP/IP stack in the two nodes
@@ -187,7 +189,11 @@ MmWaveVehicularRateTestCase::StartTest (uint8_t mcs)
 
   NS_LOG_DEBUG("IPv4 Address node 0: " << n.Get (0)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal ());
   NS_LOG_DEBUG("IPv4 Address node 1: " << n.Get (1)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal ());
-
+  
+  // Mandatory to install buildings helper even if there are no buildings, 
+  // otherwise V2V-Urban scenario does not work
+  BuildingsHelper::Install (n);
+  
   //
   // Create a UdpEchoServer application on node one.
   //

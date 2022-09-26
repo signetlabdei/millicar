@@ -26,6 +26,7 @@
 #include "ns3/spectrum-channel.h"
 #include "ns3/mmwave-phy-mac-common.h"
 #include "ns3/mmwave-vehicular-traces-helper.h"
+#include "ns3/object-factory.h"
 
 namespace ns3 {
 
@@ -72,24 +73,12 @@ public:
    * \return a pointer to a MmWavePhyMacCommon object
    */
   Ptr<mmwave::MmWavePhyMacCommon> GetConfigurationParameters () const;
-
+  
   /**
-   * Set the propagation loss model type
-   * \param plm the type id of the propagation loss model to use
+   * Set the beamforming delay model type
+   * \param pdm the type id of the beamforming model to use
    */
-  void SetPropagationLossModelType (std::string plm);
-
-  /**
-   * Set the spectrum propagation loss model type
-   * \param splm the type id of the spectrum propagation loss model to use
-   */
-  void SetSpectrumPropagationLossModelType (std::string splm);
-
-  /**
-   * Set the propagation delay model type
-   * \param pdm the type id of the propagation delay model to use
-   */
-  void SetPropagationDelayModelType (std::string pdm);
+  void SetBeamformingModelType (std::string type);
 
   /**
    * Associate the devices in the container
@@ -102,6 +91,12 @@ public:
    * \param index numerology index, used to define PHY layer parameters
    */
   void SetNumerology (uint8_t index);
+                                   
+  /**
+   * Configure the type of channel model to be used
+   * \param model string representing the channel model to be used
+   */
+  void SetChannelModelType (std::string model);
 
   /**
    * Configure the scheduling pattern for a specific group of devices
@@ -140,17 +135,23 @@ private:
    * \return pointer to the installed NetDevice
    */
   Ptr<MmWaveVehicularNetDevice> InstallSingleMmWaveVehicularNetDevice (Ptr<Node> n, uint16_t rnti);
+  
+  /**
+   * Create and configure the spectrum channel
+   * \param model string representing the type of channel model to be created
+   * \return pointer to the SpectrumChannel object
+   */
+  Ptr<SpectrumChannel> CreateSpectrumChannel (std::string model) const;
 
   Ptr<SpectrumChannel> m_channel; //!< the SpectrumChannel
   Ptr<mmwave::MmWavePhyMacCommon> m_phyMacConfig; //!< the configuration parameters
   uint16_t m_rntiCounter; //!< a counter to set the RNTIs
   uint8_t m_numerologyIndex; //!< numerology index
   double m_bandwidth; //!< system bandwidth
-  std::string m_propagationLossModelType; //!< the type id of the propagation loss model to be used
-  std::string m_spectrumPropagationLossModelType; //!< the type id of the spectrum propagation loss model to be used
-  std::string m_propagationDelayModelType; //!< the type id of the delay model to be used
+  std::string m_channelModelType; //!< the type of channel model to be used
   SchedulingPatternOption_t m_schedulingOpt; //!< the type of scheduling pattern policy to be adopted
-
+  
+  ObjectFactory m_bfModelFactory; //!< beamforming model object factory
   Ptr<MmWaveVehicularTracesHelper> m_phyTraceHelper; //!< Ptr to an helper for the physical layer traces
 
 };

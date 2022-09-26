@@ -131,8 +131,10 @@ MmWaveVehicularSpectrumPhyTestCase1::StartTest (double dist)
   rx_mm->SetPosition (Vector (distance, 0.0, 0.0));
 
   // create the antenna
-  Ptr<AntennaModel> tx_am = CreateObject<IsotropicAntennaModel> ();
-  Ptr<AntennaModel> rx_am = CreateObject<IsotropicAntennaModel> ();
+  Ptr<UniformPlanarArray> tx_aam = CreateObject<UniformPlanarArray> ();
+  Ptr<UniformPlanarArray> rx_aam = CreateObject<UniformPlanarArray> ();
+  tx_aam->SetAntennaElement(CreateObject<IsotropicAntennaModel> ());
+  rx_aam->SetAntennaElement(CreateObject<IsotropicAntennaModel> ());
 
   // create the channel
   SpectrumChannelHelper sh = SpectrumChannelHelper::Default ();
@@ -141,13 +143,13 @@ MmWaveVehicularSpectrumPhyTestCase1::StartTest (double dist)
   // create and configure the tx spectrum phy
   Ptr<MmWaveSidelinkSpectrumPhy> tx_ssp = CreateObject<MmWaveSidelinkSpectrumPhy> ();
   tx_ssp->SetMobility (tx_mm);
-  tx_ssp->SetAntenna (tx_am);
+  tx_ssp->SetAntenna (tx_aam);
   tx_ssp->SetChannel (sc);
 
   // create and configure the tx spectrum phy
   Ptr<MmWaveSidelinkSpectrumPhy> rx_ssp = CreateObject<MmWaveSidelinkSpectrumPhy> ();
   rx_ssp->SetMobility (rx_mm);
-  rx_ssp->SetAntenna (rx_am);
+  rx_ssp->SetAntenna (rx_aam);
   rx_ssp->SetChannel (sc);
 
   // add the rx spectrum phy instance to the spectrum channel

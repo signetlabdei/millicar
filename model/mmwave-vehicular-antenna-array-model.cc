@@ -179,7 +179,7 @@ MmWaveVehicularAntennaArrayModel::SetBeamformingVectorPanelDevices (Ptr<NetDevic
   m_omniTx = false;
   complexVector_t antennaWeights;
   int panelId = 0;       // initialize all the variables
-  if (thisDevice != 0 && otherDevice != 0)
+  if (thisDevice && otherDevice)
     {
       Vector aPos = thisDevice->GetNode ()->GetObject<MobilityModel> ()->GetPosition ();
       NS_LOG_INFO ("aPos: " << aPos);
@@ -251,7 +251,7 @@ MmWaveVehicularAntennaArrayModel::SetBeamformingVectorPanel (complexVector_t ant
 {
   NS_LOG_FUNCTION (this << device << Simulator::Now ());
   m_omniTx = false;
-  if (device != 0)
+  if (device)
     {
       auto iter = m_beamformingVectorPanelMap.find (device);
       if (iter != m_beamformingVectorPanelMap.end ())

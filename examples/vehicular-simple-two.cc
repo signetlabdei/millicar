@@ -27,7 +27,9 @@
 #include "ns3/mmwave-spectrum-value-helper.h"
 #include "ns3/applications-module.h"
 #include "ns3/internet-module.h"
-#include "ns3/core-module.h"
+#include "ns3/buildings-module.h"
+#include "ns3/config.h"
+#include "ns3/command-line.h"
 #include "ns3/node-list.h"
 
 NS_LOG_COMPONENT_DEFINE ("VehicularSimpleTwo");
@@ -62,24 +64,21 @@ int main (int argc, char *argv[])
   double interGroupInitialDistance = 40; // initial distance between the two groups
   double laneDistance = 5.0; // distance between the two lanes
   double antennaHeight = 2.0; // the height of the antenna
-
-  // TODO
-  // CommandLine cmd;
-  // cmd.AddValue ("vehicleSpeed", "The speed of the vehicle", speed);
-  // cmd.Parse (argc, argv);
+  std::string scenario = "V2V-Urban";
+  
+  CommandLine cmd;
+  cmd.AddValue ("vehicleSpeed", "The speed of the vehicle", speed);
+  cmd.AddValue ("scenario", "set the vehicular scenario", scenario);
+  cmd.Parse (argc, argv);
 
   Config::SetDefault ("ns3::MmWaveSidelinkMac::UseAmc", BooleanValue (true));
   Config::SetDefault ("ns3::MmWavePhyMacCommon::CenterFreq", DoubleValue (frequency));
+  
   Config::SetDefault ("ns3::MmWaveVehicularHelper::Bandwidth", DoubleValue (bandwidth));
   Config::SetDefault ("ns3::MmWaveVehicularHelper::Numerology", UintegerValue (numerology));
-  Config::SetDefault ("ns3::MmWaveVehicularPropagationLossModel::ChannelCondition", StringValue ("l"));
-  Config::SetDefault ("ns3::MmWaveVehicularPropagationLossModel::Shadowing", BooleanValue (true));
-  Config::SetDefault ("ns3::MmWaveVehicularSpectrumPropagationLossModel::UpdatePeriod", TimeValue (MilliSeconds (1)));
-  Config::SetDefault ("ns3::MmWaveVehicularAntennaArrayModel::AntennaElements", UintegerValue (4));
-  Config::SetDefault ("ns3::MmWaveVehicularAntennaArrayModel::AntennaElementPattern", StringValue ("3GPP-V2V"));
-  Config::SetDefault ("ns3::MmWaveVehicularAntennaArrayModel::IsotropicAntennaElements", BooleanValue (true));
-  Config::SetDefault ("ns3::MmWaveVehicularAntennaArrayModel::NumSectors", UintegerValue (2));
-
+  
+  Config::SetDefault ("ns3::ThreeGppChannelModel::UpdatePeriod", TimeValue (MilliSeconds (10)));
+  
   // create the nodes
   NodeContainer group1, group2;
   group1.Create (2);
@@ -106,9 +105,8 @@ int main (int argc, char *argv[])
   // create and configure the helper
   Ptr<MmWaveVehicularHelper> helper = CreateObject<MmWaveVehicularHelper> ();
   helper->SetNumerology (numerology);
-  helper->SetPropagationLossModelType ("ns3::MmWaveVehicularPropagationLossModel");
-  helper->SetSpectrumPropagationLossModelType ("ns3::MmWaveVehicularSpectrumPropagationLossModel");
-  // helper->SetSpectrumPropagationLossModelType ("ns3::FriisSpectrumPropagationLossModel");
+  helper->SetNumerology (3);
+  helper->SetChannelModelType (scenario);
   NetDeviceContainer devs1 = helper->InstallMmWaveVehicularNetDevices (group1);
   NetDeviceContainer devs2 = helper->InstallMmWaveVehicularNetDevices (group2);
 
@@ -124,6 +122,11 @@ int main (int argc, char *argv[])
 
   ipv4.SetBase ("10.1.2.0", "255.255.255.0");
   i = ipv4.Assign (devs2);
+  
+  // Mandatory to install buildings helper even if there are no buildings, 
+  // otherwise V2V-Urban scenario does not work
+  BuildingsHelper::Install (group1);
+  BuildingsHelper::Install (group2);
 
   // connect the devices belonging to the same group
   helper->PairDevices(devs1);

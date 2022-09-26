@@ -409,6 +409,20 @@ MmWaveVehicularNetDevice::BidToLcid(const uint8_t bearerId) const
   return m_bid2lcid.find(bearerId)->second;
 }
 
+void
+MmWaveVehicularNetDevice::SetAntennaArray (Ptr<UniformPlanarArray> antenna)
+{
+  NS_LOG_FUNCTION (this);
+  m_antenna = antenna;
+}
+
+Ptr<UniformPlanarArray>
+MmWaveVehicularNetDevice::GetAntennaArray () const
+{
+  NS_LOG_FUNCTION (this);
+  return m_antenna;
+}
+
 }
 
 }

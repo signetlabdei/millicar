@@ -55,17 +55,11 @@ MmWaveSidelinkSpectrumSignalParameters::MmWaveSidelinkSpectrumSignalParameters (
 }
 
 Ptr<SpectrumSignalParameters>
-MmWaveSidelinkSpectrumSignalParameters::Copy ()
+MmWaveSidelinkSpectrumSignalParameters::Copy () const
 {
   NS_LOG_FUNCTION (this);
-  // Ideally we would use:
-  //   return Copy<mmwaveSpectrumSignalParameters> (*this);
-  // but for some reason it doesn't work. Another alternative is
-  //   return Copy<mmwaveSpectrumSignalParameters> (this);
-  // but it causes a double creation of the object, hence it is less efficient.
-  // The solution below is copied from the implementation of Copy<> (Ptr<>) in ptr.h
-  Ptr<MmWaveSidelinkSpectrumSignalParameters> lssp (new MmWaveSidelinkSpectrumSignalParameters (*this), false);
-  return lssp;
+
+  return Create<MmWaveSidelinkSpectrumSignalParameters> (*this);
 }
 
 }

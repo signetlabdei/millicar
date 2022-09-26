@@ -22,9 +22,12 @@
 #include "ns3/double.h"
 #include "ns3/mmwave-vehicular-net-device.h"
 #include "ns3/internet-stack-helper.h"
-#include "ns3/single-model-spectrum-channel.h"
-#include "ns3/mmwave-vehicular-antenna-array-model.h"
-#include "ns3/mmwave-vehicular-spectrum-propagation-loss-model.h"
+#include "ns3/multi-model-spectrum-channel.h"
+#include "ns3/three-gpp-spectrum-propagation-loss-model.h"
+#include "ns3/three-gpp-v2v-propagation-loss-model.h"
+#include "ns3/three-gpp-v2v-channel-condition-model.h"
+#include "ns3/three-gpp-channel-model.h"
+#include "ns3/mmwave-beamforming-model.h"
 #include "ns3/pointer.h"
 #include "ns3/config.h"
 
@@ -54,27 +57,18 @@ MmWaveVehicularHelper::GetTypeId ()
   TypeId ("ns3::MmWaveVehicularHelper")
   .SetParent<Object> ()
   .AddConstructor<MmWaveVehicularHelper> ()
-  .AddAttribute ("PropagationLossModel",
-                 "The type of path-loss model to be used. "
-                 "The allowed values for this attributes are the type names "
-                 "of any class inheriting from ns3::PropagationLossModel.",
-                 StringValue (""),
-                 MakeStringAccessor (&MmWaveVehicularHelper::SetPropagationLossModelType),
+  .AddAttribute ("BeamformingModel",
+                 "The type of beamforming model to be used.",
+                 StringValue ("ns3::MmWaveSvdBeamforming"),
+                 MakeStringAccessor (&MmWaveVehicularHelper::SetBeamformingModelType),
                  MakeStringChecker ())
-  .AddAttribute ("SpectrumPropagationLossModel",
-                 "The type of fast fading model to be used. "
-                 "The allowed values for this attributes are the type names "
-                 "of any class inheriting from ns3::SpectrumPropagationLossModel.",
-                 StringValue (""),
-                 MakeStringAccessor (&MmWaveVehicularHelper::SetSpectrumPropagationLossModelType),
-                 MakeStringChecker ())
-  .AddAttribute ("PropagationDelayModel",
-                 "The type of propagation delay model to be used. "
-                 "The allowed values for this attributes are the type names "
-                 "of any class inheriting from ns3::PropagationDelayModel.",
-                 StringValue (""),
-                 MakeStringAccessor (&MmWaveVehicularHelper::SetPropagationDelayModelType),
-                 MakeStringChecker ())
+  .AddAttribute ("ChannelModelType",
+                 "The type of channel model to be used. "
+                 "The allowed values for this attributes are V2V-Urban, V2V-Highway"
+                 " and Ideal",
+                 StringValue("V2V-Urban"),
+                 MakeStringAccessor (&MmWaveVehicularHelper::SetChannelModelType),
+                 MakeStringChecker())
   .AddAttribute ("Numerology",
                  "Numerology to use for the definition of the frame structure."
                  "2 : subcarrier spacing will be set to 60 KHz"
@@ -116,38 +110,52 @@ MmWaveVehicularHelper::DoInitialize ()
                                                                              "Bandwidth", DoubleValue (m_bandwidth));
   }
 
-  // create the channel
-  m_channel = CreateObject<SingleModelSpectrumChannel> ();
-  if (!m_propagationLossModelType.empty ())
-  {
-    ObjectFactory factory (m_propagationLossModelType);
-    m_channel->AddPropagationLossModel (factory.Create<PropagationLossModel> ());
-  }
-  if (!m_spectrumPropagationLossModelType.empty ())
-  {
-    ObjectFactory factory (m_spectrumPropagationLossModelType);
-    m_channel->AddSpectrumPropagationLossModel (factory.Create<SpectrumPropagationLossModel> ());
-  }
-  if (!m_propagationDelayModelType.empty ())
-  {
-    ObjectFactory factory (m_propagationDelayModelType);
-    m_channel->SetPropagationDelayModel (factory.Create<PropagationDelayModel> ());
-  }
+  m_channel = CreateSpectrumChannel (m_channelModelType);
+}
 
-  // 3GPP vehicular channel needs proper configuration
-  if (m_spectrumPropagationLossModelType == "ns3::MmWaveVehicularSpectrumPropagationLossModel")
+Ptr<SpectrumChannel>
+MmWaveVehicularHelper::CreateSpectrumChannel (std::string channelModelType) const
+{  
+  Ptr<SpectrumChannel> channel = CreateObject<MultiModelSpectrumChannel> ();
+  if (channelModelType == "V2V-Urban")
   {
-    Ptr<MmWaveVehicularSpectrumPropagationLossModel> threeGppSplm = DynamicCast<MmWaveVehicularSpectrumPropagationLossModel> (m_channel->GetSpectrumPropagationLossModel ());
-    PointerValue plm;
-    m_channel->GetAttribute ("PropagationLossModel", plm);
+    Ptr<ChannelConditionModel> ccm = CreateObject<ThreeGppV2vUrbanChannelConditionModel> ();
     
-    Ptr<MmWaveVehicularPropagationLossModel> pathloss = DynamicCast<MmWaveVehicularPropagationLossModel> (plm.Get<PropagationLossModel> ());
-    pathloss->SetFrequency (m_phyMacConfig->GetCenterFrequency());
+    Ptr<ThreeGppPropagationLossModel> plm = CreateObject<ThreeGppV2vUrbanPropagationLossModel> ();
+    plm->SetChannelConditionModel (ccm);
+    plm->SetFrequency (m_phyMacConfig->GetCenterFrequency());
     
-    threeGppSplm->SetPathlossModel (pathloss); // associate pathloss and fast fading models
-    threeGppSplm->SetFrequency (m_phyMacConfig->GetCenterFrequency()); // set correct value of frequency
+    Ptr<ThreeGppSpectrumPropagationLossModel> splm = CreateObject<ThreeGppSpectrumPropagationLossModel> ();
+    splm->SetChannelModelAttribute ("ChannelConditionModel", PointerValue (ccm));
+    splm->SetChannelModelAttribute ("Frequency", DoubleValue(m_phyMacConfig->GetCenterFrequency()));
+    splm->SetChannelModelAttribute ("Scenario", StringValue ("V2V-Urban"));
+    channel->AddPropagationLossModel (plm);
+    channel->AddPhasedArraySpectrumPropagationLossModel (splm);
+  }    
+  else if ("V2V-Highway")
+  {
+    Ptr<ChannelConditionModel> ccm = CreateObject<ThreeGppV2vHighwayChannelConditionModel> ();
     
+    Ptr<ThreeGppPropagationLossModel> plm = CreateObject<ThreeGppV2vHighwayPropagationLossModel> ();
+    plm->SetChannelConditionModel (ccm);
+    plm->SetFrequency (m_phyMacConfig->GetCenterFrequency());
+    
+    Ptr<ThreeGppSpectrumPropagationLossModel> splm = CreateObject<ThreeGppSpectrumPropagationLossModel> ();
+    splm->SetChannelModelAttribute ("ChannelConditionModel", PointerValue (ccm));
+    splm->SetChannelModelAttribute ("Frequency", DoubleValue(m_phyMacConfig->GetCenterFrequency()));
+    splm->SetChannelModelAttribute ("Scenario", StringValue ("V2V-Urban"));
+    channel->AddPropagationLossModel (plm);
+    channel->AddPhasedArraySpectrumPropagationLossModel (splm);
   }
+  else if ("Ideal")
+  {
+    // ideal channel, don't use any propagation loss model
+  }
+  else
+  {
+    NS_FATAL_ERROR ("Unknown channel model type");    
+  }    
+  return channel;
 }
 
 void
@@ -170,6 +178,13 @@ MmWaveVehicularHelper::SetNumerology (uint8_t index)
 {
   NS_LOG_FUNCTION (this);
   m_numerologyIndex = index;
+}
+
+void
+MmWaveVehicularHelper::SetChannelModelType (std::string model)
+{
+  NS_LOG_FUNCTION (this);
+  m_channelModelType = model;
 }
 
 NetDeviceContainer
@@ -200,17 +215,21 @@ Ptr<MmWaveVehicularNetDevice>
 MmWaveVehicularHelper::InstallSingleMmWaveVehicularNetDevice (Ptr<Node> node, uint16_t rnti)
 {
   NS_LOG_FUNCTION (this);
-
+  
   // create the antenna
-  Ptr<MmWaveVehicularAntennaArrayModel> aam = CreateObject<MmWaveVehicularAntennaArrayModel> ();
+  Ptr<UniformPlanarArray> aam = CreateObject<UniformPlanarArray> ();
 
   // create and configure the tx spectrum phy
   Ptr<MmWaveSidelinkSpectrumPhy> ssp = CreateObject<MmWaveSidelinkSpectrumPhy> ();
   NS_ASSERT_MSG (node->GetObject<MobilityModel> (), "Missing mobility model");
   ssp->SetMobility (node->GetObject<MobilityModel> ());
-  ssp->SetAntenna (aam);
   NS_ASSERT_MSG (m_channel, "First create the channel");
   ssp->SetChannel (m_channel);
+  ssp->SetAntenna (aam);
+
+  // create the phy
+  NS_ASSERT_MSG (m_phyMacConfig, "First set the configuration parameters");
+  Ptr<MmWaveSidelinkPhy> phy = CreateObject<MmWaveSidelinkPhy> (ssp, m_phyMacConfig);
 
   // add the spectrum phy to the spectrum channel
   m_channel->AddRx (ssp);
@@ -220,9 +239,6 @@ MmWaveVehicularHelper::InstallSingleMmWaveVehicularNetDevice (Ptr<Node> node, ui
   pData->AddCallback (MakeCallback (&MmWaveSidelinkSpectrumPhy::UpdateSinrPerceived, ssp));
   ssp->AddDataSinrChunkProcessor (pData);
 
-  // create the phy
-  NS_ASSERT_MSG (m_phyMacConfig, "First set the configuration parameters");
-  Ptr<MmWaveSidelinkPhy> phy = CreateObject<MmWaveSidelinkPhy> (ssp, m_phyMacConfig);
 
   // connect the rx callback of the spectrum object to the sink
   ssp->SetPhyRxDataEndOkCallback (MakeCallback (&MmWaveSidelinkPhy::Receive, phy));
@@ -230,7 +246,7 @@ MmWaveVehicularHelper::InstallSingleMmWaveVehicularNetDevice (Ptr<Node> node, ui
   // connect the callback to report the SINR
   ssp->SetSidelinkSinrReportCallback (MakeCallback (&MmWaveSidelinkPhy::GenerateSinrReport, phy));
 
-  if(m_phyTraceHelper != 0)
+  if(m_phyTraceHelper)
   {
     ssp->SetSidelinkSinrReportCallback (MakeCallback (&MmWaveVehicularTracesHelper::McsSinrCallback, m_phyTraceHelper));
   }
@@ -245,6 +261,7 @@ MmWaveVehicularHelper::InstallSingleMmWaveVehicularNetDevice (Ptr<Node> node, ui
 
   // create and configure the device
   Ptr<MmWaveVehicularNetDevice> device = CreateObject<MmWaveVehicularNetDevice> (phy, mac);
+  device->SetAntennaArray (aam);
   node->AddDevice (device);
   device->SetNode (node);
   ssp->SetDevice (device);
@@ -253,10 +270,14 @@ MmWaveVehicularHelper::InstallSingleMmWaveVehicularNetDevice (Ptr<Node> node, ui
   mac->SetForwardUpCallback(MakeCallback(&MmWaveVehicularNetDevice::Receive, device));
 
   // initialize the channel (if needed)
-  Ptr<MmWaveVehicularSpectrumPropagationLossModel> splm = DynamicCast<MmWaveVehicularSpectrumPropagationLossModel> (m_channel->GetSpectrumPropagationLossModel ());
-  if (splm)
-    splm->AddDevice (device, aam);
-
+  Ptr<ThreeGppSpectrumPropagationLossModel> splm = DynamicCast<ThreeGppSpectrumPropagationLossModel> (m_channel->GetPhasedArraySpectrumPropagationLossModel ());
+  auto channelModel = splm->GetChannelModel();  
+  Ptr<mmwave::MmWaveBeamformingModel> bfModel = m_bfModelFactory.Create<mmwave::MmWaveBeamformingModel> ();
+  bfModel->SetAttributeFailSafe ("Device", PointerValue (device));
+  bfModel->SetAttributeFailSafe ("Antenna", PointerValue (aam));
+  bfModel->SetAttributeFailSafe ("ChannelModel", PointerValue (channelModel));
+  ssp->SetBeamformingModel (bfModel);
+  
   return device;
 }
 
@@ -278,7 +299,7 @@ MmWaveVehicularHelper::PairDevices (NetDeviceContainer devices)
       Ptr<MmWaveVehicularNetDevice> di = DynamicCast<MmWaveVehicularNetDevice> (*i);
       Ptr<Node> iNode = di->GetNode ();
       Ptr<Ipv4> iNodeIpv4 = iNode->GetObject<Ipv4> ();
-      NS_ASSERT_MSG (iNodeIpv4 != 0, "Nodes need to have IPv4 installed before pairing can be activated");
+      NS_ASSERT_MSG (iNodeIpv4, "Nodes need to have IPv4 installed before pairing can be activated");
 
       di->GetMac ()->SetSfAllocationInfo (pattern); // this is called ONCE for each NetDevice
 
@@ -287,7 +308,7 @@ MmWaveVehicularHelper::PairDevices (NetDeviceContainer devices)
         Ptr<MmWaveVehicularNetDevice> dj = DynamicCast<MmWaveVehicularNetDevice> (*j);
         Ptr<Node> jNode = dj->GetNode ();
         Ptr<Ipv4> jNodeIpv4 = jNode->GetObject<Ipv4> ();
-        NS_ASSERT_MSG (jNodeIpv4 != 0, "Nodes need to have IPv4 installed before pairing can be activated");
+        NS_ASSERT_MSG (jNodeIpv4, "Nodes need to have IPv4 installed before pairing can be activated");
 
         // initialize the <IP address, RNTI> map of the devices
         int32_t interface =  jNodeIpv4->GetInterfaceForDevice (dj);
@@ -381,24 +402,10 @@ MmWaveVehicularHelper::CreateSchedulingPattern (NetDeviceContainer devices)
 }
 
 void
-MmWaveVehicularHelper::SetPropagationLossModelType (std::string plm)
+MmWaveVehicularHelper::SetBeamformingModelType (std::string type)
 {
-  NS_LOG_FUNCTION (this);
-  m_propagationLossModelType = plm;
-}
-
-void
-MmWaveVehicularHelper::SetSpectrumPropagationLossModelType (std::string splm)
-{
-  NS_LOG_FUNCTION (this);
-  m_spectrumPropagationLossModelType = splm;
-}
-
-void
-MmWaveVehicularHelper::SetPropagationDelayModelType (std::string pdm)
-{
-  NS_LOG_FUNCTION (this);
-  m_propagationDelayModelType = pdm;
+  NS_LOG_FUNCTION (this << type);
+  m_bfModelFactory = ObjectFactory (type);
 }
 
 void

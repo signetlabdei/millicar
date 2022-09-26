@@ -26,8 +26,10 @@
 #include "ns3/spectrum-helper.h"
 #include "ns3/mmwave-spectrum-value-helper.h"
 #include "ns3/applications-module.h"
+#include "ns3/buildings-module.h"
 #include "ns3/internet-module.h"
-#include "ns3/core-module.h"
+#include "ns3/config.h"
+#include "ns3/command-line.h"
 
 NS_LOG_COMPONENT_DEFINE ("VehicularSimpleFour");
 
@@ -56,21 +58,25 @@ int main (int argc, char *argv[])
 
   Time endTime = Seconds (10.0);
   double bandwidth = 1e8;
+  std::string scenario = "V2V-Urban";
 
   double speed = 20; // m/s
   CommandLine cmd;
   cmd.AddValue ("vehicleSpeed", "The speed of the vehicle", speed);
+  cmd.AddValue ("scenario", "set the vehicular scenario", scenario);
   cmd.Parse (argc, argv);
 
   Config::SetDefault ("ns3::MmWaveSidelinkMac::UseAmc", BooleanValue (true));
-  //Config::SetDefault ("ns3::MmWaveSidelinkMac::Mcs", UintegerValue (28));
+  Config::SetDefault ("ns3::MmWaveSidelinkMac::Mcs", UintegerValue (28));
   Config::SetDefault ("ns3::MmWavePhyMacCommon::CenterFreq", DoubleValue (60.0e9));
   Config::SetDefault ("ns3::MmWaveVehicularNetDevice::RlcType", StringValue("LteRlcUm"));
   Config::SetDefault ("ns3::LteRlcUm::MaxTxBufferSize", UintegerValue (50*1024));
-  Config::SetDefault ("ns3::MmWaveVehicularPropagationLossModel::ChannelCondition", StringValue ("l"));
-  Config::SetDefault ("ns3::MmWaveVehicularHelper::Bandwidth", DoubleValue (bandwidth));
+  
   Config::SetDefault ("ns3::MmWaveVehicularHelper::SchedulingPatternOption", EnumValue(2)); // use 2 for SchedulingPatternOption=OPTIMIZED, 1 or SchedulingPatternOption=DEFAULT
+  Config::SetDefault ("ns3::MmWaveVehicularHelper::Bandwidth", DoubleValue (bandwidth));
 
+  Config::SetDefault ("ns3::ThreeGppChannelModel::UpdatePeriod", TimeValue (MilliSeconds (10)));
+  
   // create the nodes
   NodeContainer group;
   group.Create (3);
@@ -91,10 +97,13 @@ int main (int argc, char *argv[])
 
   // create and configure the helper
   Ptr<MmWaveVehicularHelper> helper = CreateObject<MmWaveVehicularHelper> ();
-  helper->SetPropagationLossModelType ("ns3::MmWaveVehicularPropagationLossModel");
-  helper->SetSpectrumPropagationLossModelType ("ns3::MmWaveVehicularSpectrumPropagationLossModel");
   helper->SetNumerology (3);
+  helper->SetChannelModelType (scenario);
   NetDeviceContainer devs = helper->InstallMmWaveVehicularNetDevices (group);
+  
+  // Mandatory to install buildings helper even if there are no buildings, 
+  // otherwise V2V-Urban scenario does not work
+  BuildingsHelper::Install (group);
 
   InternetStackHelper internet;
   internet.Install (group);

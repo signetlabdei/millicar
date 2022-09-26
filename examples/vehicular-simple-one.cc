@@ -28,12 +28,16 @@
 #include "ns3/mmwave-spectrum-value-helper.h"
 #include "ns3/applications-module.h"
 #include "ns3/internet-module.h"
-#include "ns3/core-module.h"
+#include "ns3/buildings-module.h"
+#include "ns3/command-line.h"
+#include "ns3/node-list.h"
 
 NS_LOG_COMPONENT_DEFINE ("VehicularSimpleOne");
 
 using namespace ns3;
 using namespace millicar;
+
+void PrintGnuplottableNodeListToFile (std::string filename);
 
 uint32_t g_rxPackets; // total number of received packets
 uint32_t g_txPackets; // total number of transmitted packets
@@ -81,27 +85,28 @@ int main (int argc, char *argv[])
   // mobility
   double speed = 20; // speed of the vehicles m/s
   double intraGroupDistance = 10; // distance between two vehicles belonging to the same group
+  
+  std::string scenario = "V2V-Urban";
 
   CommandLine cmd;
-  //
   cmd.AddValue ("bandwidth", "used bandwidth", bandwidth);
   cmd.AddValue ("iip", "inter packet interval, in microseconds", interPacketInterval);
   cmd.AddValue ("intraGroupDistance", "distance between two vehicles belonging to the same group, y-coord", intraGroupDistance);
   cmd.AddValue ("numerology", "set the numerology to use at the physical layer", numerology);
   cmd.AddValue ("frequency", "set the carrier frequency", frequency);
+  cmd.AddValue ("scenario", "set the vehicular scenario", scenario);
   cmd.Parse (argc, argv);
 
   Config::SetDefault ("ns3::MmWaveSidelinkMac::UseAmc", BooleanValue (true));
+  Config::SetDefault ("ns3::MmWaveSidelinkMac::Mcs", UintegerValue (28));
   Config::SetDefault ("ns3::MmWavePhyMacCommon::CenterFreq", DoubleValue (frequency));
+  
   Config::SetDefault ("ns3::MmWaveVehicularHelper::Bandwidth", DoubleValue (bandwidth));
   Config::SetDefault ("ns3::MmWaveVehicularHelper::Numerology", UintegerValue (numerology));
-  Config::SetDefault ("ns3::MmWaveVehicularPropagationLossModel::ChannelCondition", StringValue ("a"));
-  Config::SetDefault ("ns3::MmWaveVehicularPropagationLossModel::Shadowing", BooleanValue (true));
-  Config::SetDefault ("ns3::MmWaveVehicularSpectrumPropagationLossModel::UpdatePeriod", TimeValue (MilliSeconds (1)));
-  Config::SetDefault ("ns3::MmWaveVehicularAntennaArrayModel::AntennaElements", UintegerValue (16));
-  Config::SetDefault ("ns3::MmWaveVehicularAntennaArrayModel::AntennaElementPattern", StringValue ("3GPP-V2V"));
-  Config::SetDefault ("ns3::MmWaveVehicularAntennaArrayModel::IsotropicAntennaElements", BooleanValue (true));
-  Config::SetDefault ("ns3::MmWaveVehicularAntennaArrayModel::NumSectors", UintegerValue (2));
+  Config::SetDefault ("ns3::MmWaveVehicularHelper::ChannelModelType", StringValue (scenario));
+  
+  Config::SetDefault ("ns3::ThreeGppChannelModel::UpdatePeriod", TimeValue (MilliSeconds (10)));
+  Config::SetDefault ("ns3::ThreeGppChannelConditionModel::UpdatePeriod", TimeValue (MilliSeconds (10)));
 
   Config::SetDefault ("ns3::MmWaveVehicularNetDevice::RlcType", StringValue("LteRlcUm"));
   Config::SetDefault ("ns3::MmWaveVehicularHelper::SchedulingPatternOption", EnumValue(2)); // use 2 for SchedulingPatternOption=OPTIMIZED, 1 or SchedulingPatternOption=DEFAULT
@@ -124,12 +129,9 @@ int main (int argc, char *argv[])
   // create and configure the helper
   Ptr<MmWaveVehicularHelper> helper = CreateObject<MmWaveVehicularHelper> ();
   helper->SetNumerology (3);
-  helper->SetPropagationLossModelType ("ns3::MmWaveVehicularPropagationLossModel");
-  helper->SetSpectrumPropagationLossModelType ("ns3::MmWaveVehicularSpectrumPropagationLossModel");
   NetDeviceContainer devs = helper->InstallMmWaveVehicularNetDevices (n);
 
   // Install the TCP/IP stack in the two nodes
-
   InternetStackHelper internet;
   internet.Install (n);
 
@@ -137,6 +139,10 @@ int main (int argc, char *argv[])
   NS_LOG_INFO ("Assign IP Addresses.");
   ipv4.SetBase ("10.1.1.0", "255.255.255.0");
   Ipv4InterfaceContainer i = ipv4.Assign (devs);
+  
+  // Mandatory to install buildings helper even if there are no buildings, 
+  // otherwise V2V-Urban scenario does not work
+  BuildingsHelper::Install (n);
 
   // Need to pair the devices in order to create a correspondence between transmitter and receiver
   // and to populate the < IP addr, RNTI > map.
@@ -174,7 +180,9 @@ int main (int argc, char *argv[])
   // set the application start/end time
   apps.Start (MilliSeconds (startTime));
   apps.Stop (MilliSeconds (endTime));
-
+  
+  PrintGnuplottableNodeListToFile ("scenario.txt");
+  
   Simulator::Stop (MilliSeconds (endTime + 1000));
   Simulator::Run ();
   Simulator::Destroy ();
@@ -185,4 +193,46 @@ int main (int argc, char *argv[])
   std::cout << "Average Throughput:\t" << (double(g_rxPackets)*(double(packetSize)*8)/double( g_lastReceived.GetSeconds() - g_firstReceived.GetSeconds()))/1e6 << " Mbps" << std::endl;
 
   return 0;
+}
+
+void
+PrintGnuplottableNodeListToFile (std::string filename)
+{
+  std::ofstream outFile;
+  outFile.open (filename.c_str (), std::ios_base::out | std::ios_base::trunc);
+  if (!outFile.is_open ())
+    {
+      NS_LOG_ERROR ("Can't open file " << filename);
+      return;
+    }
+  outFile << "set xrange [-200:200]; set yrange [-200:200]" << std::endl;
+  for (NodeList::Iterator it = NodeList::Begin (); it != NodeList::End (); ++it)
+    {
+      Ptr<Node> node = *it;
+      int nDevs = node->GetNDevices ();
+      for (int j = 0; j < nDevs; j++)
+        {
+          Ptr<MmWaveVehicularNetDevice> vdev = node->GetDevice (j)->GetObject <MmWaveVehicularNetDevice> ();
+          if (vdev)
+            {
+              Vector pos = node->GetObject<MobilityModel> ()->GetPosition ();
+              outFile << "set label \"" << vdev->GetMac ()->GetRnti ()
+                      << "\" at "<< pos.x << "," << pos.y << " left font \"Helvetica,8\" textcolor rgb \"black\" front point pt 7 ps 0.3 lc rgb \"black\" offset 0,0"
+                      << std::endl;
+
+              // Simulator::Schedule (Seconds (1), &PrintHelper::UpdateGnuplottableNodeListToFile, filename, node);
+            }
+        }
+    }
+    
+  uint32_t index = 0;
+  for (BuildingList::Iterator it = BuildingList::Begin (); it != BuildingList::End (); ++it)
+    {
+      ++index;
+      Box box = (*it)->GetBoundaries ();
+      outFile << "set object " << index
+              << " rect from " << box.xMin  << "," << box.yMin
+              << " to "   << box.xMax  << "," << box.yMax
+              << std::endl;
+    }
 }

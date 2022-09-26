@@ -138,7 +138,7 @@ MmWaveSidelinkSpectrumPhy::ResetSpectrumModel ()
 void
 MmWaveSidelinkSpectrumPhy::SetDevice (Ptr<NetDevice> d)
 {
-  NS_ABORT_MSG_IF(DynamicCast<MmWaveVehicularNetDevice>(d) == 0,
+  NS_ABORT_MSG_IF(!DynamicCast<MmWaveVehicularNetDevice>(d),
     "The MmWaveSidelinkSpectrumPhy only works with MmWaveVehicularNetDevices");
   m_device = d;
 }
@@ -173,14 +173,14 @@ MmWaveSidelinkSpectrumPhy::GetRxSpectrumModel () const
   return m_rxSpectrumModel;
 }
 
-Ptr<AntennaModel>
-MmWaveSidelinkSpectrumPhy::GetRxAntenna () const
+Ptr<Object>
+MmWaveSidelinkSpectrumPhy::GetAntenna () const
 {
   return m_antenna;
 }
 
 void
-MmWaveSidelinkSpectrumPhy::SetAntenna (Ptr<AntennaModel> a)
+MmWaveSidelinkSpectrumPhy::SetAntenna (Ptr<PhasedArrayModel> a)
 {
   m_antenna = a;
 }
@@ -235,7 +235,7 @@ MmWaveSidelinkSpectrumPhy::StartRx (Ptr<SpectrumSignalParameters> params)
   Ptr<MmWaveSidelinkSpectrumSignalParameters> mmwaveSidelinkParams =
     DynamicCast<MmWaveSidelinkSpectrumSignalParameters> (params);
 
-  if (mmwaveSidelinkParams != 0)
+  if (mmwaveSidelinkParams)
     {
       // TODO remove dead code after testing that the following code can be
       // handled by the MmWaveSidelinkSpectrumPhy state machine
@@ -497,7 +497,7 @@ MmWaveSidelinkSpectrumPhy::StartTxDataFrames (Ptr<PacketBurst> pb,
         txParams->psd = m_txPsd;
         txParams->packetBurst = pb;
         //txParams->ctrlMsgList = ctrlMsgList;
-        txParams->txAntenna = m_antenna;
+        txParams->txAntenna = nullptr;
         txParams->mcs = mcs;
         txParams->numSym = numSym;
         txParams->destinationRnti = destinationRnti;
@@ -601,13 +601,22 @@ MmWaveSidelinkSpectrumPhy::ConfigureBeamforming (Ptr<NetDevice> dev)
 {
   NS_LOG_FUNCTION (this);
 
-  Ptr<MmWaveVehicularAntennaArrayModel> antennaArray = DynamicCast<MmWaveVehicularAntennaArrayModel> (m_antenna);
-  if (antennaArray)
-  {
-    //TODO consider to update this in order to not recompute the beamforming
-    // vectors each time
-    antennaArray->SetBeamformingVectorPanelDevices (m_device, dev);
-  }
+  Ptr<UniformPlanarArray> antenna;
+  
+  // test if device is a MmWaveVehicularNetDevice
+  Ptr<MmWaveVehicularNetDevice> vehicularDevice = DynamicCast<MmWaveVehicularNetDevice> (dev);
+  if (vehicularDevice)
+    {
+      antenna = vehicularDevice->GetAntennaArray ();
+    }
+  m_beamforming->SetBeamformingVectorForDevice (dev, antenna);
+}
+
+void
+MmWaveSidelinkSpectrumPhy::SetBeamformingModel (Ptr<ns3::mmwave::MmWaveBeamformingModel> beamformingModel)
+{
+  NS_LOG_FUNCTION (this);
+  m_beamforming = beamformingModel;
 }
 
 void

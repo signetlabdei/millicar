@@ -27,8 +27,9 @@
 #include "ns3/mmwave-spectrum-value-helper.h"
 #include "ns3/test.h"
 #include "ns3/applications-module.h"
+#include "ns3/buildings-module.h"
 #include "ns3/internet-module.h"
-#include "ns3/core-module.h"
+#include "ns3/config.h"
 
 NS_LOG_COMPONENT_DEFINE ("MmWaveVehicularInterferenceTestSuite");
 
@@ -166,6 +167,7 @@ MmWaveVehicularInterferenceTestCase::StartTest (double txPower)
   // create and configure the helper
   Ptr<MmWaveVehicularHelper> helper = CreateObject<MmWaveVehicularHelper> ();
   helper->SetNumerology (3);
+  helper->SetChannelModelType ("Ideal");
   NetDeviceContainer devs1 = helper->InstallMmWaveVehicularNetDevices (group1);
   NetDeviceContainer devs2 = helper->InstallMmWaveVehicularNetDevices (group2);
 
@@ -238,7 +240,12 @@ MmWaveVehicularInterferenceTestCase::StartTest (double txPower)
   apps2 = client2.Install (group2.Get (0));
   apps2.Start (startTime);
   apps2.Stop (endTime);
-
+  
+  // Mandatory to install buildings helper even if there are no buildings, 
+  // otherwise V2V-Urban scenario does not work 
+  BuildingsHelper::Install (group1);
+  BuildingsHelper::Install (group2);
+  
   // ---------------------------------
 
   double kT_dBm_Hz = -174.0;  // dBm/Hz

@@ -31,9 +31,6 @@ jobs:
     
     - name: check that millicar is correctly installed
       run: ls src/ | grep millicar
-
-    - name: enable only millicar
-      run: printf "#! /usr/bin/env python \n modules_enabled = ['millicar']" > .ns3rc
       
     - name: build and run the tests
-      run: ./waf configure --enable-examples --enable-tests && ./waf build && ./test.py
+      run: ./ns3 configure --enable-examples --enable-tests --enable-modules=millicar && ./ns3 build && ./test.py

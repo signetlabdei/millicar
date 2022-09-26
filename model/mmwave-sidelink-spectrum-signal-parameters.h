@@ -37,7 +37,7 @@ struct MmWaveSidelinkSpectrumSignalParameters : public SpectrumSignalParameters
 {
 
   // inherited from SpectrumSignalParameters
-  virtual Ptr<SpectrumSignalParameters> Copy ();
+  virtual Ptr<SpectrumSignalParameters> Copy () const;
 
   /**
   * default constructor

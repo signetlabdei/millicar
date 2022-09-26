@@ -23,8 +23,10 @@
 #include "ns3/mobility-module.h"
 #include "ns3/mmwave-spectrum-value-helper.h"
 #include "ns3/applications-module.h"
+#include "ns3/buildings-module.h"
 #include "ns3/internet-module.h"
-#include "ns3/core-module.h"
+#include "ns3/config.h"
+#include "ns3/command-line.h"
 
 NS_LOG_COMPONENT_DEFINE ("VehicularSimpleThree");
 
@@ -109,6 +111,7 @@ int main (int argc, char *argv[])
   uint32_t numAntennaElements = 4; // number of antenna elements
 
   bool orthogonalResources = true; // if true, resouces are orthogonal among the two groups, if false resources are shared
+  std::string scenario = "V2V-Highway";
 
   CommandLine cmd;
   cmd.AddValue ("startTime", "application stop time in milliseconds", startTime);
@@ -122,20 +125,22 @@ int main (int argc, char *argv[])
   cmd.AddValue ("numAntennaElements", "number of antenna elements", numAntennaElements);
   cmd.AddValue ("orthogonalResources", "if true, resouces are orthogonal among the two groups, if false resources are shared", orthogonalResources);
   cmd.AddValue ("sameLane", "if true the two groups lie on the same lane, if false they lie on adjacent lanes", sameLane);
+  cmd.AddValue ("scenario", "set the vehicular scenario", scenario);
   cmd.Parse (argc, argv);
 
   Config::SetDefault ("ns3::MmWaveSidelinkMac::UseAmc", BooleanValue (false));
   Config::SetDefault ("ns3::MmWaveSidelinkMac::Mcs", UintegerValue (mcs));
   Config::SetDefault ("ns3::MmWavePhyMacCommon::CenterFreq", DoubleValue (28.0e9));
-  Config::SetDefault ("ns3::MmWaveVehicularPropagationLossModel::ChannelCondition", StringValue ("l"));
   Config::SetDefault ("ns3::MmWaveVehicularNetDevice::RlcType", StringValue("LteRlcUm"));
+  
   Config::SetDefault ("ns3::MmWaveVehicularHelper::SchedulingPatternOption", EnumValue(2)); // use 2 for SchedulingPatternOption=OPTIMIZED, 1 or SchedulingPatternOption=DEFAULT
+
+  Config::SetDefault ("ns3::ThreeGppChannelModel::UpdatePeriod", TimeValue (MilliSeconds (10)));
+  
   Config::SetDefault ("ns3::LteRlcUm::MaxTxBufferSize", UintegerValue (500*1024));
 
-  Config::SetDefault ("ns3::MmWaveVehicularAntennaArrayModel::AntennaElements", UintegerValue (numAntennaElements));
-  Config::SetDefault ("ns3::MmWaveVehicularAntennaArrayModel::AntennaElementPattern", StringValue ("3GPP-V2V"));
-  Config::SetDefault ("ns3::MmWaveVehicularAntennaArrayModel::IsotropicAntennaElements", BooleanValue (true));
-  Config::SetDefault ("ns3::MmWaveVehicularAntennaArrayModel::NumSectors", UintegerValue (2));
+  Config::SetDefault ("ns3::UniformPlanarArray::NumColumns", UintegerValue (std::sqrt (numAntennaElements)));
+  Config::SetDefault ("ns3::UniformPlanarArray::NumRows", UintegerValue (std::sqrt (numAntennaElements)));
 
   // create the nodes
   NodeContainer group1, group2;
@@ -172,8 +177,7 @@ int main (int argc, char *argv[])
   // create and configure the helper
   Ptr<MmWaveVehicularHelper> helper = CreateObject<MmWaveVehicularHelper> ();
   helper->SetNumerology (3);
-  helper->SetPropagationLossModelType ("ns3::MmWaveVehicularPropagationLossModel");
-  helper->SetSpectrumPropagationLossModelType ("ns3::MmWaveVehicularSpectrumPropagationLossModel");
+  helper->SetChannelModelType (scenario);
   NetDeviceContainer devs1 = helper->InstallMmWaveVehicularNetDevices (group1);
   NetDeviceContainer devs2 = helper->InstallMmWaveVehicularNetDevices (group2);
 
@@ -214,6 +218,11 @@ int main (int argc, char *argv[])
   staticRouting = ipv4RoutingHelper.GetStaticRouting (group2.Get (0)->GetObject<Ipv4> ());
   staticRouting->SetDefaultRoute (group2.Get (1)->GetObject<Ipv4> ()->GetAddress (1, 0).GetLocal () , 2 );
 
+  // Mandatory to install buildings helper even if there are no buildings, 
+  // otherwise V2V-Urban scenario does not work
+  BuildingsHelper::Install (group1);
+  BuildingsHelper::Install (group2);
+
   // create the random variables used to setup the applications
   Ptr<ConstantRandomVariable> onPeriodRv = CreateObjectWithAttributes<ConstantRandomVariable> ("Constant", DoubleValue (onPeriod / 1000.0));
   Ptr<ExponentialRandomVariable> offPeriodRv = CreateObjectWithAttributes<ExponentialRandomVariable> ("Mean", DoubleValue (offPeriod / 1000.0));
@@ -225,7 +234,7 @@ int main (int argc, char *argv[])
   onoff.SetAttribute ("OnTime", PointerValue (onPeriodRv));
   onoff.SetAttribute ("OffTime", PointerValue (offPeriodRv));
   ApplicationContainer onOffApps = onoff.Install (group1.Get (0));
-
+  
   PacketSinkHelper sink ("ns3::UdpSocketFactory", Address (InetSocketAddress (Ipv4Address::GetAny (), port)));
   ApplicationContainer packetSinkApps = sink.Install (group1.Get (1));
 
