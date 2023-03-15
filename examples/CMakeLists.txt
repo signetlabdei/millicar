@@ -3,7 +3,6 @@ set(base_examples
     vehicular-simple-two
     vehicular-simple-three
     vehicular-simple-four
-    mmwave-vehicular-link-adaptation-example
 )
 
 foreach(
